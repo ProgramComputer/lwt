@@ -20,10 +20,15 @@ plugins
 # Backup files (Doxygen)
 *.bak
 
-/vendor/
-.phpunit.result.cache
-
+# Composer packages
 composer.phar
+/vendor/
+
+# PHPDoc documentation
+.phpdoc
+
+# PHP Units test result
+.phpunit.result.cache
 
 # Editor
 .vscode
