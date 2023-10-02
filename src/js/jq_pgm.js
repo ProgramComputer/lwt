@@ -860,11 +860,11 @@ function word_hover_over () {
     $('.' + v).addClass('hword');
     if (JQ_TOOLTIP) {
       $(this).trigger('mouseover');
-      if (HTS) { 
-        const lg = getLangFromDict(WBLINK3);
-        readTextAloud($(this).text(), lg);
-        }
     }
+    if (HTS) { 
+      const lg = getLangFromDict(WBLINK3);
+      readTextAloud($(this).text(), lg);
+      }
   }
 }
 
