@@ -15,7 +15,7 @@ services:
     links:
       - db
     volumes:
-      - ./media:/var/www/media
+      - ./media:/var/www/html/media
     ports:
       - "8010:80"
     restart: unless-stopped
