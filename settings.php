@@ -107,6 +107,14 @@ if (isset($_REQUEST['op'])) {
                 1 : 0
             )
         );
+        saveSetting(
+            'set-hts',
+            (
+                array_key_exists('set-hts', $_REQUEST) && 
+                (int)$_REQUEST['set-hts'] ? 
+                1 : 0
+            )
+        );
     
         saveSetting(
             'set-archivedtexts-per-page',
@@ -564,11 +572,23 @@ echo error_message_with_hide($message, 1);
     </tr>
     <!-- ******************************************************* -->
     <tr>
-        <th class="th1 center">Text to Speech</th>
+        <th class="th1 center" rowspan="2">Text to Speech</th>
         <td class="td1 center">Save Audio Files to Disk</td>
         <td class="td1 center">
             <input type="checkbox" name="set-tts" value="1" 
             <?php echo ((int)getSettingWithDefault('set-tts') ? "checked" : ""); ?>  />
+        </td>
+        <td class="td1 center">
+            <img src="icn/status-busy.png" title="Field must not be empty" 
+            alt="Field must not be empty" />
+        </td>
+    </tr>
+    <!-- ******************************************************* -->
+    <tr>
+        <td class="td1 center">Always speak when hovering</td>
+        <td class="td1 center">
+            <input type="checkbox" name="set-hts" value="1" 
+            <?php echo ((int)getSettingWithDefault('set-hts') ? "checked" : ""); ?>  />
         </td>
         <td class="td1 center">
             <img src="icn/status-busy.png" title="Field must not be empty" 
