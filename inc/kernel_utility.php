@@ -162,6 +162,9 @@ function get_setting_data()
         'set-tts' => array(
             "dft" => '1', "num" => 0
         ),
+        'set-hts' => array(
+            "dft" => '0', "num" => 0
+        ),
         'set-term-sentence-count' => array(
             "dft" => '1', "num" => 0
         ),

@@ -31,6 +31,7 @@ RTL = 0;
 ANN_ARRAY = {};
 DELIMITER = '';
 JQ_TOOLTIP = 0;
+HTS = 0;
 
 /**************************************************************
 LWT jQuery functions
@@ -859,6 +860,10 @@ function word_hover_over () {
     $('.' + v).addClass('hword');
     if (JQ_TOOLTIP) {
       $(this).trigger('mouseover');
+      if (HTS) { 
+        const lg = getLangFromDict(WBLINK3);
+        readTextAloud($(this).text(), lg);
+        }
     }
   }
 }

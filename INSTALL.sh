@@ -27,7 +27,7 @@ echo
 
 # Database access settings
 echo "LWT needs to know how to access the database. You can change this options later in 'connect.inc.php'."
-host=localhost
+host=127.0.0.1
 read -p "Database User Name [lwt]: " -r user
 user=${user:-lwt}
 read -p "Database Password [abcxyz]: " -r passwd
@@ -41,6 +41,7 @@ echo "Creating the MySQL user and database..."
 sudo mysql -e "CREATE USER $user@$host IDENTIFIED BY '$passwd'"
 sudo mysql -e "CREATE DATABASE $db_name"
 sudo mysql -e "GRANT ALL PRIVILEGES ON $db_name.* TO $user@$host"
+sudo mysql -e "GRANT SYSTEM_VARIABLES_ADMIN on *.* to $user@$host"
 echo
 
 # Database connection parameters
