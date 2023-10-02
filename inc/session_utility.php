@@ -5051,8 +5051,10 @@ function makeAudioPlayer($audio, $offset=0)
 <!-- Audio controls once that page was loaded -->
 <script type="text/javascript">
     //<![CDATA[
-
-    const MEDIA = <?php echo prepare_textdata_js(encodeURI($audio)); ?>;
+    var MEDIA =  <?php echo prepare_textdata_js(encodeURI($audio)); ?>;
+    if (!(/(http(s?)):\/\//i.test(MEDIA))) {
+        MEDIA = new URL(MEDIA, window.location.origin).href
+    }
     const MEDIA_OFFSET = <?php echo $offset; ?>;
 
     /**
