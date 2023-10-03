@@ -787,7 +787,6 @@ function parse_japanese_text($text, $id): ?array
     );
     $handle = fopen($file_name, 'r');
     $mecabed = fread($handle, filesize($file_name));
-    echo $mecabed;
    
     fclose($handle);
     $values = array();
