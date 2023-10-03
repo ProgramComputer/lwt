@@ -4992,7 +4992,6 @@ function makeAudioPlayer($audio, $offset=0)
     ?>
 <link type="text/css" href="<?php print_file_path('css/jplayer.css');?>" rel="stylesheet" />
 <script type="text/javascript" src="js/jquery.jplayer.js"></script>
-<script src="https://gist.githubusercontent.com/ryangoree/def0a520ed43c6c465d9a6518161bc7c/raw/c39070710dab5082515a012630eb5c9b5e1f5b38/url-api-polyfill.js"></script> <!-- Adds IE support for URL API -->
 <table style="margin-top: 5px; margin-left: auto; margin-right: auto;" cellspacing="0" cellpadding="0">
     <tr>
         <td class="center borderleft" style="padding-left:10px;">
