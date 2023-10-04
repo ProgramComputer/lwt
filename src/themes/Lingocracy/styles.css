@@ -8,6 +8,7 @@ body {
 	font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
 	margin: 20px;
 	padding: 0px;
+	max-width: 900px;
 	cursor: default;
 	max-width: 900px;
 	margin-left: auto;
