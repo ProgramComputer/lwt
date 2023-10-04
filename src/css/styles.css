@@ -384,6 +384,7 @@ img.lwtlogoright
 */
 #floatdiv {
   position: absolute;
+  background:rgb(221, 221, 221);
   top: 10px;
   right: 10px; 
   padding: 5px;
