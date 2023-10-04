@@ -19,6 +19,7 @@
 		@import url(../css/styles.css);
 		</style>
 		<script type="text/javascript" src="../js/jquery.js"></script>
+		<script type="text/javascript" src="../js/floating.js"></script>
  		<script type="text/javascript">
 			/**
 			 * Perform an AJAX query to get the current theme style sheet.
@@ -73,35 +74,47 @@
 	<body>
 		<div id="floatdiv">
 			<a href="#">↑ TOP ↑</a>
-			<div>&nbsp;</div>
-			<a href="#preface">Preface</a>
-			<a href="#current">Curr. Version </a>
-			<a href="#abstract">Abstract</a>
-			<a href="#install">Installation</a>
-			<a href="#postinstall">Post-<wbr>Installation</a>
-			<a href="#features">Features</a>
-			<a href="#newfeatures">New Features</a>
-			<a href="#screencasts">Screencasts</a>
-			<a href="#links">Links</a>
-			<a href="#restrictions">Restrictions</a>
-			<a href="#UNLICENSE">License</a>
-			<a href="#thirdpartylicenses">Third Party</a>
-			<a href="#learn">How to learn</a>
-			<a href="#howto">How to use</a>
-			<a href="#faq">Q & A</a>
-			<div>&nbsp;</div>
-			<a href="#ipad">Setup Tablets</a> 
-			<a href="#langsetup">Lang. Setup</a>
-			<a href="#termscores">Term Scores</a>
-			<a href="#keybind">Key Bindings</a>
-			<a href="#export">Export Template</a>
-			<div>&nbsp;</div>
-			<a href="#contribute">Contribute</a>
-			<a href="#wordpress">WordPress Integration</a>
-			<a href="#database">Database</a>
-			<a href="#CHANGELOG">Changelog</a>
-		</div>	
+			<br>
+			<br>
 
+						<a href="#preface">Preface</a>
+			<br>
+
+						<a href="#current">Curr. Version </a>
+			<br>
+						<a href="#links">Links</a><br>
+						<a href="#abstract">Abstract</a><br>
+						<a href="#features">Features</a><br>
+						<a href="#newfeatures">New Features</a><br>
+						<a href="#screencasts">Screencasts</a><br>
+						<a href="#restrictions">Restrictions</a><br>
+						<a href="#UNLICENSE">(Un-) License</a><br>
+						<a href="#thirdpartylicenses">Third Party</a><br><br>
+						<a href="#install">Installation</a><br>
+						<a href="#learn">How to learn</a><br>
+						<a href="#howto">How to use</a><br>
+						<a href="#faq">Q &amp; A</a><br><br>
+						<a href="#ipad">Setup Tablets</a> <br>
+						<a href="#langsetup">Lang. Setup</a><br>
+						<a href="#termscores">Term Scores</a><br>
+						<a href="#keybind">Key Bindings</a><br>
+						<a href="#export">Export Template</a><br>
+						<a href="#contribute">Contribute</a><br>
+						<a href="#wordpress">WordPress Integration</a><br>
+						<a href="#database">Database</a><br>
+						<a href="#CHANGELOG">Changelog</a>
+		</div>
+			<script type="text/javascript">	
+			//<![CDATA[
+			$(document).ready( function() {
+				$('#floatdiv').addFloating( {	
+					targetRight: 10,	
+					targetTop: 10,
+					snap: true	
+				} );	
+			});
+			//]]>
+			</script>
 		<div style="margin-right:100px;">
 
 			<h4>
@@ -151,6 +164,9 @@
 					</option>
 					<option value="UNLICENSE">
 						License
+					</option>
+					<option value="thirdpartylicenses">
+						Third Party
 					</option>
 					<option value="learn">
 						How to learn
@@ -206,10 +222,10 @@
 <li>Thank you for your attention. I hope you will enjoy this application as I do every day.</li>
 </ul>
 <h3>Contributions by HugoFara (GitHub  version maintainer)</h3>
-<p>I started using LWT in 2021, and continued its development almost instantly. I felt that the core idea was very good, but its implementation seemed unnadapted, and the code was quite obfuscated. While I do not have any official responsibility to LWT (we don't have any kind of official agreement with lang-learn-guy), I am the the <em>de facto</em> maintainer of the community version. I dedicated myself to the following points (see the <a href="https://github.com/HugoFara/lwt/discussions/6">GitHub post</a>):</p>
+<p>I started using LWT in 2021, and continued its development almost instantly. I felt that the core idea was very good, but its implementation seemed unadapted, and the code was quite obfuscated. While I do not have any official responsibility to LWT (we don't have any kind of official agreement with lang-learn-guy), I am the the <em>de facto</em> maintainer of the community version. I dedicated myself to the following points (see the <a href="https://github.com/HugoFara/lwt/discussions/6">GitHub post</a>):</p>
 <ul>
 <li>Make LWT Open Source: document and refactor code</li>
-<li>Meet the HTML5 standards: the interface was relying on deprecated systmes like frames, making it difficult to use on small screens.</li>
+<li>Meet the HTML5 standards: the interface was relying on deprecated systems like frames, making it difficult to use on small screens.</li>
 <li>Simplify users' lives: avoid complex installation or procedures whenever possible.</li>
 </ul>
 <p>If you spot any problem, please post any <a href="https://github.com/HugoFara/lwt/issues">issue on GitHub</a>, and we will look at it.</p>
