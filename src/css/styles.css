@@ -393,10 +393,10 @@ img.lwtlogoright
   border: 1px gray solid;
 }
 
-#floatdiv > * {
+/* #floatdiv > * {
   display: block;
   width: 75px;
-}
+} */
 
 .inline
 {
