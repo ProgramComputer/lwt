@@ -383,7 +383,7 @@ img.lwtlogoright
 * Floating menu in docs/info.html 
 */
 #floatdiv {
-  position: fixed;
+  position: absolute;
   top: 10px;
   right: 10px; 
   padding: 5px;
