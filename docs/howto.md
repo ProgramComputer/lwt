@@ -47,7 +47,7 @@ A different third web dictionary is of course possible, but sentence translation
 
 ##### Specify Encoding
 
-**This feature has been abandoned, do not use it**!
+**This feature has been abandonned, do not use it**!
 
 If the searchword in the three URIs needs to be converted into a different encoding (standard is UTF-8), you could use ###encoding### as a placeholder. Normally you see this right away if terms show up wrongly in the web dictionary. Example: Linguee expects the searchword in ISO-8859-15, not in UTF-8, so you define it this way: "http&#58;&#47;&#47;www.linguee.de/search?direction=auto&query=###ISO-8859-15###". A list of encodings can be found [here](http://php.net/manual/en/mbstring.supported-encodings.php).
 
@@ -121,20 +121,21 @@ You can also import a longer text into LWT with the possibility to split it up i
 ![Image](../img/33.jpg)  
 
 ## Newsfeed
+<a name="feed_imp"></a>
 
 ### Newsfeed Import
 
-Here you can download the articles of your newsfeeds (HowTo add a new newsfeed see [here](info.html#new_feed)). If you've set up multiple newsfeeds for your selected language, the link "update multiple feeds" will appear. By clicking that link you can update one or more feeds at once. If you've selected a newsfeed, a blue circle-arrow will appear as well as the date of your last update. A click on the circle-arrow will update your selected newsfeed. All downloaded articles will be marked by a bookmark-icon instead of the checkbox, so you can access them immediately. If a downloaded article is archived, a red mark will appear. An error may occur, when you try to download an article and the link or the text-section of the article is not found. Then a yellow warning sign appears, which can be removed temporarily by clicking on it or permanently in [Manage Feeds](info.html#man_feed). If you hover over an article title, a description of the article will be shown. You can open the article and, if available, the audio in a new window.  
+Here you can download the articles of your newsfeeds (How to add a new newsfeed see [here](info.html#new_feed)). If you've set up multiple newsfeeds for your selected language, the link "update multiple feeds" will appear. By clicking that link you can update one or more feeds at once. If you've selected a newsfeed, a blue circle-arrow will appear as well as the date of your last update. A click on the circle-arrow will update your selected newsfeed. All downloaded articles will be marked by a bookmark-icon instead of the checkbox, so you can access them immediately. If a downloaded article is archived, a red mark will appear. An error may occur, when you try to download an article and the link or the text-section of the article is not found. Then a yellow warning sign appears, which can be removed temporarily by clicking on it or permanently in [Manage Feeds](info.html#man_feed). If you hover over an article title, a description of the article will be shown. You can open the article and, if available, the audio in a new window.  
 
 ![Image](../img/37.jpg)  
-
+<a name="man_feed"></a>
 ### Manage Feeds
 
 Multi Actions for marked newsfeeds: You can update feeds, unset unloadable articles (see [my newsfeeds](info.html#feed_imp)), delete all articles or delete feeds.  
 Actions: You can edit, update, delete a feed or follow the link to the newsfeed.  
 
 ![Image](../img/38.jpg)  
-
+<a name="new_feed"></a>
 ### New/Edit Feeds
 
 Explanations of the input fields
@@ -154,7 +155,7 @@ Explanations of the input fields
   * Article Source: some feeds have its texts integrated in the description. The articles can be cached in the database, which results in a faster download and a bigger database. Feeds with cached articles should have less Max. Links. The feed wizard can be used to detect the Article Source. If this is unchecked, each article will be downloaded from the internet.
 
     ![Image](../img/41.jpg)  
-
+<a name="feed_wizard"></a>
 ### Feed Wizard  
 
 Here you can edit or set up a new newsfeed in 4 steps.  

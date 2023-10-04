@@ -345,7 +345,7 @@ function owin(url){window.open(url,'dictwin','width=800, height=400, scrollbars=
 function oewin(url){window.open(url,'editwin','width=800, height=600, scrollbars=yes, menubar=no, resizable=yes, status=no')}
 function createTheDictUrl(u,w){const url=u.trim();const trm=w.trim();const term_elem=url.match(/lwt_term|###/);const pos=(term_elem===null)?-1:url.indexOf(term_elem[0]);if(pos==-1){return url+encodeURIComponent(trm)}
 const pos2=url.indexOf('###',pos+1);if(pos2===-1){return url.replace(term_elem,trm==''?'+':encodeURIComponent(trm))}
-const enc=url.substring(pos+term_elem[0].length,pos2-pos-term_elem[0].length).trim();console.warn("Trying to use encoding '"+enc+"'. This feature is abandoned since "+"2.6.0-fork. Using default UTF-8.");let output=url.substring(0,pos)+encodeURIComponent(trm);if(pos2+3<url.length){output+=url.substring(pos2+3)}
+const enc=url.substring(pos+term_elem[0].length,pos2-pos-term_elem[0].length).trim();console.warn("Trying to use encoding '"+enc+"'. This feature is abandonned since "+"2.6.0-fork. Using default UTF-8.");let output=url.substring(0,pos)+encodeURIComponent(trm);if(pos2+3<url.length){output+=url.substring(pos2+3)}
 return output}
 function createTheDictLink(u,w,t,b){let url=u.trim();let popup=!1;const trm=w.trim();const txt=t.trim();const txtbefore=b.trim();let r='';if(url==''||txt==''){return r}
 if(url.startsWith('*')){url=url.substring(1);popup=!0}
