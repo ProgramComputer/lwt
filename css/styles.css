@@ -33,7 +33,6 @@ Stylesheet
 ***************************************************************/
 #floatdiv {
     position: absolute;
-    background:rgb(221, 221, 221);
     top: 10px;
     padding: 5px;
     z-index: 2;
@@ -46,7 +45,8 @@ body {
 	background-color: #FFFFFF;
 	color: #000000;
 	font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
-	margin: 20px;
+	max-width: 900px;
+    margin: 20px;
 	padding: 0px;
 }
 input[type=text] {
