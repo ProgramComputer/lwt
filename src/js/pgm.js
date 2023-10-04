@@ -900,7 +900,7 @@ function createTheDictUrl (u, w) {
     pos + term_elem[0].length, pos2 - pos - term_elem[0].length
   ).trim();
   console.warn(
-   "Trying to use encoding '" + enc + "'. This feature is abandonned since " + 
+   "Trying to use encoding '" + enc + "'. This feature is abandoned since " + 
    "2.6.0-fork. Using default UTF-8." 
   );
   let output = url.substring(0, pos) + encodeURIComponent(trm);

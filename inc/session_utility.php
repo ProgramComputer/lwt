@@ -2799,7 +2799,7 @@ function makeStatusClassFilterHelper($status, &$array): void
  * Case 1: url without any ### or lwt_term: append UTF-8-term
  * Case 2: url with one ### or lwt_term: substitute UTF-8-term
  * Case 3: url with two (###|lwt_term)enc###: unsupported encoding changed, 
- *         abandonned since 2.6.0-fork
+ *         abandoned since 2.6.0-fork
  * 
  * @param string $u Dictionary URL. It may contain 'lwt_term' that will get parsed
  * @param string $t Text that substite the 'lwt_term'

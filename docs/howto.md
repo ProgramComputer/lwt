@@ -47,7 +47,7 @@ A different third web dictionary is of course possible, but sentence translation
 
 ##### Specify Encoding
 
-**This feature has been abandonned, do not use it**!
+**This feature has been abandoned, do not use it**!
 
 If the searchword in the three URIs needs to be converted into a different encoding (standard is UTF-8), you could use ###encoding### as a placeholder. Normally you see this right away if terms show up wrongly in the web dictionary. Example: Linguee expects the searchword in ISO-8859-15, not in UTF-8, so you define it this way: "http&#58;&#47;&#47;www.linguee.de/search?direction=auto&query=###ISO-8859-15###". A list of encodings can be found [here](http://php.net/manual/en/mbstring.supported-encodings.php).
 
