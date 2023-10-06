@@ -1,4 +1,6 @@
 <?php
+require __DIR__ . '/vendor/autoload.php';
+use \Done\Subtitles\Subtitles;
 
 /**
  * \file
@@ -437,6 +439,11 @@ function edit_texts_archive($txid): string
  *
  * @since 2.4.1-fork $message1 is unnused
  */
+function debug_to_console($data) {
+    $output = $data;
+
+    echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+}
 function edit_texts_do_operation($op, $message1, $no_pagestart): string
 {
     global $tbpref;
@@ -523,6 +530,41 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
         ),
         $_REQUEST["TxLgID"], $id 
     );
+    $splitText = parse_standard_text(get_first_value(
+        'SELECT TxText AS value FROM ' . $tbpref . 'texts 
+        WHERE TxID = ' . $id
+    ), -2,  $_REQUEST["TxLgID"]); // TEST
+    debug_to_console(count($splitText));
+    try {
+    //TRY and see if file has timed text
+    $subtitles =  Subtitles::loadFromString(get_first_value(
+        'SELECT TxText AS value FROM ' . $tbpref . 'texts 
+        WHERE TxID = ' . $id
+    ));
+
+    $internalFormat = $subtitles->getInternalFormat();
+        foreach ($internalFormat as $format) {
+            foreach ($format['lines'] as $key => $line) {
+                debug_to_console($line);
+
+            }
+        }
+        debug_to_console(get_first_value(
+            "SELECT COUNT(*) AS value 
+            FROM {$tbpref}sentences 
+            WHERE SeTxID = $id"
+        ));
+    debug_to_console($internalFormat);
+    
+    } 
+    catch (\Done\Subtitles\Code\UserException $e) {
+
+
+    echo $e->getMessage(); // SCC file can't have more than 4 lines of text each 32 characters long. This text is too long: <text from user file that triggered this error>
+
+}
+
+    
 
     $message = $message1 . " / " . $message2 . 
     " / Sentences added: " . get_first_value(
