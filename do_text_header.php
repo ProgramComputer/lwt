@@ -176,16 +176,11 @@ function browser_tts($text, $languageName): void
 {
     global $langDefs;
 
-    /** 
-     * @var string $languageCode BCP 47 convention (i. e.: en-US) is suggested.
-     * Two-letter language code is enough (i. e. "en") 
-     */
-    $languageCode = $langDefs[$languageName][1];
     /**
     * @var string $phoneticText 
     * Phonetic reading for this text 
     */
-    $phoneticText = phonetic_reading($text, $languageCode);
+    $phoneticText = phonetic_reading($text, $languageName);
     ?>
 <script type="text/javascript">
 
