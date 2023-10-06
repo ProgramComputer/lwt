@@ -554,7 +554,7 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
             FROM {$tbpref}sentences 
             WHERE SeTxID = $id"
         ));
-    debug_to_console($internalFormat);
+    debug_to_console($id);
     
     } 
     catch (\Done\Subtitles\Code\UserException $e) {
