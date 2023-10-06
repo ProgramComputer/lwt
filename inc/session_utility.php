@@ -4706,18 +4706,22 @@ function trim_value(&$value): void
  * is supported, using MeCab.
  *
  * @param  string $text Text to be converted
- * @param  string $lang Language code (usually BCP 47 or ISO 639-1)
+ * @param  string $languageName Name of the language
  * @return string Parsed text in a phonetic format.
  * 
  * @since 2.9.0 Any language starting by "ja" or "jp" is considered phonetic.
  */
-function phonetic_reading($text, $lang) 
+function phonetic_reading($text, $languageName) 
 {
     global $tbpref;
+    $mecab = get_first_value('select LgRegexpWordCharacters as value from ' . $tbpref . 'languages where LgName = ' . '"'.$languageName.'"');
+
     // Many languages are already phonetic
-    if (!str_starts_with($lang, "ja") && !str_starts_with($lang, "jp")) {
+    if ( $mecab != "mecab") {
+
         return $text;
     }
+
 
     // Japanese is an exception
     $mecab_file = sys_get_temp_dir() . "/" . $tbpref . "mecab_to_db.txt";
