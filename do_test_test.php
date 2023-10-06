@@ -701,8 +701,7 @@ function do_test_test_javascript_clickable($wo_record, $solution)
         WHERE LgID = ' . $wo_record['WoLgID'] . '
         LIMIT 1'        
     );
-    $abbr = $langDefs[$lang][1];
-    $phoneticText = phonetic_reading($wo_record['WoText'], $abbr);
+    $phoneticText = phonetic_reading($wo_record['WoText'], $lang);
     ?>
 <script type="text/javascript">
     /** 
