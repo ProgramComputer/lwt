@@ -134,13 +134,13 @@ function rest_api_version($get_req): array
 /**
  * List the audio and video files in the media folder.
  * 
- * @param array $get_req Unnused
+ * @param array $get_req Used for id
  * 
  * @return string[] Path of media files
  */
 function media_files($get_req) 
 {
-    return get_media_paths();
+    return get_media_paths($get_req["id"]);
 }
 
 /**
@@ -160,7 +160,7 @@ function get_phonetic_reading($get_req): array
 
 
 /**
- * Retun the next word to test as JSON
+ * Return the next word to test as JSON
  *
  * @param string $testsql   SQL projection query
  * @param bool   $word_mode    Test is in word mode
@@ -185,9 +185,12 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
     }
     if ($word_mode) {
         $sent = "{" . $word_record['WoText'] . "}";
+        $startSec = 0;
+        $endSec = 0;
+        $txID = null;
     } else {
         // $nosent == FALSE, mode 1-3
-        list($sent, $_) = do_test_test_sentence(
+        list($sent, $_,$startSec,$endSec,$txID) = do_test_test_sentence(
             $word_record['WoID'], $lgid, $word_record['WoTextLC']
         );
         if ($sent === null) {
@@ -203,7 +206,10 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
         "word_id" => $word_record['WoID'],
         "solution" => $solution,
         "word_text" => $save,
-        "group" => $html_sentence
+        "group" => $html_sentence,        
+        "startSec" => $startSec,
+        "endSec" => $endSec,
+        "txID" => $txID
     );
 }
 

@@ -250,6 +250,9 @@ function do_test_header_content($title, $p, $totalcountdue, $totalcount, $langua
         <input type="button" value="Table" 
         onclick="startTestTable('<?php echo $p; ?>')" /> 
     </div>
+    <div>
+    <button id="playSentence" onClick=playAudio() style="display:none;" type="button" width="2.4rem" height="1.9rem"><svg   width="1.3rem" height="1.3rem"><path xmlns="http://www.w3.org/2000/svg" d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="#000000"/></svg></button>
+    </div>
     <div> 
         <input type="checkbox" id="utterance-allowed">Read words aloud</input>
     </div>

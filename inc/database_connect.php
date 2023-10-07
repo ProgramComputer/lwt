@@ -1871,6 +1871,8 @@ function check_update_db($debug, $tbpref, $dbname): void
                 SeTxID smallint(5) unsigned NOT NULL, 
                 SeOrder smallint(5) unsigned NOT NULL, 
                 SeText text, SeFirstPos smallint(5) unsigned NOT NULL, 
+                SeStartSec int(11) unsigned NOT NULL DEFAULT '0',  
+                SeEndSec int(11) unsigned NOT NULL DEFAULT '0',   
                 PRIMARY KEY (SeID), 
                 KEY SeLgID (SeLgID), 
                 KEY SeTxID (SeTxID), 
@@ -2157,7 +2159,7 @@ function check_update_db($debug, $tbpref, $dbname): void
     runsql(
         "ALTER TABLE `{$tbpref}sentences` ADD SeFirstPos smallint(5) NOT NULL", 
         '', 
-        $sqlerrdie = false
+       false
     );
     
     if ($count > 0) {        
