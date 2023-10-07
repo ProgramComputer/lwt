@@ -439,12 +439,13 @@ function edit_texts_archive($txid): string
  * @return string Edition message (number of rows edited)
  *
  * @global string $tbpref Database table prefix
+ * @global string $debug debug flag
  *
  * @since 2.4.1-fork $message1 is unnused
  */
 function edit_texts_do_operation($op, $message1, $no_pagestart): string
 {
-    global $tbpref;
+    global $tbpref,$debug;
     if (strlen(prepare_textdata($_REQUEST['TxText'])) > 65000) {
         $message = "Error: Text too long, must be below 65000 Bytes";
         $currentlang = (int) validateLang(
@@ -559,7 +560,9 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
     
     } 
     catch (\Done\Subtitles\Code\UserException $e) {
-
+if($debug){
+    echo $e;
+}
 }
    
 
