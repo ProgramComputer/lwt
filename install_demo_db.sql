@@ -76,7 +76,7 @@ INSERT INTO languages VALUES('7','Thai','http://dict.longdo.com/search/lwt_term'
 INSERT INTO languages VALUES('8','Hebrew','http://dictionary.reverso.net/hebrew-english/lwt_term&lwt_popup=1',NULL,'https://translate.google.com/?ie=UTF-8&sl=iw&tl=en&text=lwt_term&lwt_popup=1','$y\\t$t\\n','150','','.!?:;','','\\x{0590}-\\x{05FF}','0','0','1');
 
 DROP TABLE IF EXISTS sentences;
-CREATE TABLE `sentences` (   `SeID` int(11) unsigned NOT NULL AUTO_INCREMENT,   `SeLgID` int(11) unsigned NOT NULL,   `SeTxID` int(11) unsigned NOT NULL,   `SeOrder` int(11) unsigned NOT NULL,   `SeText` text,   PRIMARY KEY (`SeID`),   KEY `SeLgID` (`SeLgID`),   KEY `SeTxID` (`SeTxID`),   KEY `SeOrder` (`SeOrder`) ) ENGINE=MyISAM AUTO_INCREMENT=357 DEFAULT CHARSET=utf8;
+CREATE TABLE `sentences` (   `SeID` int(11) unsigned NOT NULL AUTO_INCREMENT,   `SeLgID` int(11) unsigned NOT NULL,   `SeTxID` int(11) unsigned NOT NULL,   `SeOrder` int(11) unsigned NOT NULL,   `SeText` text,   `SeFirstPos` smallint(5) unsigned NOT NULL,`SeStartSec` int(11) unsigned NOT NULL DEFAULT '0', `SeEndSec` int(11) unsigned NOT NULL DEFAULT '0',  PRIMARY KEY (`SeID`),   KEY `SeLgID` (`SeLgID`),   KEY `SeTxID` (`SeTxID`),   KEY `SeOrder` (`SeOrder`) ) ENGINE=MyISAM AUTO_INCREMENT=357 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS settings;
 CREATE TABLE `settings` (   `StKey` varchar(40) NOT NULL,   `StValue` varchar(40) DEFAULT NULL,   PRIMARY KEY (`StKey`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

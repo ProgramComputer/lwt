@@ -1650,15 +1650,29 @@ function media_paths_search($dir)
 }
 
 /**
- * Return the paths for all media files.
- *
+ * Return the paths for all media files or mediaID from Text
+ *based on id
+ * @param int $id -1 for all, else search in texts
  * @return string[] Paths of media files
  */
-function get_media_paths()
+function get_media_paths($id)
 {
+    global $tbpref;
     $answer = array(
         "base_path" => basename(getcwd())
     );
+    if($id != "-1")
+    {
+
+        $testsql = "Select TxAudioURI as value from {$tbpref}texts WHERE TxID =" . convert_string_to_sqlsyntax_nonull($id);
+        $answer["paths"] = trim(get_first_value(
+        $testsql
+        ));
+    
+        return $answer;
+    }
+    else{
+
     if (!file_exists('media')) {
         $answer["error"] = "does_not_exist";
     } else if (!is_dir('media')) {
@@ -1668,6 +1682,7 @@ function get_media_paths()
         $answer["paths"] = $paths["paths"];
         $answer["folders"] = $paths["folders"];
     }
+}
     return $answer;
 }
 
@@ -1702,7 +1717,7 @@ function selectmediapathoptions($dir): string
  */
 function selectmediapath($f): string 
 {
-    $media = get_media_paths();
+    $media = get_media_paths("-1");
     $r = '<p>
         YouTube, Dailymotion, Vimeo or choose a file in "../' . $media["base_path"] . '/media"
         <br />
@@ -4924,14 +4939,24 @@ allowfullscreen type="text/html">
     } else {
         // Local video player
         // makeAudioPlayer($path, $offset);
+    
         $type = "video/" . pathinfo($path, PATHINFO_EXTENSION);
         $title = pathinfo($path, PATHINFO_FILENAME);
         ?>
+    
 <video preload="auto" controls title="<?php echo $title ?>" 
 style="width: 100%; height: 300px; display: block; margin-left: auto; margin-right: auto;">
-    <source src="<?php echo $path; ?>" type="<?php echo $type; ?>">
+    <source id="vidsrc" type="<?php echo $type; ?>">
     <p>Your browser does not support video tags.</p>
 </video>
+<script>
+        var MEDIA =  <?php echo prepare_textdata_js(encodeURI($path)); ?>;
+        if (!(/(http(s?)):\/\//i.test(MEDIA))) {
+            MEDIA = new URL(MEDIA, window.location.origin).href
+            document.getElementById("vidsrc").src = MEDIA;
+        }
+        
+        </script>
         <?php
     }
 }
@@ -5052,7 +5077,10 @@ function makeAudioPlayer($audio, $offset=0)
 <script type="text/javascript">
     //<![CDATA[
 
-    const MEDIA = <?php echo prepare_textdata_js(encodeURI($audio)); ?>;
+    var MEDIA =  <?php echo prepare_textdata_js(encodeURI($audio)); ?>;
+    if (!(/(http(s?)):\/\//i.test(MEDIA))) {
+        MEDIA = new URL(MEDIA, window.location.origin).href
+    }
     const MEDIA_OFFSET = <?php echo $offset; ?>;
 
     /**

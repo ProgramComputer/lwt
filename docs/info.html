@@ -1785,6 +1785,8 @@ SeTxID smallint(5) unsigned NOT NULL, -- TEXT FOREIGN KEY --
 SeOrder smallint(5) unsigned NOT NULL,  
 SeText text,  
 SeFirstPos smallint(5) unsigned NOT NULL,  
+SeStartSec int(11) unsigned NOT NULL DEFAULT '0',  
+SeEndSec int(11) unsigned NOT NULL DEFAULT '0',   
 PRIMARY KEY (SeID),  
 KEY SeLgID (SeLgID),  
 KEY SeTxID (SeTxID),  

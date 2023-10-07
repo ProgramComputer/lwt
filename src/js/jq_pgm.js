@@ -1286,7 +1286,7 @@ function media_select_receive_data(data) {
 /**
  * Perform an AJAX query to retrieve and display the media files path.
  */
-function do_ajax_update_media_select () {
+function do_ajax_update_media_select (id) {
   $('#mediaSelectErrorMessage').css("display", "none");
   $('#mediaselect select').css("display", "none");
   $('#mediaSelectLoadingImg').css("display", "inherit");
@@ -1294,7 +1294,8 @@ function do_ajax_update_media_select () {
     'inc/ajax.php',
     {
       action: "query",
-      action_type: "media_paths"
+      action_type: "media_paths",
+      id: "-1"
     },
     media_select_receive_data
   );
