@@ -100,6 +100,10 @@ function get_first_value($sql)
  */
 function prepare_textdata($s): string 
 {
+    if (is_null($s))
+    {
+        return "";
+    }
     return str_replace("\r\n", "\n", $s);
 }
 
