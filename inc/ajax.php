@@ -34,7 +34,7 @@ function rest_api_version($get_req)
 }
 
 /**
- * Retun the next word to test as JSON
+ * Return the next word to test as JSON
  * 
  * @param string $testsql   SQL projection query
  * @param bool   $nosent    Test is in word mode
@@ -56,11 +56,14 @@ function get_word_test_ajax($testsql, $nosent, $lgid, $wordregex, $testtype)
         return $output;
     }
     $sent = repl_tab_nl($word_record['WoSentence']);
+    $startSec = 0;
+    $endSec = 0;
+    $txID = null;
     if ($nosent) {
         $sent = "{" . $word_record['WoText'] . "}";
     } else {
         // $nosent == FALSE, mode 1-3
-        list($sent, $_) = do_test_test_sentence(
+        list($sent, $_,$startSec,$endSec,$txID) = do_test_test_sentence(
             $word_record['WoID'], $lgid, $word_record['WoTextLC']
         );
         if ($sent === null) {
@@ -75,7 +78,11 @@ function get_word_test_ajax($testsql, $nosent, $lgid, $wordregex, $testtype)
         "word_id" => $word_record['WoID'],
         "solution" => get_test_solution($testtype, $word_record, $nosent, $save),
         "word_text" => $save,
-        "group" => $r 
+        "group" => $r,
+        "startSec" => $startSec,
+        "endSec" => $endSec,
+        "txID" => $txID
+
     );
 }
 
@@ -160,7 +167,7 @@ function get_texts_statistics($get_req)
 function media_paths($get_req) 
 {
     chdir("..");
-    return json_encode(get_media_paths());
+    return json_encode(get_media_paths($get_req["id"]));
 }
 
 /**
