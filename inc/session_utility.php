@@ -1665,8 +1665,8 @@ function media_paths_search($dir): array
 /**
  * Return the paths for all media files or mediaID from Text
  *based on id
- * @param int $id -1 for all, else search in texts
- * @return array Paths of media files, in the form array<string, string>
+ * @param string $id -1 for all, else search in texts
+ * @return string[] Paths of media files
  */
 function get_media_paths($id): array
 {
