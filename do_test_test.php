@@ -484,19 +484,19 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
     
     $sql = "SELECT LgName, LgDict1URI, LgDict2URI, LgGoogleTranslateURI, LgTextSize, 
     LgRemoveSpaces, LgRegexpWordCharacters, LgRightToLeft 
-    FROM {$tbpref}languages WHERE LgID = $lgid";
+    FROM {$tbpref}languages WHERE LgID =" . convert_string_to_sqlsyntax_nonull($lgid);
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     $lang = array(
         'wb1' => isset($record['LgDict1URI']) ? $record['LgDict1URI'] : "",
         'wb2' => isset($record['LgDict2URI']) ? $record['LgDict2URI'] : "",
         'wb3' => isset($record['LgGoogleTranslateURI'])?$record['LgGoogleTranslateURI']:"",
-        'textsize' => $record['LgTextSize'],
-        'removeSpaces' => $record['LgRemoveSpaces'],
-        'regexword' => $record['LgRegexpWordCharacters'],
-        'rtlScript' => $record['LgRightToLeft']
+        'textsize' =>isset($record['textsize'])?$record['textsize']:"",
+        'removeSpaces' =>isset($record['removeSpaces'])?$record['removeSpaces']:"" ,
+        'regexword' => isset($record['regexword'])?$record['regexword']:"",
+        'rtlScript' =>isset($record['rtlScript'])?$record['rtlScript']:""
     );
-    $abbr = $langDefs[$record['LgName']][1];
+    $abbr = isset($record['LgName'])?$langDefs[$record['LgName'] ][1]:"";
     mysqli_free_result($res);
 
     ?>
