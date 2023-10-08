@@ -102,6 +102,7 @@ INSERT INTO settings VALUES('set-tags-per-page','100');
 INSERT INTO settings VALUES('set-show-text-word-counts','1');
 INSERT INTO settings VALUES('set-term-translation-delimiters','/;|');
 INSERT INTO settings VALUES('set-mobile-display-mode','0');
+INSERT INTO settings VALUES('set-tts','1');
 INSERT INTO settings VALUES('set-similar-terms-count','0');
 INSERT INTO settings VALUES('currenttext','1');
 

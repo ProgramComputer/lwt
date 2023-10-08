@@ -527,6 +527,34 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
         $_REQUEST["TxLgID"], $id 
     );
 
+    //currently youtube dailymotin and vimeo but youtube-dl can support more
+    $pattern = "/(https?:\/\/).*(youtu|dailymotion|vimeo)/i";
+    $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --no-continue -o ".'media'.'/%(title)r-%(id)s.%(ext)s';
+    $save_to_disk = getSettingWithDefault('set-tts');
+
+   
+    if($save_to_disk &&  preg_match($pattern,  trim($_REQUEST["TxAudioURI"])) && ($youtubedl = get_youtubedl_path($youtubedl_args)) != "" )
+    {
+        $youtubedl_args = "  ". trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --get-filename -o media".'/%(title)r-%(id)s.%(ext)s ';
+        $titleandid = get_youtubedl_path($youtubedl_args);
+
+    $handle = popen($titleandid.' 2>&1; '.$youtubedl.' 2>&1', "r");
+        if (feof($handle)) {
+        pclose($handle);
+    }
+    $new_media_uri = 'lwt/'.trim(fgets($handle));
+
+    
+    runsql(
+        'update ' . $tbpref . 'texts set ' .
+        'TxAudioURI = ' . convert_string_to_sqlsyntax($new_media_uri) . 
+        ' where TxID = ' .$id, "Updated"
+    );  
+
+    pclose($handle);
+    }
+
+    //TODO? youtube-dl can extract subtitles . Add a UI feature in Text Import to allow it?
     try {
     //TRY and see if file has timed text
     $subtitles =  Subtitles::loadFromString(get_first_value(
@@ -539,7 +567,7 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
         foreach ($internalFormat as $cue) {
             foreach ($cue['lines'] as $key => $line) {      
                 $seid = get_first_value("SELECT seid AS value FROM sentences where selGID =". convert_string_to_sqlsyntax_notrim_nonull($_REQUEST["TxLgID"])."
-                AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id)." and replace('$line',' ','') LIKE concat('%',setext,'%')
+                AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id)." and replace(".convert_string_to_sqlsyntax_notrim_nonull($line).",' ','') LIKE concat('%',setext,'%')
                 ". (empty($seids) ? "": " and seid not in (" . implode(",", $seids) . ")") ."ORDER BY seid asc;");
                 $seids[] = $seid;
                 runsql(

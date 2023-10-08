@@ -39,7 +39,7 @@ function do_mysqli_query($sql)
     "</p></div><hr /><pre>Backtrace:\n\n";
     debug_print_backtrace();
     echo '</pre><hr />';
-    die('</body></html>');
+    my_die('</body></html>');
 }
 
 /**
