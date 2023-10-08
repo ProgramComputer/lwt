@@ -59,8 +59,12 @@ echo
 echo "You are all set! We need to copy the content of this folder to your server path."
 echo "WARNING: IT MAY ERASE ANY FILE IN THE DESTINATION FOLDER!"
 read -p "Save data under [/var/www/html/lwt]: " -r dest
+
+sudo mkdir -p  $(dirname "$0")/media
+sudo chmod -R 777 $(dirname "$0")/media
+
 dest=${dest:-/var/www/html/lwt}
-sudo cp -r . $dest
+sudo cp -ra . $dest
 # We need current folder name to add read/write/execute permissions
 sudo chmod -R 755 $dest
 echo
