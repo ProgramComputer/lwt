@@ -269,7 +269,55 @@ function get_mecab_path($mecab_args = ''): string
     my_die("Your OS '$os' cannot use MeCab with this version of LWT!");
 }
 
+/**
+ * Returns path to youtube-dl or yt-dlp application.
+ * youtube-dl supports video extraction from multiple hosts
+ *  No die because optional
+ * @param string $youtubledl_args Arguments to add
+ *
+ * @return string OS-compatible command
+ * 
+ */
+function get_youtubedl_path($youtubled1_args = ''): string 
+{
+    $os = strtoupper(substr(PHP_OS, 0, 3));
+    $youtubled1_args = escapeshellcmd($youtubled1_args);
+    if ($os == 'LIN' || $os == 'DAR') {
+        if (shell_exec("command -v youtube-dl")) {
+            return 'youtube-dl' . $youtubled1_args; 
+        }
+        if (shell_exec("command -v yt-dlp")) {
+            return 'yt-dlp' . $youtubled1_args; 
+        }
+       // my_die("youtube-dl not detected! Please install it and add it to your PATH.");
+    }
+    if ($os == 'WIN') {
+        //yt-dlp
+        if (shell_exec('where /R "%ProgramFiles%" yt-dlp.exe')) { 
+            return '"%ProgramFiles%\\yt-dlp.exe"' . $youtubled1_args;
+        } 
+        if (shell_exec('where /R "%ProgramFiles(x86)%" yt-dlp.exe')) {
+            return '"%ProgramFiles(x86)%\\yt-dlp.exe"' . $youtubled1_args; 
+        }
+        if (shell_exec('where yt-dlp.exe')) {
+            return 'yt-dlp.exe' . $youtubled1_args; 
+        }
 
+        //youtube-dl
+        if (shell_exec('where /R "%ProgramFiles%" youtube-dl.exe')) { 
+            return '"%ProgramFiles%\\youtube-dl.exe"' . $youtubled1_args;
+        } 
+        if (shell_exec('where /R "%ProgramFiles(x86)%" youtube-dl.exe')) {
+            return '"%ProgramFiles(x86)%\\youtube-dl.exe"' . $youtubled1_args; 
+        }
+        if (shell_exec('where youtube-dl.exe')) {
+            return 'youtube-dl.exe' . $youtubled1_args; 
+        }
+        //my_die("youtube-dl not detected! Install it or add it to the PATH.");
+    }
+    return "";
+  //  my_die("Your OS '$os' cannot use youtube-dl with this version of LWT!");
+}
 /**
  * Find end-of-sentence characters in a sentence using latin alphabet.
  * 
