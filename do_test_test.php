@@ -264,8 +264,8 @@ function do_test_test_sentence($wid, $lang, $wordlc): array
         $sql2 = "Select SeStartSec, SeEndSec,SeTxID from {$tbpref}sentences where SeID = " . convert_string_to_sqlsyntax_nonull($seid) .'limit 1;';
         $res2 = do_mysqli_query($sql2);
         $record2 = mysqli_fetch_assoc($res2);
-        $seStartSec = $record2['SeStartSec'];
-        $seEndSec = $record2['SeEndSec'];
+        $seStartSec = $record2['SeStartSec']/1000;
+        $seEndSec = $record2['SeEndSec']/1000;
         $seTxID = $record2['SeTxID'];
         
 

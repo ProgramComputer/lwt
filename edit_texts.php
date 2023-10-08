@@ -547,8 +547,8 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
                 $seids[] = $seid;
                 runsql(
                     "UPDATE {$tbpref}sentences 
-                    SET SeStartSec = ". convert_string_to_sqlsyntax_notrim_nonull($cue["start"]) .", SeEndSec = ". 
-                    convert_string_to_sqlsyntax_notrim_nonull($cue['end']) ."
+                    SET SeStartSec = ". convert_string_to_sqlsyntax_notrim_nonull($cue["start"] * 1000) .", SeEndSec = ". 
+                    convert_string_to_sqlsyntax_notrim_nonull($cue['end'] * 1000) ."
                     where selGID =". convert_string_to_sqlsyntax_notrim_nonull($_REQUEST["TxLgID"])."
                 AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id) ." and seid = ". convert_string_to_sqlsyntax_notrim_nonull($seid),
                     '', true
