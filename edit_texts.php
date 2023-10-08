@@ -542,7 +542,7 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
         foreach ($internalFormat as $cue) {
             foreach ($cue['lines'] as $key => $line) {      
                 $seid = get_first_value("SELECT seid AS value FROM sentences where selGID =". convert_string_to_sqlsyntax_notrim_nonull($_REQUEST["TxLgID"])."
-                AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id)." and replace('$line',' ','') LIKE concat('%',setext,'%')
+                AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id)." and replace(".convert_string_to_sqlsyntax_notrim_nonull($line).",' ','') LIKE concat('%',setext,'%')
                 ". (empty($seids) ? "": " and seid not in (" . implode(",", $seids) . ")") ."ORDER BY seid asc;");
                 $seids[] = $seid;
                 runsql(
