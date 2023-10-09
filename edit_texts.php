@@ -543,7 +543,14 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
         pclose($handle);
     }
     $new_media_uri = 'lwt/'.trim(fgets($handle));
-
+    while(!feof($handle)){
+        if ($debug){
+            echo fgets($handle).'<br />';
+        }
+        else{
+            fgets($handle);
+        }
+    }
     
     runsql(
         'update ' . $tbpref . 'texts set ' .
@@ -586,7 +593,7 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
     } 
     catch (\Done\Subtitles\Code\UserException $e) {
 if($debug){
-    echo $e;
+    echo $e.'<br />';
 }
 }
    

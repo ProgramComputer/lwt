@@ -1637,6 +1637,13 @@ function update_database($dbname)
             false
         );
         runsql(
+            "ALTER TABLE `{$tbpref}sentences` 
+                 ADD  SeStartSec int(11) unsigned NOT NULL DEFAULT '0',  
+               ADD SeEndSec int(11) unsigned NOT NULL DEFAULT '0'  ", 
+            '', 
+           false
+        );
+        runsql(
             "ALTER TABLE `{$tbpref}wordtags` 
             DROP INDEX WtWoID", '', false
         );
@@ -2152,7 +2159,7 @@ function check_update_db($debug, $tbpref, $dbname): void
         "ALTER TABLE `{$tbpref}sentences` ADD SeFirstPos smallint(5) NOT NULL", 
         '', 
        false
-    );
+    );//move to update_database()?
     
     if ($count > 0) {        
         // Rebuild Text Cache if cache tables new
