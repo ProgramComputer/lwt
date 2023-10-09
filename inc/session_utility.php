@@ -5230,7 +5230,7 @@ function pagestart_nobody($title, $addcss=''): void
     @header('Pragma: no-cache');
     ?><!DOCTYPE html>
     <?php 
-    echo '<html lang="en">';
+    echo '<html id="'. strtolower($title).'-html"  lang="en">';
     ?>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -5273,7 +5273,7 @@ function pagestart_nobody($title, $addcss=''): void
     <title>LWT :: <?php echo tohtml($title); ?></title>
 </head>
     <?php
-    echo '<body>';
+    echo '<body id="'. strtolower($title).'-body">';
     ?>
 <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>
     <?php

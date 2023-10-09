@@ -341,6 +341,8 @@ function index_do_main_page()
             margin: 20px;
         }"
     );
+    
+    $server_data = get_server_data();
     echo_lwt_logo();
     echo '<h1>Learning With Texts (LWT)</h1>
     <h2>Home' . ($debug ? ' <span class="red">DEBUG</span>' : '') . '</h2>';
@@ -405,23 +407,39 @@ function index_do_main_page()
         
     <?php wordpress_logout_link(); ?>
 
-</div>
-<p>
-    This is LWT Version <?php echo get_version(); ?>, 
-    <a href="start.php"><?php echo ($tbpref == '' ? 'default table set' : 'table prefixed with "' . $tbpref . '"') ?></a>.
-    </p>
-<br style="clear: both;" />
-<footer>
-    <p class="small">
-        <a target="_blank" href="http://unlicense.org/" style="vertical-align: top;">
-            <img alt="Public Domain" title="Public Domain" src="img/public_domain.png" style="display: inline;" />
+    </div>
+    <p class="smallgray graydotted">&nbsp;</p>
+    <p>
+        <a href="start.php">
+            <?php echo ($tbpref == '' ? 'default table set' : 'table prefixed with "' . $tbpref . '"') ?>
         </a>
-        <a href="https://sourceforge.net/projects/learning-with-texts/" target="_blank">"Learning with Texts" (LWT)</a> is free 
-        and unencumbered software released into the 
-        <a href="https://en.wikipedia.org/wiki/Public_domain_software" target="_blank">PUBLIC DOMAIN</a>. 
-        <a href="http://unlicense.org/" target="_blank">More information and detailed Unlicense ...</a>
     </p>
-</footer>
+    <br style="clear: both;" />
+
+    <table>
+        <tbody>
+            <tr>
+                <td class="width50px"><a target="_blank" href="http://unlicense.org/"><img alt="Public Domain"
+                            title="Public Domain" src="img/public_domain.png"></a></td>
+                <td>
+                    <p class="small"><a href="https://sourceforge.net/projects/learning-with-texts/"
+                            target="_blank">"Learning with Texts" (LWT)</a> is free and unencumbered software
+                        released<br>into the <a href="https://en.wikipedia.org/wiki/Public_domain_software"
+                            target="_blank">PUBLIC DOMAIN</a>. <a href="http://unlicense.org/" target="_blank">More
+                            information and detailed Unlicense ...</a><br>
+ 
+
+                            This is LWT Version <?php echo get_version(); ?><br><a href="https://en.wikipedia.org/wiki/Database"
+                            target="_blank">Database</a> size: <?php echo $server_data[1]?><br><a href="https://en.wikipedia.org/wiki/Web_server"
+                            target="_blank">Web Server</a>: <i>learning-with-texts.sourceforge.io</i> / Server Software: <a
+                            href="https://en.wikipedia.org/wiki/Apache_HTTP_Server"
+                            target="_blank">Apache/<?php echo $server_data[3]?></a>&nbsp;&nbsp;<a href="https://en.wikipedia.org/wiki/PHP"
+                            target="_blank">PHP/<?php echo $server_data[4]?></a>&nbsp;&nbsp;<a href="https://en.wikipedia.org/wiki/MySQL"
+                            target="_blank">MySQL/<?php echo $server_data[5]?></a></p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
     <?php
     index_load_warnings();
     pageend();

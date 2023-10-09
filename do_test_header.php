@@ -146,12 +146,12 @@ function do_test_header_row($_p)
     // This part only works if $textid is set
     if (is_numeric(getreq('text'))) {
         $textid = (int) getreq('text');
-        echo '<div>' . getPreviousAndNextTextLinks(
+        echo '<div class="test-btn-grp">' . getPreviousAndNextTextLinks(
             $textid, 'do_test.php?text=', false, ''
         ) . '</div>';
         
         ?>
-    <div>
+    <div class="test-btn-grp">
         <a href="do_text.php?start=<?php echo $textid; ?>" target="_top">
             <img src="icn/book-open-bookmark.png" title="Read" alt="Read" />
         </a>
@@ -220,7 +220,7 @@ function do_test_header_js()
 function do_test_header_content($title, $p, $totalcountdue, $totalcount, $language)
 {
     ?>
-<h1>TEST ▶ <?php echo tohtml($title) ?></h1>
+<h3>TEST ▶ <?php echo tohtml($title) ?></h3>
 <div style="margin: 5px;">
     Word<?php echo intval($totalcount) > 1 ? 's' : ''; ?> due today: 
     <?php echo htmlspecialchars($totalcount); ?>, 

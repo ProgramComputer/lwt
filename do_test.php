@@ -201,15 +201,15 @@ function do_test_desktop_page($property=null)
     </div>
 </div>
 <div id="frames-r" 
-style="position: fixed; top: 2%; right: 0; height: 90%; 
-width: <?php echo 97 - $frame_l_width; ?>%;">
+style="position: fixed; top: 2%; right: 0; height: 98vh; 
+width: <?php echo 100 - $frame_l_width; ?>%;display:flex; flex-direction: column;">
     <!-- iFrames wrapper for events -->
     <iframe src="empty.html" scrolling="auto" name="ro" 
-    style="height: 50%; width: 100%;">
+    style="height: 50%; width: 100%;resize:vertical;">
         Your browser doesn't support iFrames, update it!
     </iframe>
     <iframe src="empty.html" scrolling="auto" name="ru" 
-    style="height: 50%; width: 100%;">
+    style="height: 50%; width: 100%; resize:vertical;">
         Your browser doesn't support iFrames, update it!
     </iframe>
 </div>
@@ -242,7 +242,32 @@ function do_test_page($p)
         "body {
             margin: 20px;
             max-width: 100%;
-        }"
+        }
+        #frame-h {
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+            align-items: stretch;
+            overflow: auto;
+            resize: vertical;
+            height: 10.773em;
+        }
+        #frames-l {
+            top: 2%;
+            left: 0;
+            width: 50%;
+            position: absolute;
+            overflow: hidden;
+        }
+        #frames-r{
+            overflow: hidden;
+            position: absolute;
+            top: 2%;
+            right: 0;
+            height: 99vh;
+            width: 50%;
+        }
+        "
     );
     
     if (is_mobile()) {
@@ -272,7 +297,7 @@ function try_start_test($p): void
     }
 }
 
-if (get_test_property() != '') {
-    try_start_test(get_test_property());
-}
+
+try_start_test(get_test_property());
+
 ?>
