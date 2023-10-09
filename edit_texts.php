@@ -561,7 +561,7 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
     } 
     catch (\Done\Subtitles\Code\UserException $e) {
 if($debug){
-    echo $e;
+    echo $e.'<br />';
 }
 }
    
