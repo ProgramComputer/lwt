@@ -31,12 +31,6 @@ For more information, please refer to [http://unlicense.org/].
 /**************************************************************
 Stylesheet
 ***************************************************************/
-#test-html {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: none;
-}
 
 [class^="ui-resizable"] {
  width: 150em;

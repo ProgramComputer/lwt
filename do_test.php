@@ -239,7 +239,15 @@ function do_test_page($p)
 {
     pagestart_nobody(
         'Test',
-        "body {
+        "
+        #test-html {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: none;
+          }
+        
+        body {
             margin: 20px;
             max-width: 100%;
         }
