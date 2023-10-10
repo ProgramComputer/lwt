@@ -53,7 +53,7 @@ function get_word_test_ajax($testsql, $nosent, $lgid, $wordregex, $testtype)
             "word_text" => '',
             "group" => '' 
         );
-        return json_encode($output);
+        return $output;
     }
     $sent = repl_tab_nl($word_record['WoSentence']);
     if ($nosent) {
