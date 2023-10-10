@@ -267,6 +267,15 @@ function do_test_page($p)
             height: 99vh;
             width: 50%;
         }
+        .h4{ 
+
+            display: block;
+            margin-top: 1.33em;
+            margin-bottom: 1.33em;
+            margin-left: 0;
+            margin-right: 0;
+            font-weight: bold;
+        }
         "
     );
     

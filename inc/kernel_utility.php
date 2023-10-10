@@ -326,12 +326,13 @@ function my_die($text)
 
 /**
  * Display the main menu of navigation as a dropdown
+ * @param string page is location name
  */
-function quickMenu(): void 
+function quickMenu($page = ""): void 
 {
     ?>
 
-<select id="quickmenu" onchange="quickMenuRedirection(value)">
+<select id="quickmenu<?php echo $page;?>" onchange="quickMenuRedirection(value)">
     <option value="" selected="selected">[Menu]</option>
     <option value="index">Home</option>
     <optgroup label="Texts">

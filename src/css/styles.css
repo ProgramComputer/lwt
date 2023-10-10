@@ -37,9 +37,7 @@ Stylesheet
   height: 100vh;
   overflow: none;
 }
-.test-btn-grp img{
-  width: 2em;
-}
+
 [class^="ui-resizable"] {
  width: 150em;
 }

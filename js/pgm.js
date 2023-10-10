@@ -234,7 +234,7 @@ function do_ajax_edit_impr_text(pagepos,word){if(word==''){$('#editimprtextdata'
 const textid=$('#editimprtextdata').attr('data_id');$.getJSON('inc/ajax.php',{action:"query",action_type:"term_translations",text_id:textid,term_lc:word},function(data){if("error" in data){alert(data.error)}else{edit_term_ann_translations(data,textid);$.scrollTo(pagepos);$('input.impr-ann-text').on('change',changeImprAnnText);$('input.impr-ann-radio').on('change',changeImprAnnRadio)}})}
 function showRightFrames(roUrl,ruUrl){if(roUrl!==undefined){top.frames.ro.location.href=roUrl}
 if(ruUrl!==undefined){top.frames.ru.location.href=ruUrl}
-if($('#frames-r').length){$('#frames-r').animate({right:'5px'});return!0}
+if($('#frames-r').length){return!0}
 return!1}
 function hideRightFrames(){if($('#frames-r').length){$('#frames-r').animate({right:'-100%'});return!0}
 return!1}

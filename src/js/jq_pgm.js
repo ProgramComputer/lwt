@@ -1686,7 +1686,7 @@ function showRightFrames(roUrl, ruUrl) {
     top.frames.ru.location.href = ruUrl;
   }
   if ($('#frames-r').length) {
-    $('#frames-r').animate({right: '5px'});
+   // $('#frames-r').animate({right: '5px'});
     return true;
   }
   return false;

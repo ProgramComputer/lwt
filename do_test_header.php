@@ -136,22 +136,25 @@ function get_test_counts($testsql)
 function do_test_header_row($_p)
 {
     ?>
-<div class="flex-header">
+<div class="h4" style="
+    display: flex;">
     <div>
         <a href="edit_texts.php" target="_top">
             <?php echo_lwt_logo(); ?>
-        </a>
-    </div>
+            LWT-fork
+        </a>&nbsp; | &nbsp;</div>
     <?php 
     // This part only works if $textid is set
     if (is_numeric(getreq('text'))) {
         $textid = (int) getreq('text');
-        echo '<div class="test-btn-grp">' . getPreviousAndNextTextLinks(
+        echo '<div>' . getPreviousAndNextTextLinks(
             $textid, 'do_test.php?text=', false, ''
-        ) . '</div>';
+        ) . '</div>&nbsp; | &nbsp;';
         
         ?>
-    <div class="test-btn-grp">
+    <div>
+        <?php quickMenu("test"); ?>&nbsp; | &nbsp;</div>
+    <div>
         <a href="do_text.php?start=<?php echo $textid; ?>" target="_top">
             <img src="icn/book-open-bookmark.png" title="Read" alt="Read" />
         </a>
@@ -163,9 +166,6 @@ function do_test_header_row($_p)
         <?php
     }
     ?>
-    <div>
-        <?php quickMenu(); ?>
-    </div>
 </div>
     <?php
 }
