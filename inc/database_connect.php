@@ -4,6 +4,10 @@
  * \file
  * \brief Connects to the database and check its state.
  * 
+ * PHP version 8.1
+ * 
+ * @category Database
+ * @package Lwt
  * @author https://github.com/HugoFara/ HugoFara
  */
 
@@ -121,7 +125,7 @@ function prepare_textdata_js($s): string
  * @param string $data Input string
  *
  * @return string Properly escaped and trimmed string. "NULL" if the input string is empty.
- * 
+ *
  * @global $DBDONNECTION
  */
 function convert_string_to_sqlsyntax($data): string 
@@ -383,7 +387,7 @@ function getSetting($key)
         WHERE StKey = ' . convert_string_to_sqlsyntax($key)
     );
     if (isset($val)) {
-        $val = trim($val);
+        $val = trim((string) $val);
         if ($key == 'currentlanguage' ) { 
             $val = validateLang($val); 
         }
@@ -410,12 +414,12 @@ function getSettingWithDefault($key)
 {
     global $tbpref;
     $dft = get_setting_data();
-    $val = get_first_value(
+    $val = (string) get_first_value(
         'SELECT StValue AS value
          FROM ' . $tbpref . 'settings
          WHERE StKey = ' . convert_string_to_sqlsyntax($key)
     );
-    if (isset($val) && $val != '') {
+    if ($val != '') {
         return trim($val); 
     }
     if (isset($dft[$key])) { 
@@ -816,7 +820,7 @@ function parse_japanese_text($text, $id): ?array
                 $term = '¶';
             }
             $term_type = 2;
-        } else if (str_contains('2678', $node_type)) {
+        } else if (in_array($node_type, ['2', '6', '7', '8'])) {
             $term_type = 0;
         } else {
             $term_type = 1;
@@ -866,15 +870,15 @@ function parse_japanese_text($text, $id): ?array
 
 /**
  * Insert a processed text in the data in pure SQL way.
- * 
+ *
  * @param string $text Preprocessed text to insert
  * @param int    $id   Text ID
  * 
- * @return null
+ * @return void
  * 
  * @global string $tbpref Database table prefix
  */
-function save_processed_text_with_sql($text, $id)
+function save_processed_text_with_sql($text, $id): void
 {
     global $tbpref;
     $file_name = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $tbpref . "tmpti.txt";
@@ -1073,7 +1077,7 @@ function prepare_text_parsing($text, $id, $lid): ?array
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     $termchar = (string)$record['LgRegexpWordCharacters'];
-    $replace = explode("|", $record['LgCharacterSubstitutions']);
+    $replace = explode("|", (string) $record['LgCharacterSubstitutions']);
     mysqli_free_result($res);
     $text = prepare_textdata($text);
     //if(is_callable('normalizer_normalize')) $s = normalizer_normalize($s);
@@ -1206,9 +1210,9 @@ function update_default_values($id, $lid, $sql)
 /**
  * Check a text and display statistics about it.
  * 
- * @param string   $sql
- * @param bool     $rtlScript true if language is right-to-left
- * @param string[] $wl        Words lengths
+ * @param string $sql
+ * @param bool   $rtlScript true if language is right-to-left
+ * @param int[]  $wl        Words lengths
  * 
  * @return void
  */
@@ -1428,7 +1432,7 @@ function splitCheckText($text, $lid, $id)
         if ($wl_max < (int)$record['word_count']) { 
             $wl_max = (int)$record['word_count'];
         }
-        $wl[] = (string)$record['word_count'];
+        $wl[] = (int)$record['word_count'];
         $mw_sql .= ' WHEN ' . $record['word_count'] . 
         ' THEN @a' . (intval($record['word_count']) * 2 - 1);
     }
@@ -2275,7 +2279,7 @@ function connect_to_database($server, $userid, $passwd, $dbname, $socket="")
             $dbconnection, $server, $userid, $passwd
         );
 
-        if (!$success || !$dbconnection) { 
+        if (!$success) {
             my_die(
                 'DB connect error, connection parameters may be wrong, 
                 please check file "connect.inc.php". 
@@ -2291,7 +2295,7 @@ function connect_to_database($server, $userid, $passwd, $dbname, $socket="")
             DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
         );
         if (!$result) {
-            my_die("Failed to create database! " . $result);
+            my_die("Failed to create database!");
         }
         mysqli_close($dbconnection);
         $success = @mysqli_real_connect(
@@ -2334,8 +2338,7 @@ function get_database_prefixes(&$tbpref)
 
     if (!isset($tbpref)) {
         $fixed_tbpref = 0;
-        $p = LWTTableGet("current_table_prefix");
-        $tbpref = isset($p) ? $p : '';
+        $tbpref = LWTTableGet("current_table_prefix");
     } else {
         $fixed_tbpref = 1; 
     }
