@@ -640,7 +640,7 @@ function edit_language_form($language)
      * Check the word splitting method.
      */
     function checkWordChar(method) {
-        document.forms.lg_form.LgRegexpAlt.value = (method == "mecab") ? "mecab" : "regex";
+        document.forms.lg_form.LgRegexpAlt.value = (method == "mecab") ? "mecab" : "regexp";
     }
 
     /**
