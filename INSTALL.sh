@@ -23,7 +23,6 @@ echo
 echo "Enabling mbstring and mysqli (PHP extensions necessary for LWT)..."
 sudo phpenmod -s apache2 mbstring
 sudo phpenmod -s apache2 mysqli
-composer require mantas-done/subtitles
 echo
 
 # Database access settings
@@ -39,7 +38,6 @@ echo
 
 # Create a new MySQL user
 echo "Creating the MySQL user and database..."
-sudo service mysql restart
 sudo mysql -e "CREATE USER $user@$host IDENTIFIED BY '$passwd'"
 sudo mysql -e "CREATE DATABASE $db_name"
 sudo mysql -e "GRANT ALL PRIVILEGES ON $db_name.* TO $user@$host"
