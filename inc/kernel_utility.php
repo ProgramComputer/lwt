@@ -163,7 +163,7 @@ function get_setting_data()
             "dft" => '1', "num" => 0
         ),
         'set-hts' => array(
-            "dft" => '0', "num" => 0
+            "dft" => '1', "num" => 0
         ),
         'set-term-sentence-count' => array(
             "dft" => '1', "num" => 0
