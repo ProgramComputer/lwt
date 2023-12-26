@@ -43,7 +43,6 @@ sudo service mysql restart
 sudo mysql -e "CREATE USER $user@$host IDENTIFIED BY '$passwd'"
 sudo mysql -e "CREATE DATABASE $db_name"
 sudo mysql -e "GRANT ALL PRIVILEGES ON $db_name.* TO $user@$host"
-sudo mysql -e "GRANT SYSTEM_VARIABLES_ADMIN ON *.* TO $user@$host"
 echo
 
 # Database connection parameters
