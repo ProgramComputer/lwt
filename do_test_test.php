@@ -496,7 +496,6 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
         'regexword' => isset($record['regexword'])?$record['regexword']:"",
         'rtlScript' =>isset($record['rtlScript'])?$record['rtlScript']:""
     );
-    $abbr = isset($record['LgName'])?$langDefs[$record['LgName'] ][1]:"";
     mysqli_free_result($res);
 
     ?>
@@ -534,106 +533,6 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
           //  })
        // };
         }
-        /**
-         * Insert a new word test.
-         */
-        function insert_new_word(word) {
-            const options_phonetic_reading = {
-                "action": "query",
-                "action_type": "phonetic_reading",
-                "text": word['word_text'],
-                "lang": <?php echo json_encode((string) $abbr); ?>
-
-            };
-            $.getJSON(
-                'inc/ajax.php?' + $.param(options_phonetic_reading)
-            ).done(function (data) {
-                if (data["phonetic_reading"]) {
-                    $('.word').on('click', read_word);
-
-                    /** 
-                    * Read the word aloud
-                    */
-                    function read_word() {
-                        if (('speechSynthesis' in window) &&
-                            document.getElementById('utterance-allowed').checked) {
-                            const text = data["phonetic_reading"];
-                            const lang = <?php echo json_encode($abbr); ?>;
-                            readRawTextAloud(text, lang);
-                        }
-                    }
-                }
-            });
-            const options_media_paths = {
-                "action": "query",
-                "action_type": "media_paths",
-                "id": word['txID'],
-            };
-            $.getJSON(
-                'inc/ajax.php?' + $.param(options_media_paths)
-            ).done(function (data) {
-                if (data["paths"]) {
-                    var MEDIA =  data["paths"]
-                    sentenceaudio.src = MEDIA;
-        if (!(/(http(s?)):\/\//i.test(MEDIA))) {
-            MEDIA = new URL(MEDIA, window.location.origin).href
-            sentenceaudio.src = MEDIA;
-        }
-                }
-            })
-            SOLUTION = word['solution'];
-            WID = word['word_id'];
-            var playsentence = document.getElementById('playSentence');
-
-            if(parseInt(word['endSec']) == 0 || word['endSec'] == null )
-            {
-                playsentence.style.display = 'none';
-
-            }
-            else{
-            playsentence.style.display = '';
-            playsentence.setAttribute('data-start-time',word['startSec'])
-            playsentence.setAttribute('data-end-time',word['endSec'])
-            }
-      
-
-                $('#term-test').html(word['group']);
-                $('#term-test').html(word['group']);
-
-            $('#term-test').html(word['group']);
-
-            $(document).on('keydown', keydown_event_do_test_test);
-            $('.word').on('click', word_click_event_do_test_test)
-
-        }
-
-        /**
-         * Handles an ajax query for word tests.
-         */
-        function test_query_handler(data) {
-            if (data['word_id'] == 0) {
-                do_test_finished(<?php echo json_encode($count); ?>);
-                const options = {
-                    "action": "query",
-                    "action_type": "tomorrow_test_count",
-                    "test_sql": <?php echo json_encode((string) $testsql); ?>
-                };
-                $.getJSON(
-                    'inc/ajax.php?' + $.param(options)
-                ).done(function (data) {
-                    if (data["test_count"]) {
-                        $('#tests-tomorrow').css("display", "inherit");
-                        $('#tests-tomorrow').text(
-                            "Tomorrow you'll find here " + data["test_count"] +
-                            ' test' + (data["test_count"] == 1 ? '' : 's') + "!"
-                        );
-                    }
-                });
-            } else {
-                insert_new_word(data);
-            }
-        }
-
         /**
          * Get a new word test.
          */
@@ -883,17 +782,30 @@ function do_test_test_javascript_clickable($wo_record, $solution, $startSec, $en
     $phoneticText = phonetic_reading($wo_record['WoText'], $abbr);
     ?>
     <script type="text/javascript">
-        /** 
-         * Read the word aloud
-         */
-        function read_word() {
-            if (('speechSynthesis' in window) &&
-                document.getElementById('utterance-allowed').checked) {
-                const text = <?php echo json_encode($phoneticText); ?>;
-                const lang = <?php echo json_encode($abbr); ?>;
-                readRawTextAloud(text, lang);
-            }
-        }
+             const options_phonetic_reading = {
+                "text": word['word_text'],
+                "lang": <?php echo json_encode((string) $abbr); ?>
+
+            };
+            $.getJSON(
+                'api.php/v1/phonetic-reading?' + $.param(options_phonetic_reading)
+            ).done(function (data) {
+                if (data["phonetic_reading"]) {
+                    $('.word').on('click', read_word);
+
+                    /** 
+                    * Read the word aloud
+                    */
+                    function read_word() {
+                        if (('speechSynthesis' in window) &&
+                            document.getElementById('utterance-allowed').checked) {
+                            const text = data["phonetic_reading"];
+                            const lang = <?php echo json_encode($abbr); ?>;
+                            readRawTextAloud(text, lang);
+                        }
+                    }
+                }
+            });
 
         SOLUTION = <?php echo prepare_textdata_js($solution); ?>;
         WID = <?php echo $wid; ?>;
@@ -1027,6 +939,7 @@ function do_test_footer($notyettested, $wrong, $correct)
  */
 function do_test_test_javascript($count)
 {
+
     ?>
 <script type="text/javascript">
     /**
@@ -1060,13 +973,46 @@ function do_test_test_javascript($count)
      * Insert a new word test.
      * 
      * @param {number} word_id  Word ID
+     * @param {number} tx_id  transaction ID
+     * @param {number} start_sec  starting second
+     * @param {number} end_sec  ending second
      * @param {string} solution Test answer
      * @param {string} group    
      */
-    function insert_new_word(word_id, solution, group) {
+    function insert_new_word(word_id,tx_id,start_sec,end_sec, solution, group) {
+   
+            const options_media_paths = {
+                "id": tx_id
+            };
+            $.getJSON(
+                'api.php/v1/media-files?' + $.param(options_media_paths)
+            ).done(function (data) {
+                console.log(data["paths"])
+                if (data["paths"]) {
+                    var MEDIA =  data["paths"]
+                    sentenceaudio.src = MEDIA;
+        if (!(/(http(s?)):\/\//i.test(MEDIA))) {
+            MEDIA = new URL(MEDIA, window.location.origin).href
+            sentenceaudio.src = MEDIA;
+        }
+                }
+            })
+
 
         SOLUTION = solution;
         WID = word_id;
+        var playsentence = document.getElementById('playSentence');
+
+if(parseInt(end_sec) == 0 || end_sec == null )
+{
+    playsentence.style.display = 'none';
+
+}
+else{
+playsentence.style.display = '';
+playsentence.setAttribute('data-start-time',start_sec)
+playsentence.setAttribute('data-end-time',end_sec)
+}
 
         $('#term-test').html(group);
 
@@ -1105,7 +1051,7 @@ function do_test_test_javascript($count)
             );
         } else {
             insert_new_word(
-                current_test.word_id, current_test.solution, current_test.group
+                current_test.word_id,current_test.txID,current_test.startSec,current_test.endSec,current_test.solution, current_test.group
             );
         }
     }
