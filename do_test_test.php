@@ -782,30 +782,7 @@ function do_test_test_javascript_clickable($wo_record, $solution, $startSec, $en
     $phoneticText = phonetic_reading($wo_record['WoText'], $abbr);
     ?>
     <script type="text/javascript">
-             const options_phonetic_reading = {
-                "text": word['word_text'],
-                "lang": <?php echo json_encode((string) $abbr); ?>
-
-            };
-            $.getJSON(
-                'api.php/v1/phonetic-reading?' + $.param(options_phonetic_reading)
-            ).done(function (data) {
-                if (data["phonetic_reading"]) {
-                    $('.word').on('click', read_word);
-
-                    /** 
-                    * Read the word aloud
-                    */
-                    function read_word() {
-                        if (('speechSynthesis' in window) &&
-                            document.getElementById('utterance-allowed').checked) {
-                            const text = data["phonetic_reading"];
-                            const lang = <?php echo json_encode($abbr); ?>;
-                            readRawTextAloud(text, lang);
-                        }
-                    }
-                }
-            });
+   
 
         SOLUTION = <?php echo prepare_textdata_js($solution); ?>;
         WID = <?php echo $wid; ?>;
@@ -939,7 +916,7 @@ function do_test_footer($notyettested, $wrong, $correct)
  */
 function do_test_test_javascript($count)
 {
-
+    
     ?>
 <script type="text/javascript">
     /**
@@ -976,18 +953,43 @@ function do_test_test_javascript($count)
      * @param {number} tx_id  transaction ID
      * @param {number} start_sec  starting second
      * @param {number} end_sec  ending second
+     * @param {string} word_text  word text
+     * @param {string} word_lg_abbr  Word ID
      * @param {string} solution Test answer
      * @param {string} group    
      */
-    function insert_new_word(word_id,tx_id,start_sec,end_sec, solution, group) {
-   
+    function insert_new_word(word_id,tx_id,start_sec,end_sec,word_text,word_lg_abbr, solution, group) {
+        
+        const options_phonetic_reading = {
+                "text": word_text,
+                "lang": word_lg_abbr
+
+            };
+            $.getJSON(
+                'api.php/v1/phonetic-reading?' + $.param(options_phonetic_reading)
+            ).done(function (data) {
+                if (data["phonetic_reading"]) {
+                    $('.word').on('click', read_word);
+
+                    /** 
+                    * Read the word aloud
+                    */
+                    function read_word() {
+                        if (('speechSynthesis' in window) &&
+                            document.getElementById('utterance-allowed').checked) {
+                            const text = data["phonetic_reading"];
+                            const lang = word_lg_abbr;
+                            readRawTextAloud(text, lang);
+                        }
+                    }
+                }
+            });
             const options_media_paths = {
                 "id": tx_id
             };
             $.getJSON(
                 'api.php/v1/media-files?' + $.param(options_media_paths)
             ).done(function (data) {
-                console.log(data["paths"])
                 if (data["paths"]) {
                     var MEDIA =  data["paths"]
                     sentenceaudio.src = MEDIA;
@@ -1051,7 +1053,7 @@ playsentence.setAttribute('data-end-time',end_sec)
             );
         } else {
             insert_new_word(
-                current_test.word_id,current_test.txID,current_test.startSec,current_test.endSec,current_test.solution, current_test.group
+                current_test.word_id,current_test.txID,current_test.startSec,current_test.endSec,current_test.word_text,current_test.word_lg_abbr,current_test.solution, current_test.group
             );
         }
     }
@@ -1101,7 +1103,7 @@ playsentence.setAttribute('data-end-time',end_sec)
 
 /**
  * Do the main content of a test page.
- * 
+ * Replaced by do_test_test_content_ajax()
  * @global int $debug Show debug informations
  * 
  * @return void
