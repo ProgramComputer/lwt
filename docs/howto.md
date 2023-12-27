@@ -124,13 +124,29 @@ You can also import a longer text into LWT with the possibility to split it up i
 
 ### Newsfeed Import
 
-Here you can download the articles of your newsfeeds (HowTo add a new newsfeed see [here](info.html#new_feed)). If you've set up multiple newsfeeds for your selected language, the link "update multiple feeds" will appear. By clicking that link you can update one or more feeds at once. If you've selected a newsfeed, a blue circle-arrow will appear as well as the date of your last update. A click on the circle-arrow will update your selected newsfeed. All downloaded articles will be marked by a bookmark-icon instead of the checkbox, so you can access them immediately. If a downloaded article is archived, a red mark will appear. An error may occur, when you try to download an article and the link or the text-section of the article is not found. Then a yellow warning sign appears, which can be removed temporarily by clicking on it or permanently in [Manage Feeds](info.html#man_feed). If you hover over an article title, a description of the article will be shown. You can open the article and, if available, the audio in a new window.  
+Here you can download the articles of your newsfeeds (see the section New/Edit Feeds
+for an explanation on how To add a new newsfeed). 
+If you've set up multiple newsfeeds for your selected language, the link 
+"update multiple feeds" will appear. By clicking that link you can update one or 
+more feeds at once. 
+If you've selected a newsfeed, a blue circle-arrow will appear as well as the date 
+of your last update. 
+A click on the circle-arrow will update your selected newsfeed. 
+All downloaded articles will be marked by a bookmark-icon instead of the checkbox, 
+so you can access them immediately. If a downloaded article is archived, 
+a red mark will appear. An error may occur, when you try to download an article and 
+the link or the text-section of the article is not found. 
+Then a yellow warning sign appears, which can be removed temporarily by clicking on 
+it or permanently in "Manage Feeds" (see next section). 
+If you hover over an article title, a description of the article will be shown. 
+You can open the article and, if available, the audio in a new window.  
 
 ![Image](../img/37.jpg)  
 
 ### Manage Feeds
 
-Multi Actions for marked newsfeeds: You can update feeds, unset unloadable articles (see [my newsfeeds](info.html#feed_imp)), delete all articles or delete feeds.  
+Multi Actions for marked newsfeeds: You can update feeds, unset unloadable articles 
+(see [Newsfeed Import](info.html#Newsfeed%20Import)), delete all articles or delete feeds.  
 Actions: You can edit, update, delete a feed or follow the link to the newsfeed.  
 
 ![Image](../img/38.jpg)  
@@ -176,7 +192,7 @@ Here you can edit or set up a new newsfeed in 4 steps.
 
     ![Image](../img/40.jpg)  
 
-4. The settings are explained in [New/Edit Feeds](#new_feed).  
+4. The settings are explained in the [New/Edit Feeds](info.html#New%2FEdit%20Feeds).  
 
 ## Read a Text
 
@@ -198,33 +214,33 @@ With the checkbox \[Show All\] you can switch the display of text:
 
 ![Image](../img/30.jpg)  
 
-## Test terms
+## Review terms
 
 Tests are only possible if a term has a translation. Terms with status "Ignored" and "Well Known" are never tested, and terms with a positive or zero score are not tested today. In summary, the term score must fall below zero to trigger the test. See also [Term scores](info.html#termscores). Terms that are due today are marked with a red bullet in the term table. Terms that are due tomorrow are marked with a yellow bullet in the term table.  
 
-During a test, a status display (at the bottom of the test frame) shows you the elapsed time "mm:ss", a small bar graph, and the total, not yet tested, wrong and correct terms in this test.  
+During a test, a status display (at the bottom of the test frame) shows you the elapsed time "mm:ss", a small bar graph, and the total, not yet tested, wrong and correct terms in this test.
 
-In the following, L1 denotes you mother tongue (= translations), and L2 the language you want to learn (= the terms (words and expressions).
+In the following, L1 denotes you mother tongue (= translations), and L2 the language you want to learn (= the terms, meaning words and expressions).
 
-### Test terms in a text (L2 -> L1)
+### Review terms in a text (L2 -> L1)
 
 This is Test #1 or #4: L2 -> L1 (recognition) - to train your ability to recognize a L2 term. You may test within sentence context (Button "..\[L2\].."), or just the term (Button "\[L2\]"). You can also use the Keyboard in the test frame, see [Key Bindings](info.html#keybind).  
 
 ![Image](../img/07.jpg)  
 
-### Test terms in a text (L1 -> L2)
+### Review terms in a text (L1 -> L2)
 
 This is Test #2 or #5: L1 -> L2 (recall) - to train your ability to produce a term from L1. You may test within sentence context (Button "..\[L1\].."), or just the term (Button "\[L1\]"). You can also use the Keyboard in the test frame, see [Key Bindings](info.html#keybind).  
 
 ![Image](../img/11.jpg)  
 
-### Test terms in a text (••• -> L2)
+### Review terms in a text (••• -> L2)
 
 This is test #3: ••• -> L2 (recall) - to train your ability to produce a term only from the sentence context (Button "..\[••\].."). If you hover over "\[•••\]", a tooltip displays the translation of the term. You can also use the Keyboard in the test frame, see [Key Bindings](info.html#keybind).  
 
 ![Image](../img/12.jpg)  
 
-### Test yourself in a table / word list format (Button "Table")
+### Review yourself in a table / word list format (Button "Table")
 
 This is test #6: The selected terms and expressions are presented as a table. You can make invisible either the columns "Term" or "Translation", and you can hide or show the columns "Sentence", "Romanization", "Status" and "Ed" (Edit). To reveal the invisible solution ("Term" or "Translation"), you just click into the empty table cell. You can review or test yourself with or without changing the status by clicking "+" or "-" in the "Status" column. A status in red signifies that the term is due for testing. You can also edit the term by clicking the yellow "Edit" icon. Columns 2 to 6 may also my sorted by clicking on the header row. The initial sort order is according to term score.  
 
