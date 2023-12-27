@@ -22,7 +22,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lwt_icon.png"/></td>
   <td id="projectalign">
-   <div id="projectname">Learning with Texts - Fork<span id="projectnumber">&#160;2.8.1-fork</span>
+   <div id="projectname">Learning with Texts - Fork<span id="projectnumber">&#160;2.9.0-fork</span>
    </div>
    <div id="projectbrief">Learn foreign languages with texts</div>
   </td>
@@ -105,7 +105,8 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Start Reading a text (frameset) </p>
-<p>Call: <a class="el" href="do__text_8php.html" title="Start Reading a text (frameset)">do_text.php</a>?text=[textid] Create the main window when reading texts. </p>
+<p>Call: <a class="el" href="do__text_8php.html" title="Start Reading a text (frameset)">do_text.php</a>?text=[textid] Create the main window when reading texts.</p>
+<p>PHP version 8.1 </p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="a2774129d7a15a91894fe926c5eabdb15" name="a2774129d7a15a91894fe926c5eabdb15"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2774129d7a15a91894fe926c5eabdb15">&#9670;&#160;</a></span>do_text_desktop_content()</h2>
@@ -135,7 +136,7 @@ Variables</h2></td></tr>
 <p>Echo the page content for the desktop version of do_text.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramtype">int</td><td class="paramname">$textid</td><td>Text ID </td></tr>
+    <tr><td class="paramtype">int</td><td class="paramname">$textid</td><td><a class="el" href="class_text.html">Text</a> ID </td></tr>
     <tr><td class="paramtype">mixed</td><td class="paramname">$audio</td><td>Audio URI, unnused, null by default</td></tr>
   </table>
   </dd>
@@ -172,7 +173,7 @@ Variables</h2></td></tr>
 <p>Echo the page content for the mobile version of do_text.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramtype">int</td><td class="paramname">$textid</td><td>Text ID </td></tr>
+    <tr><td class="paramtype">int</td><td class="paramname">$textid</td><td><a class="el" href="class_text.html">Text</a> ID </td></tr>
     <tr><td class="paramtype">mixed</td><td class="paramname">$audio</td><td>Audio URI, unnused, null by default</td></tr>
   </table>
   </dd>
@@ -202,7 +203,7 @@ Variables</h2></td></tr>
 <p>Echo the text page.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramtype">int</td><td class="paramname">$textit</td><td>Text ID </td></tr>
+    <tr><td class="paramtype">int</td><td class="paramname">$textit</td><td><a class="el" href="class_text.html">Text</a> ID </td></tr>
     <tr><td class="paramtype">bool</td><td class="paramname">$mobile</td><td>Set to true if you want the mobile version of the page.</td></tr>
   </table>
   </dd>
@@ -229,8 +230,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Get text ID (if possible).</p>
-<p>Text ID if first looked at int the 'text' parameter. If not found, then look at 'start'.</p>
-<dl class="section return"><dt>Returns</dt><dd>int|null Text ID or null </dd></dl>
+<p><a class="el" href="class_text.html">Text</a> ID if first looked at int the 'text' parameter. If not found, then look at 'start'.</p>
+<dl class="section return"><dt>Returns</dt><dd>int|null <a class="el" href="class_text.html">Text</a> ID or null </dd></dl>
 
 </div>
 </div>

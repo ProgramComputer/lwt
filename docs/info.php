@@ -3,7 +3,10 @@
  * \file
  * \brief LWT Information / Help
  *
- * @package Lwt
+ * PHP version 8.1
+ *
+ * @category Documentation
+ * @package Lwt_Documentation
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
  * @link    https://hugofara.github.io/lwt/docs/html/info_8php.html
@@ -42,29 +45,25 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 			 * @since 2.9.0 Function is modified to use JSON with the REST API.
 			 */
 			function ajaxGetTheme () {
-				$.ajax(
+				$.getJSON(
+					'../api.php/v1/settings/theme-path',
 					{
-						type: 'GET',
-						url: '../inc/ajax.php',
-						async: false, 
-						data: {
-							action: "query",
-							action_type: "theme_path",
-							path: '../css/styles.css' 
-						}, 
-						success: function (data) {
-							if ("error" in data)
-								return;
-							const path = data["theme_path"].trim();
-							if (path.endsWith("styles.css")) {
-								$('style').html(
-									"@import url(../" + path + ");"
-								);
-							}
-						},
-						dataType: "json"
+						path: '../css/styles.css' 
+					},
+					function (data) {
+						if ("error" in data)
+							return;
+						const path = data["theme_path"].trim();
+						if (path.endsWith("styles.css")) {
+							$('style').html(
+								"@import url(../" + path + ");"
+							);
+						}
 					}
-				);
+				)
+				.always(function () {
+					$('html').show();
+				});
 			}
 
 			/**
@@ -78,7 +77,9 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 				qm.selectedIndex = 0;
 			}
 
-			ajaxGetTheme();
+			$('html').addClass('hidden');
+
+			$(document).ready(ajaxGetTheme);
 
 		</script>
 		<title>
@@ -116,7 +117,8 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 						<a href="#export">Export Template</a><br>
 						<a href="#contribute">Contribute</a><br>
 						<a href="#wordpress">WordPress Integration</a><br>
-						<a href="#database">Database</a><br>
+						<a href="#api">Public API</a>
+			<a href="#database">Database</a><br>
 						<a href="#CHANGELOG">Changelog</a>
 		</div>
 			<script type="text/javascript">	
@@ -213,6 +215,9 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 					<option value="wordpress">
 						WordPress Integration
 					</option>
+					<option value="api">
+						Public API
+					</option>
 					<option value="database">
 						Database Structure
 					</option>
@@ -222,7 +227,7 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 				</select>
 			</p>
 
-			<?php echo markdown_integration(__DIR__ . "/preface.md"); ?>
+			<?php markdown_integration(__DIR__ . "/preface.md"); ?>
 
 			<h2 name="current" id="current">
 				▶ Current Version - <a href="#">[↑]</a>
@@ -235,15 +240,15 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 			</p>
 			
 
-			<?php echo markdown_integration(__DIR__ . "/abstract.md"); ?>
+			<?php markdown_integration(__DIR__ . "/abstract.md"); ?>
 			
-			<?php echo markdown_integration(__DIR__ . "/install.md"); ?>
+			<?php markdown_integration(__DIR__ . "/install.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/postinstall.md"); ?>
+			<?php markdown_integration(__DIR__ . "/postinstall.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/features.md"); ?>
+			<?php markdown_integration(__DIR__ . "/features.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/newfeatures.md"); ?>
+			<?php markdown_integration(__DIR__ . "/newfeatures.md"); ?>
 			
 			<h2 name="screencasts" id="screencasts">
 				▶ Screencasts/Videos - <a href="#">[↑]</a>
@@ -267,37 +272,39 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 				<a href="http://www.fluentin3months.com/learning-with-texts/" target="_blank">Fluent In 3 Months: Introducing LWT</a>, with <a target="_blank" href="http://lwtfi3m.co/">Benny's own (free) version of LWT</a>.<br />
 			</p>
 
-			<?php echo markdown_integration(__DIR__ . "/links.md"); ?>
+			<?php markdown_integration(__DIR__ . "/links.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/restrictions.md"); ?>
+			<?php markdown_integration(__DIR__ . "/restrictions.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/../UNLICENSE.md" ) ?>
+			<?php markdown_integration(__DIR__ . "/../UNLICENSE.md" ) ?>
 
-			<?php echo markdown_integration(__DIR__ . "/thirdpartylicenses.md" ) ?>
+			<?php markdown_integration(__DIR__ . "/thirdpartylicenses.md" ) ?>
 
-			<?php echo markdown_integration(__DIR__ . "/learn.md"); ?>
+			<?php markdown_integration(__DIR__ . "/learn.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/howto.md"); ?>
+			<?php markdown_integration(__DIR__ . "/howto.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/faq.md"); ?>
+			<?php markdown_integration(__DIR__ . "/faq.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/ipad.md"); ?>
+			<?php markdown_integration(__DIR__ . "/ipad.md"); ?>
 		
-			<?php echo markdown_integration(__DIR__ . '/langsetup.md'); ?>
+			<?php markdown_integration(__DIR__ . '/langsetup.md'); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/termscores.md"); ?>
+			<?php markdown_integration(__DIR__ . "/termscores.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/keybind.md"); ?>
+			<?php markdown_integration(__DIR__ . "/keybind.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/export.md"); ?>
+			<?php markdown_integration(__DIR__ . "/export.md"); ?>
 			
-			<?php echo markdown_integration(__DIR__ . "/contribute.md"); ?>
+			<?php markdown_integration(__DIR__ . "/contribute.md"); ?>
 
-			<?php echo markdown_integration(__DIR__ . "/wordpress.md"); ?>
+			<?php markdown_integration(__DIR__ . "/wordpress.md"); ?>
+
+			<?php markdown_integration(__DIR__ . "/api.md"); ?>
 			
-			<?php echo markdown_integration(__DIR__ . "/database.md"); ?>
+			<?php markdown_integration(__DIR__ . "/database.md"); ?>
 			
-			<?php echo markdown_integration(__DIR__ . "/CHANGELOG.md"); ?>
+			<?php markdown_integration(__DIR__ . "/CHANGELOG.md"); ?>
 
 			<footer>
 				<p class="smallgray">
