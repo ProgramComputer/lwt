@@ -34,10 +34,8 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 		<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png" />
 		<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png" />
 		<link rel="apple-touch-startup-image" href="../img/apple-touch-startup.png" />
-		<style type="text/css">
-			@import url(../css/styles.css);
-			.hidden {display:none;}
-		</style>
+		<link rel="stylesheet" href="../css/styles.css">
+
 		<script type="text/javascript" src="../js/jquery.js"></script>
 		<script type="text/javascript" src="../js/floating.js"></script>
  		<script type="text/javascript">
@@ -92,36 +90,48 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 	<body>
 		<div id="floatdiv">
 			<a href="#">↑ TOP ↑</a>
-			<div>&nbsp;</div>
-			<a href="#preface">Preface</a>
-			<a href="#current">Curr. Version </a>
-			<a href="#abstract">Abstract</a>
-			<a href="#install">Installation</a>
-			<a href="#postinstall">Post-<wbr>Installation</a>
-			<a href="#features">Features</a>
-			<a href="#newfeatures">New Features</a>
-			<a href="#screencasts">Screencasts</a>
-			<a href="#links">Links</a>
-			<a href="#restrictions">Restrictions</a>
-			<a href="#UNLICENSE">License</a>
-			<a href="#thirdpartylicenses">Third Party</a>
-			<a href="#learn">How to learn</a>
-			<a href="#howto">How to use</a>
-			<a href="#faq">Q & A</a>
-			<div>&nbsp;</div>
-			<a href="#ipad">Setup Tablets</a> 
-			<a href="#langsetup">Lang. Setup</a>
-			<a href="#termscores">Term Scores</a>
-			<a href="#keybind">Key Bindings</a>
-			<a href="#export">Export Template</a>
-			<div>&nbsp;</div>
-			<a href="#contribute">Contribute</a>
-			<a href="#wordpress">WordPress Integration</a>
-			<a href="#api">Public API</a>
-			<a href="#database">Database</a>
-			<a href="#CHANGELOG">Changelog</a>
-		</div>	
+			<br>
+			<br>
 
+						<a href="#preface">Preface</a>
+			<br>
+
+						<a href="#current">Curr. Version </a>
+			<br>
+						<a href="#links">Links</a><br>
+						<a href="#abstract">Abstract</a><br>
+						<a href="#features">Features</a><br>
+						<a href="#newfeatures">New Features</a><br>
+						<a href="#screencasts">Screencasts</a><br>
+						<a href="#restrictions">Restrictions</a><br>
+						<a href="#UNLICENSE">(Un-) License</a><br>
+						<a href="#thirdpartylicenses">Third Party</a><br><br>
+						<a href="#install">Installation</a><br>
+						<a href="#learn">How to learn</a><br>
+						<a href="#howto">How to use</a><br>
+						<a href="#faq">Q &amp; A</a><br><br>
+						<a href="#ipad">Setup Tablets</a> <br>
+						<a href="#langsetup">Lang. Setup</a><br>
+						<a href="#termscores">Term Scores</a><br>
+						<a href="#keybind">Key Bindings</a><br>
+						<a href="#export">Export Template</a><br>
+						<a href="#contribute">Contribute</a><br>
+						<a href="#wordpress">WordPress Integration</a><br>
+						<a href="#api">Public API</a>
+			<a href="#database">Database</a><br>
+						<a href="#CHANGELOG">Changelog</a>
+		</div>
+			<script type="text/javascript">	
+			//<![CDATA[
+			$(document).ready( function() {
+				$('#floatdiv').addFloating( {	
+					targetRight: 10,	
+					targetTop: 10,
+					snap: true	
+				} );	
+			});
+			//]]>
+			</script>
 		<div style="margin-right:100px;">
 
 			<h4>
