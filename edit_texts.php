@@ -1,6 +1,5 @@
 <?php
-require __DIR__ . '/vendor/autoload.php';
-use \Done\Subtitles\Subtitles;
+
 
 /**
  * \file
@@ -542,7 +541,7 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
         $_REQUEST["TxLgID"], $id 
     );
 
-    //currently youtube dailymotin and vimeo but youtube-dl can support more
+    //currently youtube dailymotion and vimeo but youtube-dl can support more
     $pattern = "/(https?:\/\/).*(youtu|dailymotion|vimeo)/i";
     $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --no-continue -o ".'media'.'/%(title)r-%(id)s-'.$id.'-.%(ext)s';
     $save_to_disk = getSettingWithDefault('set-tts');
@@ -576,41 +575,6 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
     pclose($handle);
     }
 
-    try {
-    //TRY and see if file has timed text
-    $subtitles =  Subtitles::loadFromString(get_first_value(
-        'SELECT TxText AS value FROM ' . $tbpref . 'texts 
-        WHERE TxID = ' . $id
-    ));
-
-    $internalFormat = $subtitles->getInternalFormat();
-    $seids= array();
-        foreach ($internalFormat as $cue) {
-            foreach ($cue['lines'] as $key => $line) {      
-                $seid = get_first_value("SELECT seid AS value FROM sentences where selGID =". convert_string_to_sqlsyntax_notrim_nonull($_REQUEST["TxLgID"])."
-                AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id)." and replace(".convert_string_to_sqlsyntax_notrim_nonull($line).",' ','') LIKE concat('%',setext,'%')
-                ". (empty($seids) ? "": " and seid not in (" . implode(",", $seids) . ")") ."ORDER BY seid asc;");
-                $seids[] = $seid;
-                runsql(
-                    "UPDATE {$tbpref}sentences 
-                    SET SeStartSec = ". convert_string_to_sqlsyntax_notrim_nonull($cue["start"] * 1000) .", SeEndSec = ". 
-                    convert_string_to_sqlsyntax_notrim_nonull($cue['end'] * 1000) ."
-                    where selGID =". convert_string_to_sqlsyntax_notrim_nonull($_REQUEST["TxLgID"])."
-                AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id) ." and seid = ". convert_string_to_sqlsyntax_notrim_nonull($seid),
-                    '', true
-                );
-
-            }
-        }
-
-    
-    } 
-    catch (\Done\Subtitles\Code\UserException $e) {
-if($debug){
-    echo $e.'<br />';
-}
-}
-   
    
 
     
