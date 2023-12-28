@@ -171,7 +171,7 @@ function get_phonetic_reading($get_req): array
 function get_subtitles($get_req): array
 {
     $data = subtitles_from_uri($get_req['uri'], $get_req['lang_id']);
-    return array("subtitles" => $data);
+    return $data;
 }
 
 

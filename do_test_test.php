@@ -991,7 +991,7 @@ function do_test_test_javascript($count)
             $.getJSON(
                 'api.php/v1/media-files?' + $.param(options_media_paths)
             ).done(function (data) {
-                if (data["paths"]) {
+                if (data["paths"] && typeof data["paths"] === 'string') {
                     var MEDIA =  data["paths"]
                     sentenceaudio.src = MEDIA;
         if (!(/(http(s?)):\/\//i.test(MEDIA))) {

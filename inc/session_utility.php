@@ -4897,8 +4897,8 @@ function phonetic_reading($text, $languageName)
  * @return string Subtitles text in any format
  * @global bool $debug Show a DEBUG span if true
  * */
-function subtitles_from_uri($uri,$lang_id){
-    global $debug;
+function subtitles_from_uri($uri,$lang_id):array
+{
 
     $abbr = getLanguageCode($lang_id, LWT_LANGUAGES_ARRAY);
 
@@ -4915,12 +4915,13 @@ function subtitles_from_uri($uri,$lang_id){
     }
     while(!feof($handle)){
         $line = fgets($handle);
-        if ($debug){
-         
-            echo $line.'<br />';
-        }
         if (($pos = strpos($line, 'media/temp')) !== false) {
             $filename = trim(substr($line,$pos));
+            
+        }
+        
+        if (($pos = strpos(mb_strtolower($line), 'err')) !== false) {
+            $err = trim(substr($line,$pos));
             
         }
       
@@ -4929,7 +4930,7 @@ function subtitles_from_uri($uri,$lang_id){
 
     unlink($filename);
     pclose($handle);
-    return $fileContent?$fileContent : "";
+    return array("subtitles" => $fileContent?$fileContent : "","error" => $err);
     }
 }
 
