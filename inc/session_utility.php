@@ -4880,7 +4880,6 @@ function phonetic_reading($text, $lang)
  * @global bool $debug Show a DEBUG span if true
  * */
 function subtitles_from_uri($uri,$lang_id){
-    global $debug;
 
     $abbr = getLanguageCode($lang_id, LWT_LANGUAGES_ARRAY);
 
@@ -4897,10 +4896,6 @@ function subtitles_from_uri($uri,$lang_id){
     }
     while(!feof($handle)){
         $line = fgets($handle);
-        if ($debug){
-         
-            echo $line.'<br />';
-        }
         if (($pos = strpos($line, 'media/temp')) !== false) {
             $filename = trim(substr($line,$pos));
             
