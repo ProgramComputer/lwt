@@ -2,8 +2,6 @@
 
 .github/*
 docker/*
-# Documentation
-docs/*
 # NPM, for debugging only
 node_modules/*
 # Phive products
