@@ -671,7 +671,7 @@ function do_text_text_javascript($var_array): void
                 return false;
             }
         });
-        saveReadingPosition(text_id, pos);
+        saveReadingPosition(vars["TID"], pos);
     }
 
     $(document).ready(prepareTextInteractions);

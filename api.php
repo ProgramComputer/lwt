@@ -56,6 +56,7 @@ function endpoint_exits($method, $requestUri)
 
         'settings' => [ 'POST' ],
         'settings/theme-path' => [ 'GET' ],
+        'subtitles' => [ 'GET' ],
 
         'terms' => [ 'GET', 'POST' ],
         'terms/imported' => [ 'GET' ],
@@ -156,6 +157,21 @@ function get_phonetic_reading($get_req): array
 {
     $data = phonetic_reading($get_req['text'], $get_req['lang']);
     return array("phonetic_reading" => $data);
+}
+
+/**
+ * Get the subtitles of a URI
+ *
+ * @param array $get_req Array with the fields "uri" and "lang" (short language name)
+ *
+ * @return string[] JSON-encoded result
+ *
+ * @psalm-return array{subtitles: string}
+ */
+function get_subtitles($get_req): array
+{
+    $data = subtitles_from_uri($get_req['uri'], $get_req['lang_id']);
+    return array("subtitles" => $data);
 }
 
 
@@ -663,6 +679,10 @@ function request_handler($method, $requestUri, $post_param) {
                         );
                 }
                 break;
+            case 'subtitles':
+                    $answer = get_subtitles($req_param);
+                    send_response(200, $answer);
+                    break; 
             case 'terms':
                 if ($endpoint_fragments[1] == "imported") {
                     $answer = imported_terms($req_param);

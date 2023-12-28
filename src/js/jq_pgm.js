@@ -1314,6 +1314,37 @@ function do_ajax_update_media_select (id) {
 }
 
 /**
+ * Process the received data from subtitles query
+ * 
+ * @param {Object} data Received data as a JSON object 
+ */
+function subtitles_receive_data(data) {
+  console.log(data)
+  $('#subtitlesLoadingImg').css("display", "none");
+
+  $('#TxText').val(data["subtitles"]);
+
+}
+/**
+ * Perform an AJAX query to retrieve subtitles.
+ */
+function do_ajax_update_subtitles () {
+  $('#subtitlesErrorMessage').css("display", "none");
+  $('#subtitlesLoadingImg').css("display", "inherit");
+
+  uri = $('[name="TxAudioURI"]').val();
+  lang_id = $("#TxLgID").val()
+  $.getJSON(
+    'api.php/v1/subtitles',
+    {
+      lang_id: lang_id,
+      uri:uri
+    },
+    subtitles_receive_data
+  );
+}
+
+/**
  * Prepare am HTML element that formats the sentences
  * 
  * @param {JSON}   sentences    A list of sentences to display. 

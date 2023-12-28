@@ -171,6 +171,13 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
     $list = "(" . implode(",", $id_list) . ")";
 
     if ($markaction == 'del') {
+        foreach ($id_list as $id)
+        {
+        if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'texts where TxID = ' . $id)) !== null)
+        {
+    unlink(ltrim($uri,"lwt/"));
+        }
+    }
         $message3 = runsql(
             'delete from ' . $tbpref . 'textitems2 where Ti2TxID in ' . $list, 
             "Text items deleted"
@@ -344,6 +351,11 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
 function edit_texts_delete($txid): string
 {
     global $tbpref;
+
+    if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'texts where TxID = ' . $txid)) !== null)
+    {
+unlink(ltrim($uri,"lwt/"));
+    }
     $message3 = runsql(
         'DELETE FROM ' . $tbpref . 'textitems2 where Ti2TxID = ' . $txid,
         "Text items deleted"
@@ -532,13 +544,13 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
 
     //currently youtube dailymotin and vimeo but youtube-dl can support more
     $pattern = "/(https?:\/\/).*(youtu|dailymotion|vimeo)/i";
-    $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --no-continue -o ".'media'.'/%(title)r-%(id)s.%(ext)s';
+    $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --no-continue -o ".'media'.'/%(title)r-%(id)s-'.$id.'-.%(ext)s';
     $save_to_disk = getSettingWithDefault('set-tts');
 
    
     if($save_to_disk &&  preg_match($pattern,  trim($_REQUEST["TxAudioURI"])) && ($youtubedl = get_youtubedl_path($youtubedl_args)) != "" )
     {
-        $youtubedl_args = "  ". trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --get-filename -o media".'/%(title)r-%(id)s.%(ext)s ';
+        $youtubedl_args = "  ". trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --get-filename -o media".'/%(title)r-%(id)s-'.$id.'-.%(ext)s ';
         $titleandid = get_youtubedl_path($youtubedl_args);
 
     $handle = popen($titleandid.' 2>&1; '.$youtubedl.' 2>&1', "r");
@@ -812,9 +824,16 @@ function edit_texts_form($text, $annotated)
                     Media URI:
                 </td>
                 <td class="td1">
+                <p style="display: none;" id="subtitlesErrorMessage"></p>
+    <img style="float: right; display: none;" id="subtitlesLoadingImg" src="icn/waiting2.gif" />
+   
                     <input type="text" class="checkoutsidebmp respinput" 
                     data_info="Audio-URI" name="TxAudioURI" maxlength="200"
                     value="<?php echo tohtml($text->media_uri); ?>"  /> 
+                    <span class="click" id="genSub" onclick="do_ajax_update_subtitles();" style="display: none; margin-left: 16px;">
+    <img src="icn/arrow-circle-135.png" title="Generate Subtitles" alt="Generate Subtitles" /> 
+    Subtitles
+</span>
                     <span id="mediaselect">
                         <?php echo selectmediapath('TxAudioURI'); ?>
                     </span>        

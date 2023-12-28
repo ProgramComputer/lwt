@@ -1747,6 +1747,23 @@ function selectmediapath($f): string
         Refresh
     </span>
     <script type="text/javascript">
+   
+    $(\'[name="TxAudioURI"]\').on("propertychange change keyup paste input", function(){
+        var input = $(this).val();
+        if ((/(http(s?)):\/\//i.test(input))) {
+
+            $("#genSub").css("display", "");
+    
+        }
+        else{
+
+
+            $("#genSub").css("display", "none");
+        }
+
+
+    });
+ 
         // Populate fields with data
         media_select_receive_data(' . json_encode($media) . ');
     </script>';
@@ -4852,7 +4869,51 @@ function phonetic_reading($text, $lang)
     unlink($mecab_file);
     return $mecab_str;
 }
+/** 
+ * Gets subtitles for a language
+ * 
+ * 
+ *
+ * @param  string $uri uri source
+ * @param  string $lang_id Id of language
+ * @return string Subtitles text in any format
+ * @global bool $debug Show a DEBUG span if true
+ * */
+function subtitles_from_uri($uri,$lang_id){
+    global $debug;
 
+    $abbr = getLanguageCode($lang_id, LWT_LANGUAGES_ARRAY);
+
+    $youtubedl_args = " " ." --write-sub --sub-lang ".$abbr. " --skip-download ".trim($uri).' -o media/temp';
+    
+   
+    if(($youtubedl = get_youtubedl_path($youtubedl_args)) != "" )
+    {
+       
+
+    $handle = popen($youtubedl.' 2>&1;', "r");
+        if (feof($handle)) {
+        pclose($handle);
+    }
+    while(!feof($handle)){
+        $line = fgets($handle);
+        if ($debug){
+         
+            echo $line.'<br />';
+        }
+        if (($pos = strpos($line, 'media/temp')) !== false) {
+            $filename = trim(substr($line,$pos));
+            
+        }
+      
+    }
+    $fileContent = file_get_contents($filename);
+
+    unlink($filename);
+    pclose($handle);
+    return $fileContent?$fileContent : "";
+    }
+}
 
 /**
  * Refresh a text.

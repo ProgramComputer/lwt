@@ -138,11 +138,18 @@ if (isset($_REQUEST['markaction'])) {
                 $list .= ")";
                 
                 if ($markaction == 'del') {
+                    foreach($_REQUEST['marked'] as $id) {
+                        if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'archivedtexts where AtID = ' . $id)) !== null)
+                        {
+                    unlink(ltrim($uri,"lwt/"));
+                        }
+                    }
                     $message = runsql(
                         'delete from ' . $tbpref . 'archivedtexts 
                         where AtID in ' . $list, 
                         "Archived Texts deleted"
                     );
+                   
                     adjust_autoincr('archivedtexts', 'AtID');
                     runsql(
                         "DELETE " . $tbpref . "archtexttags 
@@ -225,11 +232,16 @@ if (isset($_REQUEST['markaction'])) {
 
 
 if (isset($_REQUEST['del'])) {
+    if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'archivedtexts where AtID = ' . $_REQUEST['del'])) !== null)
+    {
+unlink(ltrim($uri,"lwt/"));
+    }
     // DEL
     $message = runsql(
         'delete from ' . $tbpref . 'archivedtexts where AtID = ' . $_REQUEST['del'], 
         "Archived Texts deleted"
     );
+   
     adjust_autoincr('archivedtexts', 'AtID');
     runsql(
         "DELETE " . $tbpref . "archtexttags 
@@ -381,9 +393,16 @@ if (isset($_REQUEST['chg'])) {
             </td>
         </tr>
         <tr>
+       
             <td class="td1 right">Audio-URI:</td>
             <td class="td1">
+            <p style="display: none;" id="subtitlesErrorMessage"></p>
+    <img style="float: right; display: none;" id="subtitlesLoadingImg" src="icn/waiting2.gif" />
                 <input type="text" class="checkoutsidebmp" data_info="Audio-URI" name="AtAudioURI" value="<?php echo tohtml($record['AtAudioURI']); ?>" maxlength="200" size="60" />
+                <span class="click" id="genSub" onclick="do_ajax_update_subtitles();" style="display: none; margin-left: 16px;">
+    <img src="icn/arrow-circle-135.png" title="Generate Subtitles" alt="Generate Subtitles" /> 
+    Subtitles
+</span>
                 <span id="mediaselect"><?php echo selectmediapath('AtAudioURI'); ?></span>        
             </td>
         </tr>
