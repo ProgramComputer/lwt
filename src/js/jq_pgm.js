@@ -1323,6 +1323,13 @@ function subtitles_receive_data(data) {
   $('#subtitlesLoadingImg').css("display", "none");
 
   $('#TxText').val(data["subtitles"]);
+  if (data["error"] !== undefined) {
+  
+      msg = data["error"];
+    
+    $('#subtitlesErrorMessage').text(msg);
+    $('#subtitlesErrorMessage').css("display", "inherit");
+  }
 
 }
 /**
