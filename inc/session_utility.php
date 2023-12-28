@@ -1668,7 +1668,7 @@ function media_paths_search($dir): array
  * @param string $id -1 for all, else search in texts
  * @return string[] Paths of media files
  */
-function get_media_paths($id$id): array
+function get_media_paths($id): array
 {
     global $tbpref;
     $answer = array(
