@@ -22,6 +22,9 @@ use \Done\Subtitles\Subtitles;
  *     ... page=[pageno] ... page
  *     ... query=[titlefilter] ... title filter
  * 
+ * PHP version 8.1
+ * 
+ * @category User_Interface
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
@@ -75,7 +78,7 @@ function edit_texts_get_wh_query($currentquery, $currentquerymode, $currentregex
             $wh_query = '';
             unset($_SESSION['currentwordquery']);
             if (isset($_REQUEST['query'])) { 
-                echo '<p id="hide3" style="color:red;text-align:center;">' + 
+                echo '<p id="hide3" style="color:red;text-align:center;">' . 
                 '+++ Warning: Invalid Search +++</p>'; 
             }
         }
@@ -97,14 +100,14 @@ function edit_texts_get_wh_tag($currentlang)
     $wh_tag1 = null;
     $wh_tag2 = null;
     $currenttag1 = validateTextTag(
-        processSessParam("tag1", "currenttexttag1", '', 0), 
+        (string) processSessParam("tag1", "currenttexttag1", '', false), 
         $currentlang
     );
     $currenttag2 = validateTextTag(
-        processSessParam("tag2", "currenttexttag2", '', 0), 
+        (string) processSessParam("tag2", "currenttexttag2", '', false), 
         $currentlang
     );
-    $currenttag12 = processSessParam("tag12", "currenttexttag12", '', 0);
+    $currenttag12 = (string) processSessParam("tag12", "currenttexttag12", '', false);
     if ($currenttag1 == '' && $currenttag2 == '') {
         return '';
     }
@@ -142,13 +145,13 @@ function edit_texts_get_wh_tag($currentlang)
  * @param array  $marked     Texts marked.
  * @param string $actiondata Values to insert to the database
  *
- * @return array{0: int, 1: null} Number of rows edited, the second element is always null.
+ * @return (null|string)[] Number of rows edited, the second element is always null.
  *
  * @global string $tbpref Database table prefix
  *
- * @since 2.4.1-fork The second return field is always null 
+ * @since 2.4.1-fork The second return field is always null
  *
- * @psalm-return array{0: string, 1: null}
+ * @psalm-return list{string, null}
  */
 function edit_texts_mark_action($markaction, $marked, $actiondata): array
 {
@@ -168,6 +171,13 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
     $list = "(" . implode(",", $id_list) . ")";
 
     if ($markaction == 'del') {
+        foreach ($id_list as $id)
+        {
+        if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'texts where TxID = ' . $id)) !== null)
+        {
+    unlink(ltrim($uri,"lwt/"));
+        }
+    }
         $message3 = runsql(
             'delete from ' . $tbpref . 'textitems2 where Ti2TxID in ' . $list, 
             "Text items deleted"
@@ -332,7 +342,7 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
 /**
  * Delete an existing text.
  *
- * @param string $txid Text ID
+ * @param string|int $txid Text ID
  *
  * @return string Texts, sentences, and text items deleted.
  *
@@ -341,6 +351,11 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
 function edit_texts_delete($txid): string
 {
     global $tbpref;
+
+    if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'texts where TxID = ' . $txid)) !== null)
+    {
+unlink(ltrim($uri,"lwt/"));
+    }
     $message3 = runsql(
         'DELETE FROM ' . $tbpref . 'textitems2 where Ti2TxID = ' . $txid,
         "Text items deleted"
@@ -429,9 +444,9 @@ function edit_texts_archive($txid): string
 /**
  * Do an operation on texts.
  *
- * @param string $op           Operation name
- * @param mixed  $message1     Unnused
- * @param int    $no_pagestart If you don't want a page
+ * @param string   $op           Operation name
+ * @param mixed    $message1     Unnused
+ * @param int|bool $no_pagestart If you don't want a page
  *
  * @return string Edition message (number of rows edited)
  *
@@ -446,7 +461,7 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
     if (strlen(prepare_textdata($_REQUEST['TxText'])) > 65000) {
         $message = "Error: Text too long, must be below 65000 Bytes";
         $currentlang = (int) validateLang(
-            processDBParam("filterlang", 'currentlanguage', '', 0)
+            (string) processDBParam("filterlang", 'currentlanguage', '', false)
         );
         if ($no_pagestart) { 
             pagestart('My ' . getLanguage($currentlang) . ' Texts', true); 
@@ -529,13 +544,13 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
 
     //currently youtube dailymotin and vimeo but youtube-dl can support more
     $pattern = "/(https?:\/\/).*(youtu|dailymotion|vimeo)/i";
-    $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --no-continue -o ".'media'.'/%(title)r-%(id)s.%(ext)s';
+    $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --no-continue -o ".'media'.'/%(title)r-%(id)s-'.$id.'-.%(ext)s';
     $save_to_disk = getSettingWithDefault('set-tts');
 
    
     if($save_to_disk &&  preg_match($pattern,  trim($_REQUEST["TxAudioURI"])) && ($youtubedl = get_youtubedl_path($youtubedl_args)) != "" )
     {
-        $youtubedl_args = "  ". trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --get-filename -o media".'/%(title)r-%(id)s.%(ext)s ';
+        $youtubedl_args = "  ". trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --get-filename -o media".'/%(title)r-%(id)s-'.$id.'-.%(ext)s ';
         $titleandid = get_youtubedl_path($youtubedl_args);
 
     $handle = popen($titleandid.' 2>&1; '.$youtubedl.' 2>&1', "r");
@@ -562,6 +577,44 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
     }
 
     //TODO? youtube-dl can extract subtitles . Add a UI feature in Text Import to allow it?
+    try {
+    //TRY and see if file has timed text
+    $subtitles =  Subtitles::loadFromString(get_first_value(
+        'SELECT TxText AS value FROM ' . $tbpref . 'texts 
+        WHERE TxID = ' . $id
+    ));
+
+    $internalFormat = $subtitles->getInternalFormat();
+    $seids= array();
+        foreach ($internalFormat as $cue) {
+            foreach ($cue['lines'] as $key => $line) {      
+                $seid = get_first_value("SELECT seid AS value FROM sentences where selGID =". convert_string_to_sqlsyntax_notrim_nonull($_REQUEST["TxLgID"])."
+                AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id)." and replace(".convert_string_to_sqlsyntax_notrim_nonull($line).",' ','') LIKE concat('%',setext,'%')
+                ". (empty($seids) ? "": " and seid not in (" . implode(",", $seids) . ")") ."ORDER BY seid asc;");
+                $seids[] = $seid;
+                runsql(
+                    "UPDATE {$tbpref}sentences 
+                    SET SeStartSec = ". convert_string_to_sqlsyntax_notrim_nonull($cue["start"] * 1000) .", SeEndSec = ". 
+                    convert_string_to_sqlsyntax_notrim_nonull($cue['end'] * 1000) ."
+                    where selGID =". convert_string_to_sqlsyntax_notrim_nonull($_REQUEST["TxLgID"])."
+                AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id) ." and seid = ". convert_string_to_sqlsyntax_notrim_nonull($seid),
+                    '', true
+                );
+
+            }
+        }
+
+    
+    } 
+    catch (\Done\Subtitles\Code\UserException $e) {
+if($debug){
+    echo $e.'<br />';
+}
+}
+   
+
+    
+
     try {
     //TRY and see if file has timed text
     $subtitles =  Subtitles::loadFromString(get_first_value(
@@ -650,8 +703,6 @@ function edit_texts_form($text, $annotated)
         /**
          * Change the language of inputs for text and title based on selected 
          * language.
-         * 
-         * @returns undefined
          */
         function change_textboxes_language() {
             const lid = document.getElementById("TxLgID").value;
@@ -773,9 +824,16 @@ function edit_texts_form($text, $annotated)
                     Media URI:
                 </td>
                 <td class="td1">
+                <p style="display: none;" id="subtitlesErrorMessage"></p>
+    <img style="float: right; display: none;" id="subtitlesLoadingImg" src="icn/waiting2.gif" />
+   
                     <input type="text" class="checkoutsidebmp respinput" 
                     data_info="Audio-URI" name="TxAudioURI" maxlength="200"
                     value="<?php echo tohtml($text->media_uri); ?>"  /> 
+                    <span class="click" id="genSub" onclick="do_ajax_update_subtitles();" style="display: none; margin-left: 16px;">
+    <img src="icn/arrow-circle-135.png" title="Generate Subtitles" alt="Generate Subtitles" /> 
+    Subtitles
+</span>
                     <span id="mediaselect">
                         <?php echo selectmediapath('TxAudioURI'); ?>
                     </span>        
@@ -856,21 +914,21 @@ function edit_texts_change($txid)
  */
 function edit_texts_filters_form($currentlang, $recno, $currentpage, $pages)
 {
-    $currentquery = processSessParam("query", "currenttextquery", '', 0);
-    $currentquerymode = processSessParam(
-        "query_mode", "currenttextquerymode", 'title,text', 0
+    $currentquery = (string) processSessParam("query", "currenttextquery", '', false);
+    $currentquerymode = (string) processSessParam(
+        "query_mode", "currenttextquerymode", 'title,text', false
     );
     $currentregexmode = getSettingWithDefault("set-regex-mode");
     $currenttag1 = validateTextTag(
-        processSessParam("tag1", "currenttexttag1", '', 0), 
+        (string) processSessParam("tag1", "currenttexttag1", '', false), 
         $currentlang
     );
     $currenttag2 = validateTextTag(
-        processSessParam("tag2", "currenttexttag2", '', 0), 
+        (string) processSessParam("tag2", "currenttexttag2", '', false), 
         $currentlang
     );
-    $currentsort = processDBParam("sort", 'currenttextsort', '1', 1);
-    $currenttag12 = processSessParam("tag12", "currenttexttag12", '', 0);
+    $currentsort = (int) processDBParam("sort", 'currenttextsort', '1', true);
+    $currenttag12 = (string) processSessParam("tag12", "currenttexttag12", '', false);
     ?>
 <form name="form1" action="#" onsubmit="document.form1.querybutton.click(); return false;">
     <table class="tab2" cellspacing="0" cellpadding="5">
@@ -974,7 +1032,7 @@ function edit_texts_other_pages($recno)
         return;
     }
 
-    $currentpage = processSessParam("page", "currenttextpage", '1', 1);
+    $currentpage = (int) processSessParam("page", "currenttextpage", '1', true);
     if ($currentpage < 1) { 
         $currentpage = 1; 
     }
@@ -1002,7 +1060,7 @@ function edit_texts_other_pages($recno)
  *                                                                   Various information about the text should contain 'TxID' at least.
  * @param string                                        $currentlang 
  *                                                                   Current language ID
- * @param array<int<0, 5>|98|99, array<string, string>> $statuses
+ * @param array{int<0, 5>|98|99, array{string, string}} $statuses
  * List of statuses WITH unknown words (status 0)
  * 
  * @return void
@@ -1240,14 +1298,14 @@ function edit_texts_display($message)
     // Page, Sort, etc.
 
     $currentlang = validateLang(
-        processDBParam("filterlang", 'currentlanguage', '', 0)
+        (string) processDBParam("filterlang", 'currentlanguage', '', false)
     );
-    $currentsort = processDBParam("sort", 'currenttextsort', '1', 1);
+    $currentsort = (int) processDBParam("sort", 'currenttextsort', '1', true);
 
-    $currentpage = processSessParam("page", "currenttextpage", '1', 1);
-    $currentquery = processSessParam("query", "currenttextquery", '', 0);
-    $currentquerymode = processSessParam(
-        "query_mode", "currenttextquerymode", 'title,text', 0
+    $currentpage = (int) processSessParam("page", "currenttextpage", '1', true);
+    $currentquery = (string) processSessParam("query", "currenttextquery", '', false);
+    $currentquerymode = (string) processSessParam(
+        "query_mode", "currenttextquerymode", 'title,text', false
     );
     $currentregexmode = getSettingWithDefault("set-regex-mode");
 
@@ -1260,7 +1318,7 @@ function edit_texts_display($message)
 
     $wh_tag = edit_texts_get_wh_tag($currentlang);
 
-    echo error_message_with_hide($message, 0);
+    echo error_message_with_hide($message, false);
 
     $sql = "SELECT COUNT(*) AS value 
     FROM (
@@ -1336,8 +1394,9 @@ function edit_texts_display($message)
         <?php
         return;
     }
+    // TODO: check out the no coherent code on $showCounts 
     $showCounts = getSettingWithDefault('set-show-text-word-counts');
-    if(strlen($showCounts)!=5) { 
+    if (strlen($showCounts) != 5) { 
         $showCounts = "11111"; 
     }
     $sql = "SELECT TxID, TxTitle, LgName, TxAudioURI, TxSourceURI, 
@@ -1376,7 +1435,7 @@ function edit_texts_display($message)
 function edit_texts_do_page()
 {
     $currentlang = validateLang(
-        processDBParam("filterlang", 'currentlanguage', '', 0)
+        (string) processDBParam("filterlang", 'currentlanguage', '', false)
     );
     $no_pagestart = getreq('markaction') == 'test' || 
     getreq('markaction') == 'deltag' || 
@@ -1409,10 +1468,10 @@ function edit_texts_do_page()
 
     if (isset($_REQUEST['new'])) {
         // NEW
-        edit_texts_new($currentlang);
+        edit_texts_new((int) $currentlang);
     } elseif (isset($_REQUEST['chg'])) {
         // CHG
-        edit_texts_change(getreq('chg'));
+        edit_texts_change((int) getreq('chg'));
     } else {
         // DISPLAY
         edit_texts_display($message);

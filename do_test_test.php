@@ -9,6 +9,8 @@
  * Call: do_test_test.php?type=[testtype]&selection=1  
  *          (SQL via $_SESSION['testsql'])
  * 
+ * PHP version 8.1
+ * 
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
@@ -19,6 +21,53 @@
 require_once 'inc/session_utility.php';
 require_once 'inc/langdefs.php';
 
+/**
+ * Get the SQL string to perform tests.
+ *
+ * @param int|null   $selection    Test is of type selection
+ * @param string|null $sess_testsql SQL string for test
+ * @param int|null    $lang         Test is of type language, for the language $lang ID
+ * @param int|null    $text         Testing text with ID $text
+ *
+ * @return (int|int[]|string)[] Test identifier as an array(key, value)
+ *
+ * @psalm-return list{string, int|non-empty-list<int>|string}
+ */
+function do_test_get_identifier($selection, $sess_testsql, $lang, $text): array
+{
+    if (isset($selection) && isset($sess_testsql)) {
+        $data_string_array = explode(",", trim($sess_testsql, "()"));
+        $data_int_array = array_map('intval', $data_string_array);
+        switch ((int)$selection) {
+            case 2:
+                return array('words', $data_int_array);
+                break;
+            case 3:
+                return array('texts', $data_int_array);
+                break;
+            default:
+                // Deprecated behavior in 2.9.0, to be removed on 3.0.0
+                $test_sql = $sess_testsql;
+                $cntlang = get_first_value(
+                    "SELECT COUNT(DISTINCT WoLgID) AS value 
+                    FROM $test_sql"
+                );
+                if ($cntlang > 1) {
+                    echo "<p>Sorry - The selected terms are in $cntlang languages," . 
+                    " but tests are only possible in one language at a time.</p>";
+                    exit();
+                }
+                return array('raw_sql', $test_sql);
+                break;
+            }
+    } else if (isset($lang) && is_numeric($lang)) {
+        return array("lang", $lang);
+    } 
+    if (isset($text) && is_numeric($text)) {
+        return array("text", $text);
+    }
+    my_die("do_test_test.php called with wrong parameters"); 
+}
 
 /**
  * Get the SQL string to perform tests.
@@ -32,17 +81,9 @@ require_once 'inc/langdefs.php';
  */
 function do_test_get_test_sql($selection, $sess_testsql, $lang, $text)
 {
-    if (isset($selection) && isset($sess_testsql)) {
-        $testsql = do_test_test_from_selection($selection, $sess_testsql);
-    } else if (isset($lang) && is_numeric($lang)) {
-        $testsql = do_test_test_get_projection(2, (int) $lang);
-    } else if (isset($text) && is_numeric($text)) {
-        $testsql = do_test_test_get_projection(3, (int) $text);
-    } else {
-        my_die("do_test_test.php called with wrong parameters");
-    }
+    $identifier = do_test_get_identifier($selection, $sess_testsql, $lang, $text);
+    $testsql = do_test_test_get_projection($identifier[0], $identifier[1]);
     return $testsql;
-
 }
 
 /**
@@ -51,6 +92,11 @@ function do_test_get_test_sql($selection, $sess_testsql, $lang, $text)
  * @param int $testype Initial test type value
  * 
  * @return int Clamped $testtype
+ *                     - 1: Test type is ..[L2]..
+ *                     - 2: Test type is ..[L1]..
+ *                     - 3: Test type is ..[..]..
+ *                     - 4: Test type is [L2]
+ *                     - 5: Test type is [L1]
  */
 function do_test_get_test_type($testtype)
 {
@@ -117,14 +163,14 @@ function do_test_test_css()
 
 /**
  * Return the number of test due for tomorrow.
- * 
+ *
  * @param string $testsql Test selection string
- * 
- * @return int tomorrow tests
+ *
+ * @return int Tomorrow tests
  */
-function do_test_get_tomorrow_tests_count($testsql)
+function do_test_get_tomorrow_tests_count($testsql): int
 {
-    return get_first_value(
+    return (int) get_first_value(
         "SELECT COUNT(DISTINCT WoID) AS value 
         FROM $testsql AND WoStatus BETWEEN 1 AND 5 
         AND WoTranslation != '' AND WoTranslation != '*' AND WoTomorrowScore < 0"
@@ -163,13 +209,13 @@ function do_test_test_finished($testsql, $totaltests, $ajax = false)
 
 /**
  * Get a sentence containing the word. 
- * 
+ *
  * The sentence should contain at least 70% of known words.
- * 
+ *
  * @param int    $wid    The word to test.
- * @param string $lang   ID of the language
- * @param string $wordlc 
- * 
+ * @param mixed  $lang   ID of the language, will be removed in PHP 3.0.0
+ * @param string $wordlc Word in lowercase
+ *
  * @global string $tbpref Table prefix
  * @global int    $debug  Echo the passage number if 1. 
  * 
@@ -177,9 +223,11 @@ function do_test_test_finished($testsql, $totaltests, $ajax = false)
  *                                                   2 -SeStartSec,3 - SeEndSec, 4 - SeTxID
  * 
  * @since 2.5.3-fork Properly return sentences with at least 70% of known words.
- *                   Previously, it was supposed to be 100%, but buggy. 
+ *                   Previously, it was supposed to be 100%, but buggy.
+ *
+ * @psalm-return list{null|string, 0|1}
  */
-function do_test_test_sentence($wid, $lang, $wordlc)
+function do_test_test_sentence($wid, $lang, $wordlc): array
 {
     global $debug, $tbpref;
     $num = 0;
@@ -243,16 +291,18 @@ function do_test_test_sentence($wid, $lang, $wordlc)
 
 /**
  * Return the test relative to a word.
- * 
- * @param array  $wo_record Query from the database regarding a word.
- * @param string $sent      Sentence containing the word.
- * @param int    $testtype  Type of test
- * @param int    $nosent    1 if you want to hide sentences.
- * @param string $regexword Regex to select the desired word.
- * 
- * @return array{0: string, 1: string} HTML-escaped and raw text sentences (or word)
+ *
+ * @param array    $wo_record Query from the database regarding a word.
+ * @param string   $sent      Sentence containing the word.
+ * @param int      $testtype  Type of test
+ * @param bool|int $nosent    1 or true if you want to hide sentences.
+ * @param string   $regexword Regex to select the desired word.
+ *
+ * @return string[] HTML-escaped and raw text sentences (or word)
+ *
+ * @psalm-return list{string, string}
  */
-function do_test_get_term_test($wo_record, $sent, $testtype, $nosent, $regexword)
+function do_test_get_term_test($wo_record, $sent, $testtype, $nosent, $regexword): array
 {
     $wid = $wo_record['WoID'];
     $word = $wo_record['WoText'];
@@ -321,16 +371,16 @@ function do_test_get_term_test($wo_record, $sent, $testtype, $nosent, $regexword
 
 /**
  * Echo the test relative to a word.
- * 
+ *
  * @param array  $wo_record Query from the database regarding a word.
  * @param string $sent      Sentence containing the word.
  * @param int    $testtype  Type of test
  * @param int    $nosent    1 if you want to hide sentences.
  * @param string $regexword Regex to select the desired word.
- * 
- * @return array{0: string, 1: string} HTML-escaped and raw text sentences (or word)
+ *
+ * @return string HTML-escaped and raw text sentences (or word)
  */
-function print_term_test($wo_record, $sent, $testtype, $nosent, $regexword)
+function print_term_test($wo_record, $sent, $testtype, $nosent, $regexword): string
 {
     list($word, $_) = do_test_get_term_test(
         $wo_record,
@@ -344,12 +394,14 @@ function print_term_test($wo_record, $sent, $testtype, $nosent, $regexword)
 
 /**
  * Find the next word to test.
- * 
+ *
  * @param string $testsql Test selection string
- * 
- * @return array 
+ *
+ * @return (float|int|null|string)[] Empty array
+ *
+ * @psalm-return array<string, float|int|null|string>
  */
-function do_test_get_word($testsql)
+function do_test_get_word($testsql): array
 {
     $pass = 0;
     while ($pass < 2) {
@@ -399,10 +451,11 @@ function get_test_solution($testtype, $wo_record, $nosent, $wo_text)
 /**
  * Preforms the HTML of the test area, to update through AJAX.
  *
- * @param string $testsql    SQL query of for the words that should be tested.
- * @param int    $totaltests Total number of tests to do.
- * @param int    $count      Number of tests left.
- * @param int    $testtype   Type of test.
+ * @param string    $selector   Type of test to run.
+ * @param array|int $selection  Items to run the test on.
+ * @param int       $totaltests Total number of tests to do.
+ * @param int       $count      Number of tests left.
+ * @param int       $testtype   Type of test.
  *
  * @return int Number of tests left to do.
  *
@@ -411,18 +464,23 @@ function get_test_solution($testtype, $wo_record, $nosent, $wo_text)
  * @global string $langDefs Languages definition array
  * @psalm-return int<0, max>
  */
-function do_test_prepare_ajax_test_area($testsql, $count, $testtype): int
+function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype): int
 {
     global $tbpref, $langDefs;
+
     $nosent = false;
     if ($testtype > 3) {
         $testtype -= 3;
         $nosent = true;
     }
+    $testsql = do_test_test_get_projection($selector, $selection);
+
 
     echo '<div id="body">';
 
-    $lgid = get_first_value("SELECT WoLgID AS value FROM $testsql LIMIT 1");
+    $lgid = (int) get_first_value(
+        "SELECT WoLgID AS value FROM $testsql LIMIT 1"
+    );
     
     $sql = "SELECT LgName, LgDict1URI, LgDict2URI, LgGoogleTranslateURI, LgTextSize, 
     LgRemoveSpaces, LgRegexpWordCharacters, LgRightToLeft 
@@ -477,122 +535,21 @@ function do_test_prepare_ajax_test_area($testsql, $count, $testtype): int
        // };
         }
         /**
-         * Insert a new word test.
-         */
-        function insert_new_word(word) {
-            const options_phonetic_reading = {
-                "action": "query",
-                "action_type": "phonetic_reading",
-                "text": word['word_text'],
-                "lang": <?php echo json_encode((string) $abbr); ?>
-
-            };
-            $.getJSON(
-                'inc/ajax.php?' + $.param(options_phonetic_reading)
-            ).done(function (data) {
-                if (data["phonetic_reading"]) {
-                    $('.word').on('click', read_word);
-
-                    /** 
-                    * Read the word aloud
-                    */
-                    function read_word() {
-                        if (('speechSynthesis' in window) &&
-                            document.getElementById('utterance-allowed').checked) {
-                            const text = data["phonetic_reading"];
-                            const lang = <?php echo json_encode($abbr); ?>;
-                            readRawTextAloud(text, lang);
-                        }
-                    }
-                }
-            });
-            const options_media_paths = {
-                "action": "query",
-                "action_type": "media_paths",
-                "id": word['txID'],
-            };
-            $.getJSON(
-                'inc/ajax.php?' + $.param(options_media_paths)
-            ).done(function (data) {
-                if (data["paths"]) {
-                    var MEDIA =  data["paths"]
-                    sentenceaudio.src = MEDIA;
-        if (!(/(http(s?)):\/\//i.test(MEDIA))) {
-            MEDIA = new URL(MEDIA, window.location.origin).href
-            sentenceaudio.src = MEDIA;
-        }
-                }
-            })
-            SOLUTION = word['solution'];
-            WID = word['word_id'];
-            var playsentence = document.getElementById('playSentence');
-
-            if(parseInt(word['endSec']) == 0 || word['endSec'] == null )
-            {
-                playsentence.style.display = 'none';
-
-            }
-            else{
-            playsentence.style.display = '';
-            playsentence.setAttribute('data-start-time',word['startSec'])
-            playsentence.setAttribute('data-end-time',word['endSec'])
-            }
-      
-
-                $('#term-test').html(word['group']);
-                $('#term-test').html(word['group']);
-
-            $('#term-test').html(word['group']);
-
-            $(document).on('keydown', keydown_event_do_test_test);
-            $('.word').on('click', word_click_event_do_test_test)
-
-        }
-
-        /**
-         * Handles an ajax query for word tests.
-         */
-        function test_query_handler(data) {
-            if (data['word_id'] == 0) {
-                do_test_finished(<?php echo json_encode($count); ?>);
-                const options = {
-                    "action": "query",
-                    "action_type": "tomorrow_test_count",
-                    "test_sql": <?php echo json_encode((string) $testsql); ?>
-                };
-                $.getJSON(
-                    'inc/ajax.php?' + $.param(options)
-                ).done(function (data) {
-                    if (data["test_count"]) {
-                        $('#tests-tomorrow').css("display", "inherit");
-                        $('#tests-tomorrow').text(
-                            "Tomorrow you'll find here " + data["test_count"] +
-                            ' test' + (data["test_count"] == 1 ? '' : 's') + "!"
-                        );
-                    }
-                });
-            } else {
-                insert_new_word(data);
-            }
-        }
-
-        /**
          * Get a new word test.
          */
-        function get_new_word() {
-            // Get new word through AJAX
-            const options = {
-                "action": "query",
-                "action_type": "test",
-                "test_sql": <?php echo json_encode((string) $testsql); ?>,
-                "test_nosent": <?php echo json_encode((string) $nosent); ?>,
-                "test_lgid": <?php echo json_encode((string) $lgid); ?>,
-                "test_wordregex": <?php echo json_encode((string) $lang['regexword']); ?>,
-                "test_type": <?php echo json_encode((string) $testtype); ?>
-            };
-            $.getJSON(
-                'inc/ajax.php?' + $.param(options)
-            ).done(test_query_handler);
+        function get_new_word()
+        {
+            const review_data = <?php echo json_encode(array(
+                "total_tests" => $count,
+                "test_key" => $selector,
+                "selection" => $selection,
+                "word_mode" => $nosent,
+                "lg_id" => $lgid,
+                "word_regex" => (string)$lang['regexword'],
+                "type" => $testtype
+            )); ?>;
+
+            query_next_term(review_data);
 
             // Close any previous tooltip
             cClick();
@@ -815,28 +772,18 @@ function do_test_test_interaction_globals($wb1, $wb2, $wb3)
  */
 function do_test_test_javascript_clickable($wo_record, $solution, $startSec, $endSec)
 {
-    global $tbpref, $langDefs;
-
     $wid = $wo_record['WoID'];
-    $lang = get_first_value(
+   /* $lang = get_first_value(
         'SELECT LgName AS value FROM ' . $tbpref . 'languages
         WHERE LgID = ' . $wo_record['WoLgID'] . '
         LIMIT 1'
     );
-    $phoneticText = phonetic_reading($wo_record['WoText'], $lang);
+    $abbr = $langDefs[$lang][1];*/
+    $abbr = getLanguageCode($wo_record['WoLgID'], LWT_LANGUAGES_ARRAY);
+    $phoneticText = phonetic_reading($wo_record['WoText'], $abbr);
     ?>
     <script type="text/javascript">
-        /** 
-         * Read the word aloud
-         */
-        function read_word() {
-            if (('speechSynthesis' in window) &&
-                document.getElementById('utterance-allowed').checked) {
-                const text = <?php echo json_encode($phoneticText); ?>;
-                const lang = <?php echo json_encode($abbr); ?>;
-                readRawTextAloud(text, lang);
-            }
-        }
+   
 
         SOLUTION = <?php echo prepare_textdata_js($solution); ?>;
         WID = <?php echo $wid; ?>;
@@ -880,7 +827,7 @@ function do_test_test_javascript_interaction(
     $endSec
 ) {
     do_test_test_interaction_globals($wb1, $wb2, $wb3);
-    $solution = get_test_solution($testtype, $wo_record, $nosent, $save);
+    $solution = get_test_solution($testtype, $wo_record, (bool) $nosent, $save);
     do_test_test_javascript_clickable($wo_record, $solution, $startSec, $endSec);
 }
 
@@ -964,37 +911,178 @@ function do_test_footer($notyettested, $wrong, $correct)
 /**
  * Prepare JavaScript code for interacting between the different frames.
  * 
- * @param int $count 1 for timer.
+ * @param int $count Total number of tests that were done today
  * 
  * @return void
  */
 function do_test_test_javascript($count)
 {
+    
     ?>
-    <script type="text/javascript">
-        const waitTime = <?php
-        echo json_encode((int) getSettingWithDefault('set-test-edit-frame-waiting-time'))
-            ?>;
+<script type="text/javascript">
+    /**
+     * Prepare the different frames for a test.
+     */
+    function prepare_test_frames()
+    {
+        const time_data = <?php echo json_encode(array(
+            "wait_time" => (int)getSettingWithDefault('set-test-edit-frame-waiting-time'),
+            "time" => time(),
+            "start_time" => $_SESSION['teststart'],
+            "show_timer" => ($count ? 0 : 1)
+        )) ?>;
 
-        /**
-         * Prepare the different frames for a test.
-         */
-        function prepare_test_frames() {
-            window.parent.frames['ru'].location.href = 'empty.html';
-            if (waitTime <= 0) {
-                window.parent.frames['ro'].location.href = 'empty.html';
-            } else {
-                setTimeout(
-                    'window.parent.frames["ro"].location.href="empty.html";',
-                    waitTime
-                );
-            }
-            new CountUp(
-                <?php echo time(); ?>,
-                <?php echo $_SESSION['teststart']; ?>,
-                'timer', <?php echo ($count ? 0 : 1); ?>
+        window.parent.frames['ru'].location.href = 'empty.html';
+        if (time_data.wait_time <= 0) {
+            window.parent.frames['ro'].location.href = 'empty.html';
+        } else {
+            setTimeout(
+                'window.parent.frames["ro"].location.href="empty.html";', 
+                time_data.wait_time
             );
         }
+        new CountUp(
+            time_data.time, time_data.start_time, 'timer', time_data.show_timer
+        );
+    }
+
+
+    /**
+     * Insert a new word test.
+     * 
+     * @param {number} word_id  Word ID
+     * @param {number} tx_id  transaction ID
+     * @param {number} start_sec  starting second
+     * @param {number} end_sec  ending second
+     * @param {string} word_text  word text
+     * @param {string} word_lg_abbr  Word ID
+     * @param {string} solution Test answer
+     * @param {string} group    
+     */
+    function insert_new_word(word_id,tx_id,start_sec,end_sec,word_text,word_lg_abbr, solution, group) {
+        
+        const options_phonetic_reading = {
+                "text": word_text,
+                "lang": word_lg_abbr
+
+            };
+            $.getJSON(
+                'api.php/v1/phonetic-reading?' + $.param(options_phonetic_reading)
+            ).done(function (data) {
+                if (data["phonetic_reading"]) {
+                    $('.word').on('click', read_word);
+
+                    /** 
+                    * Read the word aloud
+                    */
+                    function read_word() {
+                        if (('speechSynthesis' in window) &&
+                            document.getElementById('utterance-allowed').checked) {
+                            const text = data["phonetic_reading"];
+                            const lang = word_lg_abbr;
+                            readRawTextAloud(text, lang);
+                        }
+                    }
+                }
+            });
+            const options_media_paths = {
+                "id": tx_id
+            };
+            $.getJSON(
+                'api.php/v1/media-files?' + $.param(options_media_paths)
+            ).done(function (data) {
+                if (data["paths"]) {
+                    var MEDIA =  data["paths"]
+                    sentenceaudio.src = MEDIA;
+        if (!(/(http(s?)):\/\//i.test(MEDIA))) {
+            MEDIA = new URL(MEDIA, window.location.origin).href
+            sentenceaudio.src = MEDIA;
+        }
+                }
+            })
+
+
+        SOLUTION = solution;
+        WID = word_id;
+        var playsentence = document.getElementById('playSentence');
+
+if(parseInt(end_sec) == 0 || end_sec == null )
+{
+    playsentence.style.display = 'none';
+
+}
+else{
+playsentence.style.display = '';
+playsentence.setAttribute('data-start-time',start_sec)
+playsentence.setAttribute('data-end-time',end_sec)
+}
+
+        $('#term-test').html(group);
+
+        $(document).on('keydown', keydown_event_do_test_test);
+        $('.word')
+        .on('click', word_click_event_do_test_test)
+    }
+
+    /**
+    * Handles an ajax query for word tests.
+    * 
+    * @param {JSON}   current_test Current test data
+    * @param {number} total_tests  Total number of tests for the day
+    * @param {string} test_key     Key identifier for the test to run
+    * @param {string} selection    Selection of data to run the test on
+    */
+    function test_query_handler(current_test, total_tests, test_key, selection)
+    {
+        if (current_test['word_id'] == 0) {
+            do_test_finished(total_tests);
+            $.getJSON(
+                'api.php/v1/review/tomorrow-count', 
+                { 
+                    test_key: test_key,
+                    selection: selection
+                },
+                function (tomorrow_test) {
+                    if (tomorrow_test.count) {
+                        $('#tests-tomorrow').css("display", "inherit");
+                        $('#tests-tomorrow').text(
+                            "Tomorrow you'll find here " + tomorrow_test.count + 
+                            ' test' + (tomorrow_test.count < 2 ? '' : 's') + "!"
+                        );
+                    }
+                }
+            );
+        } else {
+            insert_new_word(
+                current_test.word_id,current_test.txID,current_test.startSec,current_test.endSec,current_test.word_text,current_test.word_lg_abbr,current_test.solution, current_test.group
+            );
+        }
+    }
+
+    /**
+    * Get new term to test through AJAX
+    * 
+    * @param {JSON} review_data Various data on the current test
+    */
+    function query_next_term(review_data)
+    {
+        $.getJSON(
+            'api.php/v1/review/next-word', 
+            {
+                test_key: review_data.test_key,
+                selection: review_data.selection,
+                word_mode: review_data.word_mode,
+                lg_id: review_data.lg_id,
+                word_regex: review_data.word_regex,
+                type: review_data.type
+            }
+        )
+        .done(function (data) {
+            test_query_handler(
+                data, review_data.count, review_data.test_key, review_data.selection
+            );
+        } );
+    }
 
         /**
          * Make a custom display when tests are finished for today.
@@ -1016,7 +1104,7 @@ function do_test_test_javascript($count)
 
 /**
  * Do the main content of a test page.
- * 
+ * Replaced by do_test_test_content_ajax()
  * @global int $debug Show debug informations
  * 
  * @return void
@@ -1055,15 +1143,19 @@ function do_test_test_content()
 /**
  * Do the main content of a test page.
  * 
+ * @param string    $selector  Type of test to run
+ * @param array|int $selection Items to run the test on
+ * 
  * @global int $debug Show debug informations
  * 
  * @return void
  */
-function do_test_test_content_ajax($test_sql)
+function do_test_test_content_ajax($selector, $selection)
 {
     global $debug;
-
-    $testtype = do_test_get_test_type((int) getreq('type'));
+    
+    $testtype = do_test_get_test_type((int)getreq('type'));
+    $test_sql = do_test_test_get_projection($selector, $selection);
     $count = get_first_value(
         "SELECT COUNT(DISTINCT WoID) AS value 
         FROM $test_sql AND WoStatus BETWEEN 1 AND 5 
@@ -1077,9 +1169,11 @@ function do_test_test_content_ajax($test_sql)
     }
     $notyettested = (int) $count;
 
-    $count2 = do_test_prepare_ajax_test_area($test_sql, $notyettested, $testtype);
+    $total_tests = do_test_prepare_ajax_test_area(
+        $selector, $selection, $notyettested, $testtype
+    );
     prepare_test_footer($notyettested);
-    do_test_test_javascript($count2);
+    do_test_test_javascript($total_tests);
 }
 
 
