@@ -22,7 +22,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lwt_icon.png"/></td>
   <td id="projectalign">
-   <div id="projectname">Learning with Texts - Fork<span id="projectnumber">&#160;2.8.1-fork</span>
+   <div id="projectname">Learning with Texts - Fork<span id="projectnumber">&#160;2.9.0-fork</span>
    </div>
    <div id="projectbrief">Learn foreign languages with texts</div>
   </td>
@@ -114,6 +114,7 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility for calling system speech synthesizer. </p>
+<p>PHP version 8.1 </p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="a2dba06939b72df3f73fdaaabb4b3ad4d" name="a2dba06939b72df3f73fdaaabb4b3ad4d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2dba06939b72df3f73fdaaabb4b3ad4d">&#9670;&#160;</a></span>get_language_code()</h2>
@@ -137,7 +138,8 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>string Two-letter language name </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>string Two-letter language name</dd></dl>
+<p>@ðeprecated Since 2.9.1-fork, use getLanguageCode </p>
 
 </div>
 </div>
@@ -202,8 +204,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>String to population a SELECT tag.</p>
-<dl class="section return"><dt>Returns</dt><dd>string HTML-formatted string</dd></dl>
-<p>@global array $langDefs List of all languages. </p>
+<dl class="section return"><dt>Returns</dt><dd>string HTML-formatted string. </dd></dl>
 
 </div>
 </div>
@@ -229,7 +230,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>string A confirmation or an error message </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
 
 </div>
 </div>

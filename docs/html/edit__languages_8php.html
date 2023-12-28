@@ -22,7 +22,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="lwt_icon.png"/></td>
   <td id="projectalign">
-   <div id="projectname">Learning with Texts - Fork<span id="projectnumber">&#160;2.8.1-fork</span>
+   <div id="projectname">Learning with Texts - Fork<span id="projectnumber">&#160;2.9.0-fork</span>
    </div>
    <div id="projectbrief">Learn foreign languages with texts</div>
   </td>
@@ -100,12 +100,6 @@ Functions</h2></td></tr>
 <tr class="separator:a22c1fc4b70e7a59656440f4ad4ed168b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f709d8f0ae540267a6c520c8df76072"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="edit__languages_8php.html#a2f709d8f0ae540267a6c520c8df76072">load_language</a> ($lgid)</td></tr>
 <tr class="separator:a2f709d8f0ae540267a6c520c8df76072"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65a052f74bc59559a235214baeff0b20"><td class="memItemLeft" align="right" valign="top"><a id="a65a052f74bc59559a235214baeff0b20" name="a65a052f74bc59559a235214baeff0b20"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>langFromDict</b> ($url)</td></tr>
-<tr class="separator:a65a052f74bc59559a235214baeff0b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4423534a2a65f2d97fe87a2381d7b6d4"><td class="memItemLeft" align="right" valign="top"><a id="a4423534a2a65f2d97fe87a2381d7b6d4" name="a4423534a2a65f2d97fe87a2381d7b6d4"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>targetLangFromDict</b> ($url)</td></tr>
-<tr class="separator:a4423534a2a65f2d97fe87a2381d7b6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc9231b5292c57447af032a2cd7691f9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="edit__languages_8php.html#acc9231b5292c57447af032a2cd7691f9">edit_language_form</a> ($language)</td></tr>
 <tr class="separator:acc9231b5292c57447af032a2cd7691f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbc803ec7100426f0aaca83f8739dab3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="edit__languages_8php.html#abbc803ec7100426f0aaca83f8739dab3">get_wizard_selectoptions</a> ($currentnativelanguage)</td></tr>
@@ -121,7 +115,8 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Manage languages. </p>
-<p>Call: <a class="el" href="edit__languages_8php.html" title="Manage languages.">edit_languages.php</a>?.... ... refresh=[langid] ... reparse all texts in lang ... del=[langid] ... do delete ... op=Save ... do insert new ... op=Change ... do update ... new=1 ... display new lang. screen ... chg=[langid] ... display edit screen </p>
+<p>Call: <a class="el" href="edit__languages_8php.html" title="Manage languages.">edit_languages.php</a>?.... ... refresh=[langid] ... reparse all texts in lang ... del=[langid] ... do delete ... op=Save ... do insert new ... op=Change ... do update ... new=1 ... display new lang. screen ... chg=[langid] ... display edit screen</p>
+<p>PHP version 8.1 </p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="acc9231b5292c57447af032a2cd7691f9" name="acc9231b5292c57447af032a2cd7691f9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acc9231b5292c57447af032a2cd7691f9">&#9670;&#160;</a></span>edit_language_form()</h2>
@@ -205,7 +200,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>void</dd></dl>
-<p>@global string $tbpref @global array $langDefs </p>
+<p>@global string $tbpref </p>
 
 </div>
 </div>
@@ -254,11 +249,11 @@ Functions</h2></td></tr>
 <p>Display the standard page of saved languages.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">{string}</td><td>$message An information message to display.</td></tr>
+    <tr><td class="paramtype">string</td><td class="paramname">$message</td><td>An information message to display.</td></tr>
   </table>
   </dd>
 </dl>
-<p>@global {string} $tbpref Database table prefix @global {int} $debug 1 to display debugging data</p>
+<p>@global string $tbpref @global int $debug</p>
 <dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
 
 </div>
@@ -397,11 +392,10 @@ Functions</h2></td></tr>
 <p>Returns a dropdown menu of the different languages.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramtype">string</td><td class="paramname">$currentnativelanguage</td><td>Default language</td></tr>
+    <tr><td class="paramtype">string</td><td class="paramname">$currentnativelanguage</td><td>Default language </td></tr>
   </table>
   </dd>
 </dl>
-<p>@global mixed $langDefs </p>
 
 </div>
 </div>
