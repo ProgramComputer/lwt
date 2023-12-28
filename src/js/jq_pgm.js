@@ -1319,11 +1319,10 @@ function do_ajax_update_media_select (id) {
  * @param {Object} data Received data as a JSON object 
  */
 function subtitles_receive_data(data) {
-  console.log(data)
   $('#subtitlesLoadingImg').css("display", "none");
 
   $('#TxText').val(data["subtitles"]);
-  if (data["error"] !== undefined) {
+  if (data["error"] !== null) {
   
       msg = data["error"];
     
