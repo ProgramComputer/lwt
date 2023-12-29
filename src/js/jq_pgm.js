@@ -1342,14 +1342,34 @@ function do_ajax_update_subtitles () {
 
   uri = $('[name="TxAudioURI"]').val();
   lang_id = $("#TxLgID").val()
-  $.getJSON(
-    'api.php/v1/subtitles',
-    {
+  $.ajax({
+    url: 'api.php/v1/subtitles',
+    dataType: 'json',
+    data:{
       lang_id: lang_id,
       uri:uri
     },
-    subtitles_receive_data
-  );
+    success: function( data,status,xhr ) {
+          subtitles_receive_data(data)
+    }
+    ,
+    error: function(xhr,status, error ) {
+      data = {
+        "subtitles":"",
+        "error": error
+        }
+      subtitles_receive_data(data)
+
+    }
+  });
+  // $.getJSON(
+  //   'api.php/v1/subtitles',
+  //   {
+  //     lang_id: lang_id,
+  //     uri:uri
+  //   },
+  //   subtitles_receive_data
+  // );
 }
 
 /**
