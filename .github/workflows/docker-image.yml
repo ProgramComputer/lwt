@@ -67,6 +67,6 @@ jobs:
         with:
           repo_token: ${{secrets.GITHUB_TOKEN }}
           file: /tmp/image.tar
-          asset_name: ${{ steps.meta.outputs.tags }}-${{ matrix.platform }}
+          asset_name: ${{ github.ref }}-${{ matrix.platform }}
           tag: ${{ github.ref }}
  
