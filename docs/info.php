@@ -127,7 +127,8 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 				$('#floatdiv').addFloating( {	
 					targetRight: 10,	
 					targetTop: 10,
-					snap: true	
+					snap: true,
+					distance: 1	
 				} );	
 			});
 			//]]>
