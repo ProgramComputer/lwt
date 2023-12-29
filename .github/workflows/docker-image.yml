@@ -54,6 +54,13 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Build  Docker images
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           outputs: type=oci,dest=/tmp/image.tar
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
