@@ -276,7 +276,7 @@ function get_mecab_path($mecab_args = ''): string
 /**
  * Returns path to youtube-dl or yt-dlp application.
  * youtube-dl supports video extraction from multiple hosts
- *  No die because optional
+ * No die commented because optional
  * @param string $youtubledl_args Arguments to add
  *
  * @return string OS-compatible command

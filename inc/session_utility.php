@@ -1731,6 +1731,7 @@ function selectmediapathoptions($dir): string
 function selectmediapath($f): string 
 {
     $media = get_media_paths("-1");
+    $youtubedlexists = get_youtubedl_path() != "";
     $r = '<p>
         YouTube, Dailymotion, Vimeo or choose a file in "../' . $media["base_path"] . '/media"
         <br />
@@ -1747,10 +1748,9 @@ function selectmediapath($f): string
         Refresh
     </span>
     <script type="text/javascript">
-   
     $(\'[name="TxAudioURI"]\').on("propertychange change keyup paste input", function(){
         var input = $(this).val();
-        if ((/(http(s?)):\/\//i.test(input))) {
+        if ((/(http(s?)):\/\//i.test(input)) && '. $youtubedlexists.') {
 
             $("#genSub").css("display", "");
     
