@@ -4407,8 +4407,8 @@ function new_expression_interactable2($hex, $appendtext, $wid, $len): void
     ?>
 <script type="text/javascript">
     let term = <?php echo json_encode($attrs); ?>;
-
-    let title = '';
+    //title is declared in new_word.php
+    title = '';
     if (window.parent.JQ_TOOLTIP) 
         title = make_tooltip(
             <?php echo json_encode($appendtext); ?>, term.data_trans, term.data_rom, 
