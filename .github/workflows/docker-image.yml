@@ -14,18 +14,16 @@ env:
 
 jobs:
   build-and-push-image:
+    permissions: write-all
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         platform:
           - linux/amd64
-          - linux/arm/v6
+          - linux/arm/v5
           - linux/arm/v7
           - linux/arm64
-    permissions:
-      contents: read
-      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -56,11 +54,19 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Build  Docker images
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=oci,dest=/tmp/image.tar
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{secrets.GITHUB_TOKEN }}
-          file: target/release/${{ matrix.platform }}
+          file: /tmp/image.tar
           asset_name: ${{ steps.meta.outputs.tags }}-${{ matrix.platform }}
           tag: ${{ github.ref }}
  
