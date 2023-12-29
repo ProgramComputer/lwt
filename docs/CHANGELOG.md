@@ -18,22 +18,39 @@ ones are marked like "v1.0.0-fork".
 
 * PHP files header docblocks are expanded, notably with a PHP version, package and category name.
 * Japanese number are now parsed by MeCab. Big thanks to [@ProgramComputer](https://github.com/ProgramComputer) for his pull request [#149](https://github.com/HugoFara/lwt/pull/149)!
+* Removes dead feeds from the demo database, as signalled in [#148](https://github.com/HugoFara/lwt/issues/148).
 
 ### Fixed
 
-* Fixes [#113](https://github.com/HugoFara/lwt/issues/113): changing a language name was making text-to-speech unusable and may prompt a warning.
-* Since 2.9.0, tests may be unable to run due to a missing key in an AJAX request ("type"). This is fixed.
+* Fixes [#113](https://github.com/HugoFara/lwt/issues/113): changing a language name 
+was making text-to-speech unusable and may prompt a warning.
+* Since 2.9.0, tests may be unable to run due to a missing key in an AJAX request ("type").
 * Since 2.9.0, audio position was not saved properly.
 * On `upload_words.php`, "update only empty fields" was broken.
 * Translation were not set by default properly when editing terms translations table.
 * The field MeCab was set for japanese even when not asked for. 
-Signalled on PR [#155](https://github.com/HugoFara/lwt/pull/155), thanks to [@ProgramComputer](https://github.com/ProgramComputer).
-* Since 2.8.1, japanese word romanization was not displayed any more. Thanks to 아르노 for signalling the bug on Discord!
+Signalled on PR [#155](https://github.com/HugoFara/lwt/pull/155), thanks to 
+[@ProgramComputer](https://github.com/ProgramComputer).
+* Since 2.8.1, japanese word romanization was not displayed any more. 
+Thanks to 아르노 for signalling the bug on Discord!
+* The go slower/faster feature on audio was broken 
+([#138](https://github.com/HugoFara/lwt/issues/138)), as functions `click_slower` 
+and `click_faster` were declared two times in `src/js/audio_controller.js`.
+* When opening a text, text position was not saved and a `text_id is unknown` error was triggered. 
+* Do not display an error on step 2 of feed wizard at first initialization 
+([#129](https://github.com/HugoFara/lwt/issues/129)).
+* It was impossible to install the demo database if they was more or less than one instruction a line.
+This is fixed, and the SQL file was made more readable.
+* Changes `WoStatusChange` default value to '1970-01-01 01:00:01', it was impossible 
+to install the demo DB out of LWT (related to [#78](https://github.com/HugoFara/lwt/issues/78)).
+* Deleting a language deletes the language ([#151](https://github.com/HugoFara/lwt/issues/151)). 
+Before it was setting the language to empty values.
 
 ### Deprecated
 
 * PHP documentation using Doxygen (under `/docs/html`) is now deprecated and will be removed in 3.0.0.
 * Using `$langDefs` is deprecated in favor of `LWT_LANGUAGES_ARRAY` ([#163](https://github.com/HugoFara/lwt/issues/163)).
+* Calling the global function `new_pos` to set audio position is deprecated. Please use `lwt_audio_controller.setPosition`.
 
 ## 2.9.0-fork (December 24 2023)
 

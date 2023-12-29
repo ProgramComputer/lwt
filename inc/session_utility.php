@@ -2182,6 +2182,7 @@ function do_test_test_get_projection($key, $value)
         my_die("do_test_test.php called with wrong parameters"); 
         break;
     }
+    return $testsql;
 }
 
 /**
@@ -4508,7 +4509,8 @@ function insertExpressions($textlc, $lid, $wid, $len, $mode): null|string
  *
  * @since 2.0.3-fork Function was broken
  * @since 2.5.3-fork Function repaired
- * @since 2.7.0-fork $handle should be for an *uncompressed* file.
+ * @since 2.7.0-fork $handle should be an *uncompressed* file.
+ * @since 2.9.1-fork It can read SQL with more or less than one instruction a line
  */
 function restore_file($handle, $title): string 
 {
@@ -4516,66 +4518,97 @@ function restore_file($handle, $title): string
     global $debug;
     global $dbname;
     $message = "";
-    $lines = 0;
-    $ok = 0;
-    $errors = 0;
-    $drops = 0;
-    $inserts = 0;
-    $creates = 0;
-    $start = 1;
-    while (!feof($handle)) {
-        $sql_line = trim(
-            str_replace("\r", "", str_replace("\n", "", fgets($handle, 99999)))
-        );
-        if ($sql_line != "") {
-            if ($start) {
-                if (strpos($sql_line, "-- lwt-backup-") === false  
-                    && strpos($sql_line, "-- lwt-exp_version-backup-") === false
-                ) {
-                    $message = "Error: Invalid $title Restore file " .
-                    "(possibly not created by LWT backup)";
-                    $errors = 1;
-                    break;
-                }
-                $start = 0;
-                continue;
+    $install_status = array(
+        "queries" => 0,
+        "successes" => 0,
+        "errors" => 0,
+        "drops" => 0,
+        "inserts" => 0,
+        "creates" => 0
+    );
+    $start = true;
+    $curr_content = '';
+    $queries_list = array();
+    while ($stream = fgets($handle)) {
+        // Check file header
+        if ($start) {
+            if (!str_starts_with($stream, "-- lwt-backup-")  
+                && !str_starts_with($stream, "-- lwt-exp_version-backup-")
+            ) {
+                $message = "Error: Invalid $title Restore file " .
+                "(possibly not created by LWT backup)";
+                $install_status["errors"] = 1;
+                break;
             }
-            if (substr($sql_line, 0, 3) !== '-- ') {
-                $res = mysqli_query(
-                    $GLOBALS['DBCONNECTION'], insert_prefix_in_sql($sql_line)
-                );
-                $lines++;
-                if ($res == false) { 
-                    $errors++; 
-                } else {
-                    $ok++;
-                    if (substr($sql_line, 0, 11) == "INSERT INTO") { 
-                        $inserts++; 
-                    } else if (substr($sql_line, 0, 10) == "DROP TABLE") { 
-                        $drops++;
-                    } else if (substr($sql_line, 0, 12) == "CREATE TABLE") { 
-                        $creates++;
+            $start = false;
+            continue;
+        }
+        // Skip comments
+        if (str_starts_with($stream, '-- ')) {
+            continue;
+        }
+        // Add stream to accumulator
+        $curr_content .= $stream;
+        // Get queries
+        $queries = explode(';' . PHP_EOL, $curr_content);
+        // Replace line by remainders of the last element (incomplete line)
+        $curr_content = array_pop($queries);
+        //var_dump("queries", $queries);
+        foreach ($queries as $query) {
+            $queries_list[] = trim($query);
+        }
+    }
+    if (!feof($handle) && $install_status["errors"] == 0) {
+        $message = "Error: cannot read the end of the demo file!";
+        $install_status["errors"] = 1;
+    }
+    fclose($handle);
+    // Now run all queries
+    if ($install_status["errors"] == 0) {
+        foreach ($queries_list as $query) {
+            $sql_line = trim(
+                str_replace("\r", "", str_replace("\n", "", $query))
+            );
+            if ($sql_line != "") {
+                if (!str_starts_with($query, '-- ')) {
+                    $res = mysqli_query(
+                        $GLOBALS['DBCONNECTION'], insert_prefix_in_sql($query)
+                    );
+                    $install_status["queries"]++;
+                    if ($res == false) {
+                        $install_status["errors"]++;
+                    } else {
+                        $install_status["successes"]++;
+                        if (str_starts_with($query,  "INSERT INTO")) {
+                            $install_status["inserts"]++;
+                        } else if (str_starts_with($query, "DROP TABLE")) {
+                            $install_status["drops"]++;
+                        } else if (str_starts_with($query, "CREATE TABLE")) { 
+                            $install_status["creates"]++;
+                        }
                     }
                 }
             }
         }
-    } // while (! feof($handle))
-    fclose($handle);
-    if ($errors == 0) {
+    }
+    if ($install_status["errors"] == 0) {
         runsql("DROP TABLE IF EXISTS {$tbpref}textitems", '');
         check_update_db($debug, $tbpref, $dbname);
         reparse_all_texts();
         optimizedb();
         get_tags(1);
         get_texttags(1);
-        $message = "Success: $title restored - $lines queries - $ok successful (" . 
-        "$drops/$creates tables dropped/created, $inserts records added), " . 
-        "$errors failed.";
+        $message = "Success: $title restored";
     } else if ($message == "") {
-        $message = "Error: $title NOT restored - $lines queries - $ok successful (" .
-        "$drops/$creates tables dropped/created, $inserts records added), ". 
-        "$errors failed.";
+        $message = "Error: $title NOT restored";
     }
+    $message .= sprintf(
+        " - %d queries - %d successful (%d/%d tables dropped/created, " . 
+        "%d records added), %d failed.", 
+        $install_status["queries"], $install_status["successes"], 
+        $install_status["drops"], $install_status["creates"], 
+        $install_status["inserts"], $install_status["errors"]
+    );
     return $message;
 }
 
@@ -5042,7 +5075,7 @@ function makeAudioPlayer($audio, $offset=0)
         return;
     }
     $audio = trim($audio);
-    $repeatMode = getSettingZeroOrOne('currentplayerrepeatmode', 0);
+    $repeatMode = (bool) getSettingZeroOrOne('currentplayerrepeatmode', 0);
     $currentplayerseconds = getSetting('currentplayerseconds');
     if ($currentplayerseconds == '') { 
         $currentplayerseconds = 5; 
@@ -5184,13 +5217,18 @@ function makeAudioPlayer($audio, $offset=0)
         if ($('#jquery_jplayer_1').data().jPlayer.status.playbackRateEnabled) {
             $("#playbackrateContainer").css("margin-top",".2em")
             .html(
-                `<span id="pbSlower" style="position:absolute;top: 0; left: 0; bottom: 0; right: 50%;" title="Slower" onclick="click_slower();">
+                `<span id="pbSlower" 
+                style="position:absolute;top: 0; left: 0; bottom: 0; right: 50%;" 
+                title="Slower" onclick="lwt_audio_controller.clickSlower();">
                     &nbsp;
                 </span>
-                <span id="pbFaster" style="position:absolute;top: 0; left: 50%; bottom: 0; right: 0;" title="Faster" onclick="click_faster();">
+                <span id="pbFaster" 
+                style="position:absolute;top: 0; left: 50%; bottom: 0; right: 0;" 
+                title="Faster" onclick="lwt_audio_controller.clickFaster();">
                     &nbsp;
                 </span>
-                <span class="ui-widget ui-state-default ui-corner-all" style="padding-left: 0.2em;padding-right: 0.2em;color:grey">
+                <span class="ui-widget ui-state-default ui-corner-all" 
+                style="padding-left: 0.2em;padding-right: 0.2em;color:grey">
                     <span id="playbackSlower" style="padding-right: 0.15em;">≪</span>
                     <span id="pbvalue">1.0</span>
                     <span id="playbackFaster" style="padding-left: 0.15em;">≫</span>
@@ -5225,20 +5263,22 @@ function makeAudioPlayer($audio, $offset=0)
         
         $("#jquery_jplayer_1")
         .on('bind', $.jPlayer.event.play, function(event) { 
-            set_current_playbackrate();
+            lwt_audio_controller.setCurrentPlaybackRate();
         });
         
-        $("#slower").on('click', click_slower);
-        $("#faster").on('click', click_faster);
-        $("#stdspeed").on('click', click_stdspeed);
-        $("#backbutt").on('click', click_back);
-        $("#forwbutt").on('click', click_forw);
-        $("#do-single").on('click', click_single);
-        $("#do-repeat").on('click', click_repeat);
-        $("#playbackrate").on('change', set_new_playbackrate);
-        $("#backtime").on('change', set_new_playerseconds);
-        
-        <?php echo ($repeatMode ? "click_repeat();\n" : ''); ?>
+        $("#slower").on('click', lwt_audio_controller.setSlower);
+        $("#faster").on('click', lwt_audio_controller.setFaster);
+        $("#stdspeed").on('click', lwt_audio_controller.setStdSpeed);
+        $("#backbutt").on('click', lwt_audio_controller.clickBackward);
+        $("#forwbutt").on('click', lwt_audio_controller.clickForward);
+        $("#do-single").on('click', lwt_audio_controller.clickSingle);
+        $("#do-repeat").on('click', lwt_audio_controller.clickRepeat);
+        $("#playbackrate").on('change', lwt_audio_controller.setNewPlaybackRate);
+        $("#backtime").on('change', lwt_audio_controller.setNewPlayerSeconds);
+
+        if (<?php echo json_encode($repeatMode); ?>) {
+            lwt_audio_controller.clickRepeat();
+        }
     }
 
     $(document).ready(prepareMediaInteractions);
