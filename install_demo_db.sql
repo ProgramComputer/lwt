@@ -33,16 +33,47 @@
 -- --------------------------------------------------------------
 -- Installing an LWT demo database
 -- --------------------------------------------------------------
+DROP 
+  TABLE IF EXISTS archivedtexts;
 
-DROP TABLE IF EXISTS archivedtexts;
-CREATE TABLE `archivedtexts` (   `AtID` int(11) unsigned NOT NULL AUTO_INCREMENT,   `AtLgID` int(11) unsigned NOT NULL,   `AtTitle` varchar(200) NOT NULL,   `AtText` text NOT NULL,   `AtAnnotatedText` longtext NOT NULL,   `AtAudioURI` varchar(200) DEFAULT NULL,   `AtSourceURI` varchar(1000) DEFAULT NULL,   PRIMARY KEY (`AtID`),   KEY `AtLgID` (`AtLgID`) ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-INSERT INTO archivedtexts VALUES('1','1','Bonjour!','Bonjour Manon.\nBonjour.\nAlors, je crois qu’il y a pas longtemps, là, vous avez fait une bonne action ?\nOui.','',NULL,'http://francebienvenue1.wordpress.com/2011/06/18/generosite/');
+CREATE TABLE `archivedtexts` (
+  `AtID` int(11) unsigned NOT NULL AUTO_INCREMENT, 
+  `AtLgID` int(11) unsigned NOT NULL, 
+  `AtTitle` varchar(200) NOT NULL, 
+  `AtText` text NOT NULL, 
+  `AtAnnotatedText` longtext NOT NULL, 
+  `AtAudioURI` varchar(200) DEFAULT NULL, 
+  `AtSourceURI` varchar(1000) DEFAULT NULL, 
+  PRIMARY KEY (`AtID`), 
+  KEY `AtLgID` (`AtLgID`)
+) ENGINE = MyISAM AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8;
 
-DROP TABLE IF EXISTS archtexttags;
-CREATE TABLE `archtexttags` (   `AgAtID` int(11) unsigned NOT NULL,   `AgT2ID` int(11) unsigned NOT NULL,   PRIMARY KEY (`AgAtID`,`AgT2ID`),   KEY `AgAtID` (`AgAtID`),   KEY `AgT2ID` (`AgT2ID`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-INSERT INTO archtexttags VALUES('1','1');
-INSERT INTO archtexttags VALUES('1','4');
-INSERT INTO archtexttags VALUES('1','8');
+INSERT INTO archivedtexts 
+VALUES 
+  (
+    '1', '1', 'Bonjour!', 'Bonjour Manon.\nBonjour.\nAlors, je crois qu’il y a pas longtemps, là, vous avez fait une bonne action ?\nOui.', 
+    '', NULL, 'http://francebienvenue1.wordpress.com/2011/06/18/generosite/'
+  );
+
+DROP 
+  TABLE IF EXISTS archtexttags;
+CREATE TABLE `archtexttags` (
+  `AgAtID` int(11) unsigned NOT NULL, 
+  `AgT2ID` int(11) unsigned NOT NULL, 
+  PRIMARY KEY (`AgAtID`, `AgT2ID`), 
+  KEY `AgAtID` (`AgAtID`), 
+  KEY `AgT2ID` (`AgT2ID`)
+) ENGINE = MyISAM DEFAULT CHARSET = utf8;
+
+INSERT INTO archtexttags 
+VALUES 
+  ('1', '1');
+INSERT INTO archtexttags 
+VALUES 
+  ('1', '4');
+INSERT INTO archtexttags 
+VALUES 
+  ('1', '8');
 
 DROP TABLE IF EXISTS newsfeeds;
 CREATE TABLE `newsfeeds` (   `NfID` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,   `NfLgID` tinyint(3) unsigned NOT NULL,   `NfName` varchar(40) NOT NULL,   `NfSourceURI` varchar(200) NOT NULL,   `NfArticleSectionTags` text NOT NULL,   `NfFilterTags` text NOT NULL,   `NfUpdate` int(12) unsigned NOT NULL,   `NfOptions` varchar(200) NOT NULL,   PRIMARY KEY (`NfID`),KEY `NfLgID` (`NfLgID`),KEY `NfUpdate` (`NfUpdate`) ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
