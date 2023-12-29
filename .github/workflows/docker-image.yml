@@ -21,7 +21,7 @@ jobs:
       matrix:
         platform:
           - linux/amd64
-          - linux/arm/v5
+          - linux/386
           - linux/arm/v7
           - linux/arm64
     steps:
@@ -67,6 +67,6 @@ jobs:
         with:
           repo_token: ${{secrets.GITHUB_TOKEN }}
           file: /tmp/image.tar
-          asset_name: ${{ steps.meta.outputs.tags }}-${{ matrix.platform }}
+          asset_name: ${{ github.ref_name }}-${{ matrix.platform }}
           tag: ${{ github.ref }}
  
