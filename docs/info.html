@@ -249,7 +249,7 @@
 			</h2>
 
 			<p>
-				The current version is 2.9.0-fork (April 14 2023).
+				The current version is 2.9.1-fork (December 29 2023).
 				<br>
 				<a href="#CHANGELOG">View the Changelog.</a>
 			</p>
@@ -2203,7 +2203,7 @@ KEY NfUpdate (NfUpdate)
 other versions come from the canonical LWT ("official" branch on Git).
 For git tags, official releases are marked like "v1.0.0", while unofficial
 ones are marked like "v1.0.0-fork".</p>
-<h3>[Unreleased]</h3>
+<h3>2.9.1-fork (December 29 2023)</h3>
 <h4>Added</h4>
 <ul>
 <li>New tools for documentation:
@@ -2212,13 +2212,19 @@ ones are marked like "v1.0.0-fork".</p>
 <li>Better PHP documentation using <a href="https://phpdoc.org/">phpDocumentor</a>. The new documentation is at <code>docs/php/</code>.</li>
 </ul>
 </li>
-<li>New constant <code>LWT_LANGUAGES_ARRAY</code>, that replaces <code>$langDefs</code> (in <code>inc/langdefs.php</code>). Part of <a href="https://github.com/HugoFara/lwt/issues/163">#163</a>.</li>
+<li>New constant <code>LWT_LANGUAGES_ARRAY</code>, that replaces <code>$langDefs</code> (in <code>inc/langdefs.php</code>).
+Part of <a href="https://github.com/HugoFara/lwt/issues/163">#163</a>.</li>
 </ul>
 <h4>Changed</h4>
 <ul>
 <li>PHP files header docblocks are expanded, notably with a PHP version, package and category name.</li>
-<li>Japanese number are now parsed by MeCab. Big thanks to <a href="https://github.com/ProgramComputer">@ProgramComputer</a> for his pull request <a href="https://github.com/HugoFara/lwt/pull/149">#149</a>!</li>
-<li>Removes dead feeds from the demo database, as signalled in <a href="https://github.com/HugoFara/lwt/issues/148">#148</a>.</li>
+<li>Japanese number are now parsed by MeCab. Big thanks to
+<a href="https://github.com/ProgramComputer">@ProgramComputer</a> for his pull request
+<a href="https://github.com/HugoFara/lwt/pull/149">#149</a>!</li>
+<li>Removes dead feeds from the demo database, as signaled in
+<a href="https://github.com/HugoFara/lwt/issues/148">#148</a>.</li>
+<li>Patch update to the REST API to 0.1.1: requests on GET with empty payload were
+resulting in error.</li>
 </ul>
 <h4>Fixed</h4>
 <ul>
@@ -2228,10 +2234,10 @@ was making text-to-speech unusable and may prompt a warning.</li>
 <li>Since 2.9.0, audio position was not saved properly.</li>
 <li>On <code>upload_words.php</code>, "update only empty fields" was broken.</li>
 <li>Translation were not set by default properly when editing terms translations table.</li>
-<li>The field MeCab was set for japanese even when not asked for.
-Signalled on PR <a href="https://github.com/HugoFara/lwt/pull/155">#155</a>, thanks to
+<li>The field MeCab was set for Japanese even when not asked for.
+Signaled on PR <a href="https://github.com/HugoFara/lwt/pull/155">#155</a>, thanks to
 <a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
-<li>Since 2.8.1, japanese word romanization was not displayed any more.
+<li>Since 2.8.1, Japanese word romanization was not displayed any more.
 Thanks to 아르노 for signalling the bug on Discord!</li>
 <li>The go slower/faster feature on audio was broken
 (<a href="https://github.com/HugoFara/lwt/issues/138">#138</a>), as functions <code>click_slower</code>
@@ -2245,10 +2251,17 @@ This is fixed, and the SQL file was made more readable.</li>
 to install the demo DB out of LWT (related to <a href="https://github.com/HugoFara/lwt/issues/78">#78</a>).</li>
 <li>Deleting a language deletes the language (<a href="https://github.com/HugoFara/lwt/issues/151">#151</a>).
 Before it was setting the language to empty values.</li>
+<li>On media select, the lwt folder name was prepended to the media folder,
+resulting in broken path (<a href="https://github.com/HugoFara/lwt/issues/161">#161</a>).</li>
+<li>With the REST API, requests with an empty query were resulting in an error.</li>
+<li>
+<code>no-minify</code> composer command was fixed, suggested as a part of
+PR <a href="https://github.com/HugoFara/lwt/pull/154/files">#154</a> by
+<a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
 </ul>
 <h4>Deprecated</h4>
 <ul>
-<li>PHP documentation using Doxygen (under <code>/docs/html</code>) is now deprecated and will be removed in 3.0.0.</li>
+<li>PHP documentation using Doxygen (under <code>docs/html</code>) is now deprecated and will be removed in 3.0.0.</li>
 <li>Using <code>$langDefs</code> is deprecated in favor of <code>LWT_LANGUAGES_ARRAY</code> (<a href="https://github.com/HugoFara/lwt/issues/163">#163</a>).</li>
 <li>Calling the global function <code>new_pos</code> to set audio position is deprecated. Please use <code>lwt_audio_controller.setPosition</code>.</li>
 </ul>

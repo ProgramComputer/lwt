@@ -1257,6 +1257,8 @@ function quick_select_to_input(select_elem, input_elem)
  * @param {string}   base_path Base path for LWT to append
  * 
  * @returns {HTMLOptionElement[]} List of options to append to the select.
+ * 
+ * @since 2.9.1-fork Base path is no longer used
  */
 function select_media_path(paths, folders, base_path)
 {
@@ -1270,7 +1272,7 @@ function select_media_path(paths, folders, base_path)
       temp_option.setAttribute("disabled", "disabled");
       temp_option.text = '-- Directory: ' + paths[i] + '--';
     } else {
-      temp_option.value = base_path + "/" + paths[i];
+      temp_option.value = paths[i];
       temp_option.text = paths[i];
     }
     options.push(temp_option);
@@ -1349,14 +1351,26 @@ function do_ajax_update_subtitles () {
 
   uri = $('[name="TxAudioURI"]').val();
   lang_id = $("#TxLgID").val()
-  $.getJSON(
-    'api.php/v1/subtitles',
-    {
+  $.ajax({
+    url: 'api.php/v1/subtitles',
+    dataType: 'json',
+    data:{
       lang_id: lang_id,
       uri:uri
     },
-    subtitles_receive_data
-  );
+    success: function( data,status,xhr ) {
+          subtitles_receive_data(data)
+    }
+    ,
+    error: function(xhr,status, error ) {
+      data = {
+        "subtitles":"",
+        "error": error
+        }
+      subtitles_receive_data(data)
+
+    }
+  });
 }
 
 /**

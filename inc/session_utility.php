@@ -12,7 +12,7 @@
  * @package Lwt
  * @author  HugoFara <hugo.farajallah@protonmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/session__utility_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/inc-session-utility.html
  * @since   2.0.3-fork
  */
 
@@ -4945,8 +4945,10 @@ function subtitles_from_uri($uri,$lang_id):array
         if (feof($handle)) {
         pclose($handle);
     }
+    $out = "";
     while(!feof($handle)){
         $line = fgets($handle);
+        $out .= $line;
         if (($pos = strpos($line, 'media/temp')) !== false) {
             $filename = trim(substr($line,$pos));
             
@@ -4958,11 +4960,16 @@ function subtitles_from_uri($uri,$lang_id):array
         }
       
     }
+    try{
     $fileContent = file_get_contents($filename);
+    }catch(ValueError $e){
+        return array("subtitles" => "","error" => "No subtitles for this video","output"=>$out);
+
+    }
 
     unlink($filename);
     pclose($handle);
-    return array("subtitles" => $fileContent?$fileContent : "","error" => $err);
+    return array("subtitles" => $fileContent?$fileContent : "","error" => $err,"output"=>$out);
     }
 }
 

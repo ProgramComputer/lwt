@@ -167,7 +167,7 @@ function do_ajax_save_setting(k,v){$.post('api.php/v1/settings',{key:k,value:v})
 function quick_select_to_input(select_elem,input_elem){let val=select_elem.options[select_elem.selectedIndex].value;if(val!='')
 input_elem.value=val;select_elem.value=''}
 function select_media_path(paths,folders,base_path){let options=[],temp_option=document.createElement('option');temp_option.value="";temp_option.text="[Choose...]";options.push(temp_option);for(let i=0;i<paths.length;i++){temp_option=document.createElement('option')
-if(folders.includes(paths[i])){temp_option.setAttribute("disabled","disabled");temp_option.text='-- Directory: '+paths[i]+'--'}else{temp_option.value=base_path+"/"+paths[i];temp_option.text=paths[i]}
+if(folders.includes(paths[i])){temp_option.setAttribute("disabled","disabled");temp_option.text='-- Directory: '+paths[i]+'--'}else{temp_option.value=paths[i];temp_option.text=paths[i]}
 options.push(temp_option)}
 return options}
 function media_select_receive_data(data){$('#mediaSelectLoadingImg').css("display","none");if(data.error!==undefined){let msg;if(data.error=="not_a_directory"){msg='[Error: "../'+data.base_path+'/media" exists, but it is not a directory.]'}else if(data.error=="does_not_exist"){msg='[Directory "../'+data.base_path+'/media" does not yet exist.]'}else{msg="[Unknown error!]"}
@@ -176,7 +176,8 @@ $('#mediaselect select').css("display","inherit")}}
 function do_ajax_update_media_select(id){$('#mediaSelectErrorMessage').css("display","none");$('#mediaselect select').css("display","none");$('#mediaSelectLoadingImg').css("display","inherit");$.getJSON('api.php/v1/media-files',{id:"-1"},media_select_receive_data)}
 function subtitles_receive_data(data){$('#subtitlesLoadingImg').css("display","none");$('#TxText').val(data.subtitles);if(data.error!==null){msg=data.error;$('#subtitlesErrorMessage').text(msg);$('#subtitlesErrorMessage').css("display","inherit")}}
 function do_ajax_update_subtitles(){$('#subtitlesErrorMessage').css("display","none");$('#subtitlesLoadingImg').css("display","inherit");uri=$('[name="TxAudioURI"]').val();lang_id=$("#TxLgID").val()
-$.getJSON('api.php/v1/subtitles',{lang_id:lang_id,uri:uri},subtitles_receive_data)}
+$.ajax({url:'api.php/v1/subtitles',dataType:'json',data:{lang_id:lang_id,uri:uri},success:function(data,status,xhr){subtitles_receive_data(data)},error:function(xhr,status,error){data={"subtitles":"","error":error}
+subtitles_receive_data(data)}})}
 function display_example_sentences(sentences,click_target){let img,clickable,parentDiv;const outElement=document.createElement("div");for(let i=0;i<sentences.length;i++){img=document.createElement("img");img.src="icn/tick-button.png";img.title="Choose";clickable=document.createElement('span');clickable.classList.add("click");clickable.setAttribute("onclick","{"+click_target+".value = '"+sentences[i][1].replaceAll("'","\\'")+"';makeDirty();}");clickable.appendChild(img);parentDiv=document.createElement("div");parentDiv.appendChild(clickable);parentDiv.innerHTML+="&nbsp; "+sentences[i][0];outElement.appendChild(parentDiv)}
 return outElement}
 function change_example_sentences_zone(sentences,ctl){$('#exsent-waiting').css("display","none");$('#exsent-sentences').css("display","inherit");const new_element=display_example_sentences(sentences,ctl);$('#exsent-sentences').append(new_element)}

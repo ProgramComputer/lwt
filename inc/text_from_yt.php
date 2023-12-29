@@ -16,7 +16,7 @@ require_once 'inc/settings.php';
 
 /**
  * @var string|null YT_API_KEY Text from YouTube API key
- * 
+ * @deprecated in #157
  * You can change the key here.
  */
 define('YT_API_KEY', null);
