@@ -10,8 +10,9 @@
  *  ... backup=xxx ... do backup 
  * ... empty=xxx ... do truncate
  * 
- * php version 8.1.12
+ * PHP version 8.1
  * 
+ * @category User_Interface
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
@@ -265,7 +266,7 @@ if (isset($_REQUEST['restore'])) {
                 `WoRomanization` varchar(100) DEFAULT NULL,   
                 `WoSentence` varchar(1000) DEFAULT NULL,   
                 `WoCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,   
-                `WoStatusChanged` timestamp NOT NULL DEFAULT '0000-00-00 00:00:01',
+                `WoStatusChanged` timestamp NOT NULL DEFAULT '1970-01-01 01:00:01',
                 `WoTodayScore` double NOT NULL DEFAULT '0',   
                 `WoTomorrowScore` double NOT NULL DEFAULT '0',   
                 `WoRandom` double NOT NULL DEFAULT '0',   
@@ -336,7 +337,7 @@ if (isset($_REQUEST['restore'])) {
 
 pagestart('Backup/Restore/Empty Database', true);
 
-echo error_message_with_hide($message, 1);
+echo error_message_with_hide($message, true);
 
 if ($tbpref == '') { 
     $prefinfo = "(Default Table Set)"; 
