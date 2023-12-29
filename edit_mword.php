@@ -36,9 +36,8 @@ function export_term_js_dict($term): string
             "woid" => $term->id,
             "text" =>  $term->text,
             "romanization" => $term->roman,
-            "translation" => prepare_textdata_js(
-                $term->translation . getWordTagList($term->id, ' ', 1, 0)
-            ),
+            "translation" =>  ($original = $term->translation) !== ($concatenated = $original . getWordTagList($term->id, ' ', 1, 0)) ? prepare_textdata_js($concatenated) : $original
+           ,
             "status" => $term->status
         )
     );
@@ -219,11 +218,11 @@ function edit_mword_do_update($term, $newstatus)
             let title = '';
             if (window.parent.JQ_TOOLTIP) 
                 title = make_tooltip(
-                    mword.text, mword.trans, mword.roman, mword.status
+                    mword.text, mword.translation, mword.romanization, mword.status
                 );
             $('.word' + mword.woid, context)
-            .attr('data_trans', mword.trans)
-            .attr('data_rom', mword.roman)
+            .attr('data_trans', mword.translation)
+            .attr('data_rom', mword.romanization)
             .attr('title', title)
             .removeClass('status' + oldstatus)
             .addClass('status' + mword.status)
