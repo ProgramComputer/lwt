@@ -1362,14 +1362,6 @@ function do_ajax_update_subtitles () {
 
     }
   });
-  // $.getJSON(
-  //   'api.php/v1/subtitles',
-  //   {
-  //     lang_id: lang_id,
-  //     uri:uri
-  //   },
-  //   subtitles_receive_data
-  // );
 }
 
 /**
