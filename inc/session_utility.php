@@ -1750,7 +1750,7 @@ function selectmediapath($f): string
     <script type="text/javascript">
     $(\'[name="TxAudioURI"]\').on("propertychange change keyup paste input", function(){
         var input = $(this).val();
-        if ((/(http(s?)):\/\//i.test(input)) && '. $youtubedlexists.') {
+        if ((/(http(s?)):\/\//i.test(input)) && '. json_encode($youtubedlexists).') {
 
             $("#genSub").css("display", "");
     
