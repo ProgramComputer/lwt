@@ -27,7 +27,8 @@ echo
 
 # Database access settings
 echo "LWT needs to know how to access the database. You can change this options later in 'connect.inc.php'."
-host=localhost
+read -p "Database host [localhost]: " -r host
+host=${host:-localhost}
 read -p "Database User Name [lwt]: " -r user
 user=${user:-lwt}
 read -p "Database Password [abcxyz]: " -r passwd
