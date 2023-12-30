@@ -1,4 +1,4 @@
-FROM php:8.1-apache-buster
+FROM php:8.1-apache-bullseye
 
 # creating config file php.ini 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
