@@ -1,4 +1,4 @@
-FROM php:8.1-apache-buster
+FROM php:8.1-apache-bullseye
 
 # creating config file php.ini 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
@@ -6,7 +6,7 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
 
 RUN docker-php-ext-install pdo pdo_mysql mysqli
 
-COPY . /var/www/html/
+COPY . /var/www/html/lwt
 
 # creating connect.inc.php
 ARG DB_HOSTNAME=db
