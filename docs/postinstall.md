@@ -58,3 +58,8 @@ To use it, please read the following steps:
 
 The Text-to-Speech may sound robotic with some languages or operating systems. A
 workaround is to download a Text-To-Speech (TTS) plugin such as [Read Aloud](https://readaloud.app/).
+
+## Automatic subtitles and video download
+youtube-dl or yt-dlp can be installed in path and allows to retrieve official subtitles at import and download videos from Youtube,Vimeo, DailyMotion and other sites.
+
+
