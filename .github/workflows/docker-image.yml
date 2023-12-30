@@ -50,14 +50,21 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build and push Docker images
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          platforms: ${{ matrix.platform }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Build and push Docker images
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     context: .
+      #     push: true
+      #     platforms: ${{ matrix.platform }}
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push container image
+        run: |
+          # Build and Publish container image
+          docker buildx build --push \
+          --tag ${{ steps.meta.outputs.tags }} \
+          --label${{ steps.meta.outputs.labels }} \
+          --platform {{ matrix.platform }} .
       - name: Build  Docker images
         uses: docker/build-push-action@v3
         with:
