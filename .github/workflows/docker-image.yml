@@ -63,7 +63,7 @@ jobs:
           # Build and Publish container image
           docker buildx build --push \
           --tag ${{ steps.meta.outputs.tags }} \
-          --label${{ steps.meta.outputs.labels }} \
+          --label ${{ steps.meta.outputs.labels}} \
           --platform {{ matrix.platform }} .
       - name: Build  Docker images
         uses: docker/build-push-action@v3
