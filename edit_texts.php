@@ -26,7 +26,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/edit__texts_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/edit-texts.html
  * @since   1.0.3
  */
 
@@ -585,7 +585,7 @@ function edit_texts_form($text, $annotated)
             $('#TxText').attr('lang', language_data[lid]);
         }
     
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(document).ready(change_textboxes_language);
     </script>
     <div class="flex-spaced">
@@ -712,7 +712,7 @@ function edit_texts_form($text, $annotated)
             <tr>
                 <td class="td1 right" colspan="2">
                     <input type="button" value="Cancel" 
-                    onclick="{resetDirty(); location.href='edit_texts.php<?php echo ($new_text ? '' : '#rec' . $text->id); ?>';}" />
+                    onclick="{lwt_form_check.resetDirty(); location.href='edit_texts.php<?php echo ($new_text ? '' : '#rec' . $text->id); ?>';}" />
                     <input type="submit" name="op" value="Check" />
                     <input type="submit" name="op" 
                     value="<?php echo ($new_text ? 'Save' : 'Change') ?>" />

@@ -15,6 +15,16 @@ require_once __DIR__ . '/inc/ajax_edit_impr_text.php';
 
 
 /**
+ * @var string Version of this current LWT API.
+ */
+define('LWT_API_VERSION', "0.1.1");
+
+/**
+ * @var string Date of the last released change of the LWT API. 
+ */
+define('LWT_API_RELEASE_DATE', "2023-12-29");
+
+/**
  * Send JSON response and exit.
  * 
  * @param int   $status Status code to display
@@ -121,13 +131,13 @@ function endpoint_exits($method, $requestUri)
  *
  * @return string[] JSON-encoded version
  *
- * @psalm-return array{version: '0.1.0', release_date: '2023-12-24'}
+ * @psalm-return array{version: '0.1.1', release_date: '2023-12-29'}
  */
 function rest_api_version($get_req): array
 {
     return array(
-        "version"      => "0.1.0",
-        "release_date" => "2023-12-24"
+        "version"      => LWT_API_VERSION,
+        "release_date" => LWT_API_RELEASE_DATE
     );
 }
 
@@ -596,7 +606,12 @@ function request_handler($method, $requestUri, $post_param) {
     // Process endpoint request
     if ($method === 'GET') {
         // Handle GET request for each endpoint
-        parse_str(parse_url($requestUri, PHP_URL_QUERY), $req_param);
+        $uri_query = parse_url($requestUri, PHP_URL_QUERY);
+        if ($uri_query == null) {
+            $req_param = array();
+        } else {
+            parse_str($uri_query, $req_param);
+        }
         switch ($endpoint_fragments[0]) {
             case 'media-files':
                 $answer = media_files($req_param);

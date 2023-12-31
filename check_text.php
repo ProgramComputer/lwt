@@ -13,7 +13,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/check__text_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/check-text.html
  * @since   1.0.3
  */
 
@@ -74,7 +74,7 @@ function display_form()
             $('#TxText').attr('lang', language_data[lid]);
         }
 
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(document).ready(change_textboxes_language);
      </script>
 <form class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
