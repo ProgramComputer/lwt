@@ -185,7 +185,7 @@ function browser_tts($text, $languageName): void
     );
     $languageCode = getLanguageCode($lg_id, LWT_LANGUAGES_ARRAY);
     // Phonetic reading for this text
-    $phoneticText = phonetic_reading($text, $languageCode);
+    $phoneticText = phonetic_reading($text, $lg_id);
     ?>
 <script type="text/javascript">
 

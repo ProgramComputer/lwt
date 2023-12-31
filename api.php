@@ -146,7 +146,7 @@ function media_files($get_req)
 /**
  * Get the phonetic reading of a word based on it's language.
  *
- * @param array $get_req Array with the fields "text" and "lang" (short language name)
+ * @param array $get_req Array with the fields "text" and "lang_id" (language_id)
  *
  * @return string[] JSON-encoded result
  *
@@ -154,7 +154,7 @@ function media_files($get_req)
  */
 function get_phonetic_reading($get_req): array
 {
-    $data = phonetic_reading($get_req['text'], $get_req['lang']);
+    $data = phonetic_reading($get_req['text'], $get_req['lang_id']);
     return array("phonetic_reading" => $data);
 }
 

@@ -704,7 +704,7 @@ function do_test_test_javascript_clickable($wo_record, $solution)
 {
     $wid = $wo_record['WoID'];
     $abbr = getLanguageCode($wo_record['WoLgID'], LWT_LANGUAGES_ARRAY);
-    $phoneticText = phonetic_reading($wo_record['WoText'], $abbr);
+    $phoneticText = phonetic_reading($wo_record['WoText'], $wo_record['WoLgID']);
     ?>
 <script type="text/javascript">
     /** 

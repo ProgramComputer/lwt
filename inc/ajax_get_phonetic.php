@@ -3,7 +3,7 @@
  * \file
  * \brief Make the phonetic translation of a word.
  * 
- * Call: inc/ajax_get_phonetic.php?text=[text_string]&lang=[language_string]
+ * Call: inc/ajax_get_phonetic.php?text=[text_string]&lang_id=[language_id]
  * 
  * @package Lwt
  * @author  HugoFara <hugo.farajallah@protonmail.com>
@@ -16,7 +16,7 @@
 require_once 'session_utility.php';
 
 if (isset($_GET['text']) && isset($_GET['lang'])) {
-    echo phonetic_reading(getreq('text'), getreq('lang'));
+    echo phonetic_reading(getreq('text'), getreq('lang_id'));
 }
 
 ?>
