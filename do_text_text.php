@@ -636,18 +636,30 @@ function do_text_text_javascript($var_array): void
     const new_globals = <?php echo json_encode($var_array); ?>;
 
     // Set global variables
-    for (const key in new_globals) {
-        window[key] = new_globals[key];
+    for (let key in new_globals) {
+        if (typeof new_globals[key] !== 'string') {
+            for (let subkey1 in new_globals[key]) {
+                if (typeof new_globals[key] !== 'string') {
+                    for (let subkey2 in new_globals[key][subkey1]) {
+                        window[key][subkey1][subkey2] = new_globals[key][subkey1][subkey2];
+                    }
+                } else {
+                    window[key][subkey1] = new_globals[key][subkey1];
+                }
+            }
+        } else {
+            window[key] = new_globals[key];
+        }
     }
-    LANG = getLangFromDict(WBLINK3);
-    TEXTPOS = -1;
+    LANG = getLangFromDict(LWT_DATA.language.translator_link);
+    LWT_DATA.text.reading_position = -1;
     OPENED = 0;
     // Change the language of the current frame
-    if (LANG && LANG != WBLINK3) {
+    if (LANG && LANG != LWT_DATA.language.translator_link) {
         $("html").attr('lang', LANG);
     }
 
-    if (JQ_TOOLTIP) {
+    if (LWT_DATA.settings.jQuery_tooltip) {
         $(function () {
             $('#overDiv').tooltip();
             $('#thetext').tooltip_wsty_init();
@@ -657,7 +669,7 @@ function do_text_text_javascript($var_array): void
 
     /**
      * Save the current reading position.
-     * @global {string} TID Text ID
+     * @global {string} LWT_DATA.text.id Text ID
      * 
      * @since 2.0.3-fork
      */
@@ -671,7 +683,7 @@ function do_text_text_javascript($var_array): void
                 return;
             }
         });
-        saveReadingPosition(TID, pos);
+        saveReadingPosition(LWT_DATA.text.id, pos);
     }
 
     $(document).ready(prepareTextInteractions);
@@ -746,24 +758,34 @@ function do_text_text_content($textid, $only_body=true): void
     }
     $var_array = array(
         // Change globals from jQuery hover
-        'ANN_ARRAY' => json_decode(annotation_to_json($ann)),
-        'DELIMITER' => tohtml(
-            str_replace(
-                array('\\',']','-','^'), 
-                array('\\\\','\\]','\\-','\\^'), 
-                getSettingWithDefault('set-term-translation-delimiters')
-            )
-        ),
-        'WBLINK1' => $wb1,
-        'WBLINK2' => $wb2,
-        'WBLINK3' => $wb3,
-        'RTL' => $rtlScript,
-        'TID' => $textid,
-        'ADDFILTER' => makeStatusClassFilter((int)$visit_status),
-        'JQ_TOOLTIP' => getSettingWithDefault('set-tooltip-mode') == 2 ? 1 : 0,
-        // Add new globals
-        'ANNOTATIONS_MODE' => $mode_trans,
-        'POS' => $pos
+        'LWT_DATA' => array(
+            'language' => array(
+                'dict_link1' => $wb1,
+                'dict_link2' => $wb2,
+                'translator_link' => $wb3,
+                'delimiter' => tohtml(
+                        str_replace(
+                            array('\\',']','-','^'), 
+                            array('\\\\','\\]','\\-','\\^'), 
+                            getSettingWithDefault('set-term-translation-delimiters')
+                        )
+                    ),
+                'rtl' => $rtlScript
+            ),
+            'text' => array(
+                'id' => $textid,
+                'reading_position' => $pos,
+                'annotations' => json_decode(annotation_to_json($ann))
+            ),
+            'settings' => array(
+                'jQuery_tooltip' => (
+                    getSettingWithDefault('set-tooltip-mode') == 2 ? 1 : 0
+                ),
+                'hts' => getSettingWithDefault('set-hts'),
+                'word_status_filter' => makeStatusClassFilter((int)$visit_status),
+                'annotations_mode' => $mode_trans
+            ),
+        )
     );
     do_text_text_javascript($var_array);
     do_text_text_style($showLearning, $mode_trans, $textsize, strlen($ann) > 0);

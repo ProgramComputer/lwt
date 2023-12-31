@@ -138,7 +138,7 @@ function change_term_display($wid, $translation, $hex): void
     ?>;
     const roman = <?php echo prepare_textdata_js($_REQUEST["WoRomanization"]); ?>;
     let title;
-    if (window.parent.document.getElementById('frame-l').JQ_TOOLTIP) {
+    if (window.parent.document.getElementById('frame-l').LWT_DATA.settings.jQuery_tooltip) {
         title = '';
     } else {
         title = make_tooltip(
@@ -285,7 +285,7 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
     pagestart_nobody($titletext);
     ?>
 <script type="text/javascript">
-    $(document).ready(ask_before_exiting);
+    $(document).ready(lwt_form_check.askBeforeExit);
     $(window).on('beforeunload',function() {
         setTimeout(function() {window.parent.frames['ru'].location.href = 'empty.html';}, 0);
     });
