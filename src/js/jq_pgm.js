@@ -538,7 +538,6 @@ function keydown_event_do_test_test (e) {
 		showRightFrames('edit_tword.php?wid=' + WID);
     return false;
   }
-  if (OPENED == 0) return true;
   if (e.which == 40) { 
     // down : status-1
 		showRightFrames('set_test_status.php?wid=' + WID + '&stchange=-1');
@@ -551,6 +550,7 @@ function keydown_event_do_test_test (e) {
       return false;
     }
   }
+  if (OPENED == 0) return true;
   return true;
 }
 

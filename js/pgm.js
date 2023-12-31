@@ -98,9 +98,9 @@ if(e.which==27){showRightFrames('set_test_status.php?wid='+WID+'&status='+$('.wo
 if(e.which==73){showRightFrames('set_test_status.php?wid='+WID+'&status=98');return!1}
 if(e.which==87){showRightFrames('set_test_status.php?wid='+WID+'&status=99');return!1}
 if(e.which==69){showRightFrames('edit_tword.php?wid='+WID);return!1}
-if(OPENED==0)return!0;if(e.which==40){showRightFrames('set_test_status.php?wid='+WID+'&stchange=-1');return!1}
+if(e.which==40){showRightFrames('set_test_status.php?wid='+WID+'&stchange=-1');return!1}
 for(let i=1;i<=5;i++){if(e.which==(48+i)||e.which==(96+i)){showRightFrames('set_test_status.php?wid='+WID+'&status='+i);return!1}}
-return!0}
+if(OPENED==0)return!0;return!0}
 function word_each_do_text_text(_){const wid=$(this).attr('data_wid');if(wid!=''){const order=$(this).attr('data_order');if(order in ANN_ARRAY){if(wid==ANN_ARRAY[order][1]){const ann=ANN_ARRAY[order][2];const re=new RegExp('(['+DELIMITER+'][ ]{0,1}|^)('+ann.replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&')+')($|[ ]{0,1}['+DELIMITER+'])','');if(!re.test($(this).attr('data_trans').replace(/ \[.*$/,''))){const trans=ann+' / '+$(this).attr('data_trans');$(this).attr('data_trans',trans.replace(' / *',''))}
 $(this).attr('data_ann',ann)}}}
 if(!JQ_TOOLTIP){this.title=make_tooltip($(this).text(),$(this).attr('data_trans'),$(this).attr('data_rom'),$(this).attr('data_status'))}}
