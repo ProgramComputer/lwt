@@ -5104,7 +5104,7 @@ function makeVideoPlayer($path, $offset=0): void
         // Dailymotion
         $domain = "https://www.dailymotion.com/embed/video/";
         $id = $matches[1];
-        $url = $domain . $id;
+        $url = $domain . $id."?start=".$offset;
         $online = true;
     } else if (preg_match(
         "/(?:https:\/\/)?vimeo\.com\/(\d+)/iu",

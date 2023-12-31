@@ -614,7 +614,7 @@ function unknown_post_action_type($post_req, $action_exists=false): array
  * @param string     $requestURI The URI being requested.
  * @param array|null $post_param Post arguments, usually equal to $_POST
  * 
- * @return never
+ * @return void
  */
 function request_handler($method, $requestUri, $post_param) {
     // Extract requested endpoint from URI
