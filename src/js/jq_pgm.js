@@ -538,6 +538,7 @@ function keydown_event_do_test_test (e) {
 		showRightFrames('edit_tword.php?wid=' + WID);
     return false;
   }
+  if (OPENED == 0) return true;
   if (e.which == 40) { 
     // down : status-1
 		showRightFrames('set_test_status.php?wid=' + WID + '&stchange=-1');
@@ -550,7 +551,6 @@ function keydown_event_do_test_test (e) {
       return false;
     }
   }
-  if (OPENED == 0) return true;
   return true;
 }
 
@@ -628,13 +628,11 @@ function mword_each_do_text_text(_) {
 
 function word_dblclick_event_do_text_text () {
   const t = parseInt($('#totalcharcount').text(), 10);
-  if (t == 0) 
-    return;
+  if (t == 0) return;
   let p = 100 * ($(this).attr('data_pos') - 5) / t;
-  if (p < 0) 
-    p = 0;
-  if (typeof (window.parent.frames.h.lwt_audio_controller.newPosition) === 'function') { 
-    window.parent.frames.h.lwt_audio_controller.newPosition(p); 
+  if (p < 0) p = 0;
+  if (typeof (window.parent.frames.h.new_pos) === 'function') { 
+    window.parent.frames.h.new_pos(p); 
   }
 }
 
@@ -1162,13 +1160,12 @@ function keydown_event_do_text_text (e) {
   if (e.which == 65) { // A : set audio pos.
     let p = curr.attr('data_pos');
     const t = parseInt($('#totalcharcount').text(), 10);
-    if (t == 0) 
-      return true;
+    if (t == 0) return true;
     p = 100 * (p - 5) / t;
     if (p < 0) p = 0;
-    if (typeof (window.parent.frames.h.lwt_audio_controller.newPosition) === 'function') { 
-      window.parent.frames.h.lwt_audio_controller.newPosition(p); 
-    } else {
+    if (typeof (window.parent.frames.h.new_pos) === 'function') { 
+      window.parent.frames.h.new_pos(p); 
+    } else { 
       return true; 
     }
     return false;
@@ -1248,8 +1245,6 @@ function quick_select_to_input(select_elem, input_elem)
  * @param {string}   base_path Base path for LWT to append
  * 
  * @returns {HTMLOptionElement[]} List of options to append to the select.
- * 
- * @since 2.9.1-fork Base path is no longer used
  */
 function select_media_path(paths, folders, base_path)
 {
@@ -1263,7 +1258,7 @@ function select_media_path(paths, folders, base_path)
       temp_option.setAttribute("disabled", "disabled");
       temp_option.text = '-- Directory: ' + paths[i] + '--';
     } else {
-      temp_option.value = paths[i];
+      temp_option.value = base_path + "/" + paths[i];
       temp_option.text = paths[i];
     }
     options.push(temp_option);
