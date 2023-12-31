@@ -5,13 +5,48 @@ other versions come from the canonical LWT ("official" branch on Git).
 For git tags, official releases are marked like "v1.0.0", while unofficial
 ones are marked like "v1.0.0-fork".
 
-## [Unreleased] 
+## [Unreleased]
+
+### Added
+
+* `unloadformcheck.js` now declares a new object `lwt_form_check` that contains all the functions needed.
+* New globals ([#163](https://github.com/HugoFara/lwt/issues/163)):
+  * On `inc/kernel_utility.php`: `LWT_APP_VERSION` and `LWT_RELEASE_DATE`.
+  * On `api.php`: `LWT_API_VERSION` and `LWT_API_RELEASE_DATE`.
+  * `src/js/jq_pgm.js`: `LWT_DATA`.
+* Word reading can be allowed on hover or on click. 
+Pull request [#147](https://github.com/HugoFara/lwt/pull/147) by 
+[@ProgramComputer](https://github.com/ProgramComputer).
+* You can add a custom text reader with the new voice API feature! 
+A courtesy of [@ProgramComputer](https://github.com/ProgramComputer) on pull request 
+[#153](https://github.com/HugoFara/lwt/pull/153). 
+A feature first requested on [#143](https://github.com/HugoFara/lwt/issues/143). 
+Discussion in open on [#174](https://github.com/HugoFara/lwt/discussions/174).
+* Starts a cleaner database management. Database schema is defined in `db/schema/baseline.sql` and no longer in PHP code.
+
+### Changed
+
+* Adds missing documentation in the Docker image:
+  * MarkDown files in the root folder are now included. 
+  See [#160](https://github.com/HugoFara/lwt/issues/160). 
+  It adds `README.md` and `UNLICENSE.md`.
+  * Adds `docs/info.html` and `docs/index.html` from [#146](https://github.com/HugoFara/lwt/pull/146).
 
 ### Fixed
 
 * The database wizard was broken since 2.9.0.
 * It was impossible to change a word status on hover since 2.9.1.
 * Avoids JavaScript error on editing a language when on dictionary field is empty.
+* For some feeds, feed wizard session was not working due to ill-configured session.
+Solves [#129](https://github.com/HugoFara/lwt/issues/129), thanks to the help of PR 
+[#168](https://github.com/HugoFara/lwt/pull/168).
+* Text reading position was not working consistently when adding several known words.
+
+### Deprecated
+
+* Using any function from `unloadformcheck.js` without using `lwt_form_check` is deprecated.
+* `get_database_prefixes` is deprecated, superseded by `getDatabasePrefix` which is much cleaner.
+* Globals defined in `jq_pgm.js` are going into a single global `LWT_DATA`.
 
 ## 2.9.1-fork (December 29 2023)
 

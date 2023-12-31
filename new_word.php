@@ -73,7 +73,7 @@ if (isset($_REQUEST['op'])) {
     var status = <?php echo prepare_textdata_js($_REQUEST["WoStatus"]); ?>;
     var trans = <?php echo prepare_textdata_js($translation . getWordTagList($wid, ' ', 1, 0)); ?>;
     var roman = <?php echo prepare_textdata_js($_REQUEST["WoRomanization"]); ?>;
-    var title = window.parent.JQ_TOOLTIP?'':make_tooltip(<?php echo prepare_textdata_js($_REQUEST["WoText"]); ?>,trans,roman,status);
+    var title = window.parent.LWT_DATA.settings.jQuery_tooltip?'':make_tooltip(<?php echo prepare_textdata_js($_REQUEST["WoText"]); ?>,trans,roman,status);
     //]]>
 </script>
             <?php
@@ -127,7 +127,7 @@ else {  // if (! isset($_REQUEST['op']))
     pagestart_nobody('');
     ?>
     <script type="text/javascript">
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(window).on('beforeunload', function() {
             setTimeout(function() {window.parent.frames['ru'].location.href = 'empty.html';}, 0);
         });

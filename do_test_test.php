@@ -673,11 +673,11 @@ function do_test_test_interaction_globals($wb1, $wb2, $wb3)
 {
     ?>
 <script type="text/javascript">
-    WBLINK1 = <?php echo json_encode($wb1); ?>;
-    WBLINK2 = <?php echo json_encode($wb2); ?>;
-    WBLINK3 = <?php echo json_encode($wb3); ?>;
-    LANG = getLangFromDict(WBLINK3);
-    if (LANG && LANG != WBLINK3) {
+    LWT_DATA.language.dict_link1 = <?php echo json_encode($wb1); ?>;
+    LWT_DATA.language.dict_link2 = <?php echo json_encode($wb2); ?>;
+    LWT_DATA.language.translator_link = <?php echo json_encode($wb3); ?>;
+    LANG = getLangFromDict(LWT_DATA.language.translator_link);
+    if (LANG && LANG != LWT_DATA.language.translator_link) {
         $("html").attr('lang', LANG);
     }
     OPENED = 0;
@@ -702,9 +702,14 @@ function do_test_test_interaction_globals($wb1, $wb2, $wb3)
  */
 function do_test_test_javascript_clickable($wo_record, $solution)
 {
+    global $tbpref;
     $wid = $wo_record['WoID'];
     $abbr = getLanguageCode($wo_record['WoLgID'], LWT_LANGUAGES_ARRAY);
     $phoneticText = phonetic_reading($wo_record['WoText'], $wo_record['WoLgID']);
+    $voiceApi = get_first_value(
+        "SELECT LgTTSVoiceAPI AS value FROM {$tbpref}languages 
+        WHERE LgID = " . $wo_record['WoLgID']
+    );
     ?>
 <script type="text/javascript">
     /** 
@@ -719,8 +724,9 @@ function do_test_test_javascript_clickable($wo_record, $solution)
         }
     }
 
-    SOLUTION = <?php echo prepare_textdata_js($solution); ?>;
-    WID = <?php echo $wid; ?>;
+    LWT_DATA.test.solution = <?php echo prepare_textdata_js($solution); ?>;
+    LWT_DATA.word.id = <?php echo $wid; ?>;
+    LWT_DATA.language.ttsVoiceApi = <?php echo json_encode($voiceApi); ?>;
 
     $(document).on('keydown', keydown_event_do_test_test);
     $('.word')
@@ -877,8 +883,8 @@ function do_test_test_javascript($count)
      */
     function insert_new_word(word_id, solution, group) {
 
-        SOLUTION = solution;
-        WID = word_id;
+        LWT_DATA.test.solution = solution;
+        LWT_DATA.word.id = word_id;
 
         $('#term-test').html(group);
 
