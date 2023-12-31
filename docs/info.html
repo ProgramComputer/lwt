@@ -2184,8 +2184,49 @@ KEY NfUpdate (NfUpdate)
 other versions come from the canonical LWT ("official" branch on Git).
 For git tags, official releases are marked like "v1.0.0", while unofficial
 ones are marked like "v1.0.0-fork".</p>
-<h3>2.9.1-fork (December 29 2023)</h3>
+<h3>[Unreleased]</h3>
 <h4>Added</h4>
+<ul>
+<li>
+<code>unloadformcheck.js</code> now declares a new object <code>lwt_form_check</code> that contains all the functions needed.</li>
+<li>New globals (<a href="https://github.com/HugoFara/lwt/issues/163">#163</a>):
+<ul>
+<li>On <code>inc/kernel_utility.php</code>: <code>LWT_APP_VERSION</code> and <code>LWT_RELEASE_DATE</code>.</li>
+<li>On <code>api.php</code>: <code>LWT_API_VERSION</code> and <code>LWT_API_RELEASE_DATE</code>.</li>
+</ul>
+</li>
+<li>Word reading can be allowed on hover or on click.
+Pull request <a href="https://github.com/HugoFara/lwt/pull/147">#147</a> by
+<a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
+<li>You can add a custom text reader with the new voice API feature!
+A courtesy of <a href="https://github.com/ProgramComputer">@ProgramComputer</a> on pull request
+<a href="https://github.com/HugoFara/lwt/pull/153">#153</a>.
+A feature first requested on <a href="https://github.com/HugoFara/lwt/issues/143">#143</a>.
+Discussion in open on <a href="https://github.com/HugoFara/lwt/discussions/174">#174</a>.</li>
+<li>Starts a cleaner database management. Database schema is defined in <code>db/schema/baseline.sql</code> and no longer in PHP code.</li>
+</ul>
+<h4>Changed</h4>
+<ul>
+<li>MarkDown files in the root folder are now included in the Docker image. See
+<a href="https://github.com/HugoFara/lwt/issues/160">#160</a>. It adds <code>README.md</code> and <code>UNLICENSE.md</code>.</li>
+</ul>
+<h4>Fixed</h4>
+<ul>
+<li>The database wizard was broken since 2.9.0.</li>
+<li>It was impossible to change a word status on hover since 2.9.1.</li>
+<li>Avoids JavaScript error on editing a language when on dictionary field is empty.</li>
+<li>For some feeds, feed wizard session was not working due to ill-configured session.
+Solves <a href="https://github.com/HugoFara/lwt/issues/129">#129</a>, thanks to the help of PR
+<a href="https://github.com/HugoFara/lwt/pull/168">#168</a>.</li>
+</ul>
+<h4>Deprecated</h4>
+<ul>
+<li>Using any function from <code>unloadformcheck.js</code> without using <code>lwt_form_check</code> is deprecated.</li>
+<li>
+<code>get_database_prefixes</code> is deprecated, superseded by <code>getDatabasePrefix</code> which is much cleaner.</li>
+</ul>
+<h3>2.9.1-fork (December 29 2023)</h3>
+<h4>Added in 2.9.1-fork</h4>
 <ul>
 <li>New tools for documentation:
 <ul>
@@ -2196,7 +2237,7 @@ ones are marked like "v1.0.0-fork".</p>
 <li>New constant <code>LWT_LANGUAGES_ARRAY</code>, that replaces <code>$langDefs</code> (in <code>inc/langdefs.php</code>).
 Part of <a href="https://github.com/HugoFara/lwt/issues/163">#163</a>.</li>
 </ul>
-<h4>Changed</h4>
+<h4>Changed in 2.9.1-fork</h4>
 <ul>
 <li>PHP files header docblocks are expanded, notably with a PHP version, package and category name.</li>
 <li>Japanese number are now parsed by MeCab. Big thanks to
@@ -2207,7 +2248,7 @@ Part of <a href="https://github.com/HugoFara/lwt/issues/163">#163</a>.</li>
 <li>Patch update to the REST API to 0.1.1: requests on GET with empty payload were
 resulting in error.</li>
 </ul>
-<h4>Fixed</h4>
+<h4>Fixed in 2.9.1-fork</h4>
 <ul>
 <li>Fixes <a href="https://github.com/HugoFara/lwt/issues/113">#113</a>: changing a language name
 was making text-to-speech unusable and may prompt a warning.</li>
@@ -2240,11 +2281,17 @@ resulting in broken path (<a href="https://github.com/HugoFara/lwt/issues/161">#
 PR <a href="https://github.com/HugoFara/lwt/pull/154/files">#154</a> by
 <a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
 </ul>
-<h4>Deprecated</h4>
+<h4>Deprecated in 2.9.1-fork</h4>
 <ul>
 <li>PHP documentation using Doxygen (under <code>docs/html</code>) is now deprecated and will be removed in 3.0.0.</li>
 <li>Using <code>$langDefs</code> is deprecated in favor of <code>LWT_LANGUAGES_ARRAY</code> (<a href="https://github.com/HugoFara/lwt/issues/163">#163</a>).</li>
 <li>Calling the global function <code>new_pos</code> to set audio position is deprecated. Please use <code>lwt_audio_controller.setPosition</code>.</li>
+</ul>
+<h4>Full Changelog for 2.9.1-fork</h4>
+<ul>
+<li>
+<a href="https://github.com/HugoFara/lwt/compare/2.9.0...2.9.1">2.9.0...2.9.1</a>
+</li>
 </ul>
 <h3>2.9.0-fork (December 24 2023)</h3>
 <h4>Added in 2.9.0-fork</h4>
