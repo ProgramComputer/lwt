@@ -9,18 +9,61 @@ ones are marked like "v1.0.0-fork".
 
 ### Added
 
-* New tools for documentation:
-  * New JavaScript documentation with [JSDoc](https://jsdoc.app/)! You will find it under `docs/js/`.
-  * Better PHP documentation using [phpDocumentor](https://phpdoc.org/). The new documentation is at `docs/php/`.
-* New constant `LWT_LANGUAGES_ARRAY`, that replaces `$langDefs` (in `inc/langdefs.php`). Part of [#163](https://github.com/HugoFara/lwt/issues/163). 
+* `unloadformcheck.js` now declares a new object `lwt_form_check` that contains all the functions needed.
+* New globals ([#163](https://github.com/HugoFara/lwt/issues/163)):
+  * On `inc/kernel_utility.php`: `LWT_APP_VERSION` and `LWT_RELEASE_DATE`.
+  * On `api.php`: `LWT_API_VERSION` and `LWT_API_RELEASE_DATE`.
+* Word reading can be allowed on hover or on click. 
+Pull request [#147](https://github.com/HugoFara/lwt/pull/147) by 
+[@ProgramComputer](https://github.com/ProgramComputer).
+* You can add a custom text reader with the new voice API feature! 
+A courtesy of [@ProgramComputer](https://github.com/ProgramComputer) on pull request 
+[#153](https://github.com/HugoFara/lwt/pull/153). 
+A feature first requested on [#143](https://github.com/HugoFara/lwt/issues/143). 
+Discussion in open on [#174](https://github.com/HugoFara/lwt/discussions/174).
+* Starts a cleaner database management. Database schema is defined in `db/schema/baseline.sql` and no longer in PHP code.
 
 ### Changed
 
-* PHP files header docblocks are expanded, notably with a PHP version, package and category name.
-* Japanese number are now parsed by MeCab. Big thanks to [@ProgramComputer](https://github.com/ProgramComputer) for his pull request [#149](https://github.com/HugoFara/lwt/pull/149)!
-* Removes dead feeds from the demo database, as signalled in [#148](https://github.com/HugoFara/lwt/issues/148).
+* MarkDown files in the root folder are now included in the Docker image. See 
+[#160](https://github.com/HugoFara/lwt/issues/160). It adds `README.md` and `UNLICENSE.md`.
 
 ### Fixed
+
+* The database wizard was broken since 2.9.0.
+* It was impossible to change a word status on hover since 2.9.1.
+* Avoids JavaScript error on editing a language when on dictionary field is empty.
+* For some feeds, feed wizard session was not working due to ill-configured session.
+Solves [#129](https://github.com/HugoFara/lwt/issues/129), thanks to the help of PR 
+[#168](https://github.com/HugoFara/lwt/pull/168).
+
+### Deprecated
+
+* Using any function from `unloadformcheck.js` without using `lwt_form_check` is deprecated.
+* `get_database_prefixes` is deprecated, superseded by `getDatabasePrefix` which is much cleaner.
+
+## 2.9.1-fork (December 29 2023)
+
+### Added in 2.9.1-fork
+
+* New tools for documentation:
+  * New JavaScript documentation with [JSDoc](https://jsdoc.app/)! You will find it under `docs/js/`.
+  * Better PHP documentation using [phpDocumentor](https://phpdoc.org/). The new documentation is at `docs/php/`.
+* New constant `LWT_LANGUAGES_ARRAY`, that replaces `$langDefs` (in `inc/langdefs.php`). 
+Part of [#163](https://github.com/HugoFara/lwt/issues/163). 
+
+### Changed in 2.9.1-fork
+
+* PHP files header docblocks are expanded, notably with a PHP version, package and category name.
+* Japanese number are now parsed by MeCab. Big thanks to 
+[@ProgramComputer](https://github.com/ProgramComputer) for his pull request 
+[#149](https://github.com/HugoFara/lwt/pull/149)!
+* Removes dead feeds from the demo database, as signaled in 
+[#148](https://github.com/HugoFara/lwt/issues/148).
+* Patch update to the REST API to 0.1.1: requests on GET with empty payload were 
+resulting in error.
+
+### Fixed in 2.9.1-fork
 
 * Fixes [#113](https://github.com/HugoFara/lwt/issues/113): changing a language name 
 was making text-to-speech unusable and may prompt a warning.
@@ -28,10 +71,10 @@ was making text-to-speech unusable and may prompt a warning.
 * Since 2.9.0, audio position was not saved properly.
 * On `upload_words.php`, "update only empty fields" was broken.
 * Translation were not set by default properly when editing terms translations table.
-* The field MeCab was set for japanese even when not asked for. 
-Signalled on PR [#155](https://github.com/HugoFara/lwt/pull/155), thanks to 
+* The field MeCab was set for Japanese even when not asked for. 
+Signaled on PR [#155](https://github.com/HugoFara/lwt/pull/155), thanks to 
 [@ProgramComputer](https://github.com/ProgramComputer).
-* Since 2.8.1, japanese word romanization was not displayed any more. 
+* Since 2.8.1, Japanese word romanization was not displayed any more. 
 Thanks to 아르노 for signalling the bug on Discord!
 * The go slower/faster feature on audio was broken 
 ([#138](https://github.com/HugoFara/lwt/issues/138)), as functions `click_slower` 
@@ -45,12 +88,22 @@ This is fixed, and the SQL file was made more readable.
 to install the demo DB out of LWT (related to [#78](https://github.com/HugoFara/lwt/issues/78)).
 * Deleting a language deletes the language ([#151](https://github.com/HugoFara/lwt/issues/151)). 
 Before it was setting the language to empty values.
+* On media select, the lwt folder name was prepended to the media folder, 
+resulting in broken path ([#161](https://github.com/HugoFara/lwt/issues/161)).
+* With the REST API, requests with an empty query were resulting in an error.
+* `no-minify` composer command was fixed, suggested as a part of 
+PR [#154](https://github.com/HugoFara/lwt/pull/154/files) by 
+[@ProgramComputer](https://github.com/ProgramComputer).
 
-### Deprecated
+### Deprecated in 2.9.1-fork
 
-* PHP documentation using Doxygen (under `/docs/html`) is now deprecated and will be removed in 3.0.0.
+* PHP documentation using Doxygen (under `docs/html`) is now deprecated and will be removed in 3.0.0.
 * Using `$langDefs` is deprecated in favor of `LWT_LANGUAGES_ARRAY` ([#163](https://github.com/HugoFara/lwt/issues/163)).
 * Calling the global function `new_pos` to set audio position is deprecated. Please use `lwt_audio_controller.setPosition`.
+
+### Full Changelog for 2.9.1-fork
+
+* [2.9.0...2.9.1](https://github.com/HugoFara/lwt/compare/2.9.0...2.9.1)
 
 ## 2.9.0-fork (December 24 2023)
 

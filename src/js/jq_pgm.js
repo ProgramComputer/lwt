@@ -10,6 +10,22 @@
 Global variables used in LWT jQuery functions
 ***************************************************************/
 
+LWT_LANG_DATA = {
+  /** First dictionary URL */
+  wblink1: '',
+  /** Second dictionary URL */
+  whlink2: '',
+  /** Translator URL */
+  wblink3: '',
+
+  delimiter: '',
+
+  rtl: false,
+  /** Third-party voice API */
+  tpVoiceApi: ''
+
+}
+
 TEXTPOS = -1;
 OPENED = 0;
 /** @var {int} WID - Word ID */
@@ -20,7 +36,7 @@ TID = 0;
 WBLINK1 = '';
 /** Second dictionary URL */
 WBLINK2 = '';
-/** Google Translate */
+/** Translator URL */
 WBLINK3 = '';
 SOLUTION = '';
 ADDFILTER = '';
@@ -29,6 +45,7 @@ RTL = 0;
 ANN_ARRAY = {};
 DELIMITER = '';
 JQ_TOOLTIP = 0;
+HTS = 0;
 
 /**************************************************************
 LWT jQuery functions
@@ -53,7 +70,7 @@ function setTransRoman(tra, rom) {
     form_changed |= true;
   }
   if (form_changed)
-    makeDirty();
+    lwt_form_check.makeDirty();
 }
 
 /**
@@ -641,6 +658,8 @@ function word_dblclick_event_do_text_text () {
 /**
  * Do a word edition window. Usually called when the user clicks on a word.
  * 
+ * @since 2.9.10-fork Read word aloud if HTS equals 2.
+ * 
  * @returns {bool} false
  */
 function word_click_event_do_text_text () {
@@ -692,6 +711,10 @@ function word_click_event_do_text_text () {
       $(this).text(), $(this).attr('data_wid'), status, multi_words, RTL, ann
     );
   }
+  if (HTS == 2) {
+    const lg = getLangFromDict(WBLINK3);
+    readTextAloud($(this).text(), lg);
+  }
   return false;
 }
 
@@ -713,6 +736,10 @@ function mword_click_event_do_text_text () {
       TID, $(this).attr('data_order'), $(this).attr('data_text'),
       $(this).attr('data_wid'), status, $(this).attr('data_code'), ann
     );
+  }
+  if (HTS == 2) {
+    const lg = getLangFromDict(WBLINK3);
+    readTextAloud($(this).text(), lg);
   }
   return false;
 }
@@ -875,6 +902,10 @@ function word_hover_over () {
     if (JQ_TOOLTIP) {
       $(this).trigger('mouseover');
     }
+    if (HTS == 3) { 
+      const lg = getLangFromDict(WBLINK3);
+      readTextAloud($(this).text(), lg);
+      }
   }
 }
 
@@ -1248,6 +1279,8 @@ function quick_select_to_input(select_elem, input_elem)
  * @param {string}   base_path Base path for LWT to append
  * 
  * @returns {HTMLOptionElement[]} List of options to append to the select.
+ * 
+ * @since 2.9.1-fork Base path is no longer used
  */
 function select_media_path(paths, folders, base_path)
 {
@@ -1261,7 +1294,7 @@ function select_media_path(paths, folders, base_path)
       temp_option.setAttribute("disabled", "disabled");
       temp_option.text = '-- Directory: ' + paths[i] + '--';
     } else {
-      temp_option.value = base_path + "/" + paths[i];
+      temp_option.value = paths[i];
       temp_option.text = paths[i];
     }
     options.push(temp_option);
@@ -1335,8 +1368,8 @@ function display_example_sentences(sentences, click_target)
     // Doesn't feel the right way to do it
     clickable.setAttribute(
       "onclick", 
-      "{" + 
-      click_target + ".value = '" + sentences[i][1].replaceAll("'", "\\'") +"';makeDirty();}"
+      "{" + click_target + ".value = '" + sentences[i][1].replaceAll("'", "\\'") + 
+      "';lwt_form_check.makeDirty();}"
     );
     clickable.appendChild(img);
     // Create parent

@@ -11,7 +11,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/do__text__text_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/do-text-text.html
  * @since   1.0.3
  */
 
@@ -761,6 +761,7 @@ function do_text_text_content($textid, $only_body=true): void
         'TID' => $textid,
         'ADDFILTER' => makeStatusClassFilter((int)$visit_status),
         'JQ_TOOLTIP' => getSettingWithDefault('set-tooltip-mode') == 2 ? 1 : 0,
+        'HTS' => getSettingWithDefault('set-hts'),
         // Add new globals
         'ANNOTATIONS_MODE' => $mode_trans,
         'POS' => $pos

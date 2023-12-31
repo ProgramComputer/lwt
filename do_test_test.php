@@ -14,7 +14,7 @@
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
- * @link    https://hugofara.github.io/lwt/docs/html/do__test__test_8php.html
+ * @link    https://hugofara.github.io/lwt/docs/php/files/do-test-test.html
  * @since   1.0.3
  */
 
@@ -771,6 +771,7 @@ function do_test_test_interaction_globals($wb1, $wb2, $wb3)
  */
 function do_test_test_javascript_clickable($wo_record, $solution, $startSec, $endSec)
 {
+    global $tbpref;
     $wid = $wo_record['WoID'];
    /* $lang = get_first_value(
         'SELECT LgName AS value FROM ' . $tbpref . 'languages
@@ -780,12 +781,17 @@ function do_test_test_javascript_clickable($wo_record, $solution, $startSec, $en
     $abbr = $langDefs[$lang][1];*/
     $abbr = getLanguageCode($wo_record['WoLgID'], LWT_LANGUAGES_ARRAY);
     $phoneticText = phonetic_reading($wo_record['WoText'], $abbr);
+    $voiceApi = get_first_value(
+        "SELECT LgTTSVoiceAPI AS value FROM {$tbpref}languages 
+        WHERE LgID = " . $wo_record['WoLgID']
+    );
     ?>
     <script type="text/javascript">
    
 
         SOLUTION = <?php echo prepare_textdata_js($solution); ?>;
         WID = <?php echo $wid; ?>;
+    LWT_LANG_DATA.tpVoiceApi = <?php echo json_encode($voiceApi); ?>;
 
         $(document).on('keydown', keydown_event_do_test_test);
         $('.word')
