@@ -13,7 +13,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-upload-image:
+  build-and-upload-image-to-release:
     permissions: write-all
     runs-on: ubuntu-latest
     strategy:
