@@ -94,7 +94,7 @@ function prepareTextInteractions() {
     $('.word').on('click', word_click_event_do_text_text);
     $('#thetext').on('selectstart','span',false).on(
         'mousedown','.wsty',
-        {annotation: ANNOTATIONS_MODE}, 
+        {annotation: LWT_DATA.settings.annotations_mode}, 
         mword_drag_n_drop_select);
     $('#thetext').on('click', '.mword', mword_click_event_do_text_text);
     $('.word').on('dblclick', word_dblclick_event_do_text_text);
@@ -118,7 +118,7 @@ function prepareTextInteractions() {
  */
 function goToLastPosition() {
     // Last registered position to go to
-    const lookPos = POS;
+    const lookPos = LWT_DATA.text.reading_position;
     // Position to scroll to
     let pos = 0;
     if (lookPos > 0) {
@@ -166,7 +166,9 @@ function saveAudioPosition(text_id, pos) {
  * Get the phonetic version of a text.
  * 
  * @param {string} text Text to convert to phonetics.
- * @param {string} lang Language, either two letters code or four letters (BCP 47)
+ * @param {string} lang Language, either two letters code or four letters (BCP 47).
+ * 
+ * @deprecated Since 2.10.0 use getPhoneticTextAsync
  */
 function getPhoneticText(text, lang) {
     let phoneticText;
@@ -248,8 +250,9 @@ function deepFindValue(obj, searchValue) {
     return null; // Return null if no matching string is found
 }
 
-function readTextWithExternalApp(text, lang) {
-    let fetchRequest = JSON.parse(LWT_LANG_DATA.tpVoiceApi);
+
+function readTextWithExternal(text, voice_api, lang) {
+    let fetchRequest = JSON.parse(voice_api);
 
     // TODO: can expose more vars to Request
     deepReplace(fetchRequest, 'lwt_term', text)
@@ -270,6 +273,25 @@ function readTextWithExternalApp(text, lang) {
     });
 }
 
+function cookieTTSSettings(language) {
+    const prefix = 'tts[' + language;
+    let lang_settings = {};
+    const num_vals = ['Rate', 'Pitch'];
+    const cookies = ['Rate', 'Pitch', 'Voice'];
+    let cookie_val;
+    for (let cook in cookies) {
+        cookie_val = getCookie(prefix + cook + ']');
+        if (cookie_val) {
+            if (num_vals.includes(cook)) {
+                lang_settings[cook.toLowerCase()] = parseFloat(cookie_val);
+            } else {
+                lang_settings[cook.toLowerCase()] = cookie_val;
+            }
+        }
+    }
+    return lang_settings;
+} 
+
 /**
  * Read a text aloud, works with a phonetic version only.
  * 
@@ -282,18 +304,16 @@ function readTextWithExternalApp(text, lang) {
  * @return {SpeechSynthesisUtterance} The spoken message object
  * 
  * @since 2.9.0 Accepts "voice" as a new optional argument
- * @since 2.10.0 Can use third-party applications to read text
  */
  function readRawTextAloud(text, lang, rate, pitch, voice) {
     let msg = new SpeechSynthesisUtterance();
-    const trimmed = lang.substring(0, 2);
-    const prefix = 'tts[' + trimmed;
+    const tts_settings = cookieTTSSettings(lang.substring(0, 2));
     msg.text = text;
     if (lang) {
         msg.lang = lang;
     }
     // Voice is a string but we have to assign a SpeechSynthesysVoice
-    const useVoice = voice || getCookie(prefix + 'Voice]');
+    const useVoice = voice || tts_settings.voice;
     if (useVoice) {
         const voices = window.speechSynthesis.getVoices();
         for (let i = 0; i < voices.length; i++) {
@@ -304,19 +324,15 @@ function readTextWithExternalApp(text, lang) {
     }
     if (rate) {
         msg.rate = rate;
-    } else if (getCookie(prefix + 'Rate]')) {
-        msg.rate = parseInt(getCookie(prefix + 'Rate]'), 10);
+    } else if (tts_settings.rate) {
+        msg.rate = tts_settings.rate;
     }
     if (pitch) {
         msg.pitch = pitch;
-    } else if (getCookie(prefix + 'Pitch]')) {
-        msg.pitch = parseInt(getCookie(prefix + 'Pitch]'), 10);
+    } else if (tts_settings.pitch) {
+        msg.pitch = tts_settings.pitch;
     }
-    if (LWT_LANG_DATA.tpVoiceApi) {
-        readTextWithExternalApp(text, lang);
-    } else {
-        window.speechSynthesis.speak(msg);
-    }
+    window.speechSynthesis.speak(msg);
     return msg;
 }
 
@@ -332,8 +348,8 @@ function readTextWithExternalApp(text, lang) {
  * 
  * @since 2.9.0 Accepts "voice" as a new optional argument
  */
-function readTextAloud(text, lang, rate, pitch, voice) {
-    if (lang.startsWith('ja')) {
+function readTextAloud(text, lang, rate, pitch, voice, convert_to_phonetic) {
+    if (convert_to_phonetic) {
         getPhoneticTextAsync(text, lang)
             .then(
                 function (data) {
@@ -344,5 +360,21 @@ function readTextAloud(text, lang, rate, pitch, voice) {
             );
     } else {
         readRawTextAloud(text, lang, rate, pitch, voice);
+    }
+}
+
+
+function speechDispatcher(term, lang_abbr, lang_data) {
+    const loc_data = lang_data ?? LWT_DATA.language;
+    const loc_lang_abbr = lang_abbr ?? loc_data.abbr;
+    if (loc_data.ttsVoiceApi) {
+        readTextWithExternal(term, loc_data.ttsVoiceApi, loc_lang_abbr);
+    } else {
+        const convert_to_phonetic = loc_data.word_parsing == 'mecab';
+        const lang_settings = cookieTTSSettings(loc_lang_abbr.substring(0, 2));
+        readTextAloud(
+            term, loc_lang_abbr, lang_settings.rate, lang_settings.pitch, 
+            lang_settings.voice, convert_to_phonetic
+        );
     }
 }
