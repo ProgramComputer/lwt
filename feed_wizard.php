@@ -120,7 +120,13 @@ function feed_wizard_select_text(): void
             }
         }
     } elseif (isset($_REQUEST['rss_url'])) {
-    
+        if (
+            isset($_SESSION['wizard']) && !empty($_SESSION['wizard']['feed']) &&
+            $_REQUEST['rss_url'] === $_SESSION['wizard']['rss_url']
+        ) {
+            session_destroy();
+            my_die("Your session seems to have an issue, please reload the page.");
+        }
         $_SESSION['wizard']['feed'] = get_links_from_new_feed($_REQUEST['rss_url']);
         $_SESSION['wizard']['rss_url'] = $_REQUEST['rss_url'];
         if(empty($_SESSION['wizard']['feed'])) {
