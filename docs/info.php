@@ -34,7 +34,7 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 		<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png" />
 		<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png" />
 		<link rel="apple-touch-startup-image" href="../img/apple-touch-startup.png" />
-		<link rel="stylesheet" href="./css/styles.css">
+		<link rel="stylesheet" href="../css/styles.css">
 
 		<script type="text/javascript" src="../js/jquery.js"></script>
 		<script type="text/javascript" src="../js/floating.js"></script>
