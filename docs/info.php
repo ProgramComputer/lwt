@@ -34,7 +34,7 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 		<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png" />
 		<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png" />
 		<link rel="apple-touch-startup-image" href="../img/apple-touch-startup.png" />
-		<link rel="stylesheet" href="../css/styles.css">
+		<link rel="stylesheet" href="./css/styles.css">
 
 		<script type="text/javascript" src="../js/jquery.js"></script>
 		<script type="text/javascript" src="../js/floating.js"></script>
@@ -256,19 +256,19 @@ require_once __DIR__ . '/../src/php/markdown_converter.php';
 			</h2>
 		
 			<p>
-				A <a target="_blank" href="http://www.youtube.com/watch?v=QSLPOATWAU4">video</a> from <a target="_blank" href="http://www.youtube.com/user/FluentCzech">FluentCzech</a>:
+				A <a target="_blank" href="https://www.youtube.com/watch?v=QSLPOATWAU4">video</a> from <a target="_blank" href="https://www.youtube.com/user/FluentCzech">FluentCzech</a>:
 				<br /><br />
-				<iframe width="640" height="360" src="http://www.youtube.com/embed/QSLPOATWAU4" frameborder="0" allowfullscreen></iframe>
+				<iframe width="640" height="360" src="https://www.youtube.com/embed/QSLPOATWAU4" frameborder="0" allowfullscreen></iframe>
 				<br /><br />
-				Please have a look at the other great videos of <a target="_blank" href="http://www.youtube.com/user/FluentCzech">FluentCzech</a> that contain many good ideas for language learning! <br />
+				Please have a look at the other great videos of <a target="_blank" href="https://www.youtube.com/user/FluentCzech">FluentCzech</a> that contain many good ideas for language learning! <br />
 				<a target="_blank" href="http://www.anthonylauder.com">Website of FluentCzech (anthonylauder.com)</a>
 				<br /><br />
 			</p>
 
 			<p>
-				A <a target="_blank" href="http://www.youtube.com/watch?v=QnGG-_urLKk">video</a> from <a target="_blank" href="http://www.youtube.com/user/irishpolyglot">Benny the Irish polyglot</a>:
+				A <a target="_blank" href="https://www.youtube.com/watch?v=QnGG-_urLKk">video</a> from <a target="_blank" href="https://www.youtube.com/user/irishpolyglot">Benny the Irish polyglot</a>:
 				<br /><br />
-				<iframe width="640" height="360" src="http://www.youtube.com/embed/QnGG-_urLKk" frameborder="0" allowfullscreen></iframe>
+				<iframe width="640" height="360" src="https://www.youtube.com/embed/QnGG-_urLKk" frameborder="0" allowfullscreen></iframe>
 				<br /><br />
 				<a href="http://www.fluentin3months.com/learning-with-texts/" target="_blank">Fluent In 3 Months: Introducing LWT</a>, with <a target="_blank" href="http://lwtfi3m.co/">Benny's own (free) version of LWT</a>.<br />
 			</p>
