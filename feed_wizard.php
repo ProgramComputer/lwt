@@ -833,7 +833,7 @@ function feed_wizard_filter_text(): void
                 <td>
                     <span>
                         <input type="button" value="Back" 
-                        onclick="window.wt_wizard_filter.clickBack()" />
+                        onclick="wt_wizard_filter.clickBack()" />
                         <button id="next">Next</button>
                     </span>
                 </td>
@@ -841,7 +841,7 @@ function feed_wizard_filter_text(): void
             </tr>
         </table>
         <button style="position:absolute;right:10px;top:10px" 
-        onclick="window.lwt_wizard_filter.clickMinMax()">
+        onclick="lwt_wizard_filter.clickMinMax()">
             min/max
         </button>
         <input type="hidden" id="filter_tags" name="filter_tags" disabled />
