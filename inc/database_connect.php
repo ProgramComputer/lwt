@@ -2161,7 +2161,11 @@ function check_update_db($debug, $tbpref, $dbname): void
         '', 
         $sqlerrdie = false
     );
+
+    // Update the database and MUST HAPPEN BEFORE ACCESSING
+    update_database($dbname);
     
+
     if ($count > 0) {        
         // Rebuild Text Cache if cache tables new
         if ($debug) { 
@@ -2170,8 +2174,7 @@ function check_update_db($debug, $tbpref, $dbname): void
         reparse_all_texts();
     }
     
-    // Update the database
-    update_database($dbname);
+
 
     // Do Scoring once per day, clean Word/Texttags, and optimize db
     $lastscorecalc = getSetting('lastscorecalc');
