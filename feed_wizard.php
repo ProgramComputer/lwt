@@ -253,17 +253,14 @@ function feed_wizard_select_text(): void
         },
 
         clickBack: function() {
-            console.log("HELLO");
             location.href = 'feed_wizard.php?step=1&amp;select_mode=' +
                 encodeURIComponent($('select[name=\'select_mode\']').val()) +
                 '&amp;hide_images=' +
                 encodeURIComponent($('select[name=\'hide_images\']').val());
-                console.log("HI")
             return false;
         },
 
         clickMinMax: function() {
-            console.log("HELLO")
             $('#lwt_container').toggle();
             if ($('#lwt_container').css('display') == 'none') {
                 $('input[name=\'maxim\']').val(0);
