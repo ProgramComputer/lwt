@@ -14,6 +14,15 @@
 
  require __DIR__ . '/settings.php';
 
+/**
+ * @var string Version of this current LWT application.
+ */
+ define('LWT_APP_VERSION', '2.9.1-fork');
+
+ /**
+  * @var string Date of the last published release of LWT 
+  */
+ define('LWT_RELEASE_DATE', "2023-12-29");
 
 /**
  * Return LWT version for humans
@@ -30,9 +39,8 @@
 function get_version(): string 
 {
     global $debug;
-    $release_number = '2.9.1-fork';
-    $release_date = 'December 29 2023';
-    $version = "$release_number ($release_date)"; 
+    $formattedDate = date("F d Y", strtotime(LWT_RELEASE_DATE));
+    $version = LWT_APP_VERSION . " ($formattedDate)"; 
     if ($debug) {
         $version .= ' <span class="red">DEBUG</span>';
     }
@@ -551,11 +559,10 @@ function annotation_to_json($ann): string|false
  */
 function getreq($s) 
 {
-    if (isset($_REQUEST[$s]) ) {
+    if (isset($_REQUEST[$s])) {
         return trim($_REQUEST[$s]);
-    } else {
-        return ''; 
     }
+    return '';
 }
 
 /**
@@ -744,7 +751,44 @@ function targetLangFromDict($url)
     }
     // Fallback to Google Translate
     return $parsed_query["tl"] ?? "";
-} 
+}
+
+/**
+ * Parse a SQL file by returning an array of the different queries it contains.
+ * 
+ * @param string $filename File name
+ * 
+ * @return array
+ */
+function SQLParser($filename)
+{  
+    $handle = fopen($filename, 'r');
+    if ($handle === false) {
+        return array();
+    }
+    $curr_content = '';
+    while ($stream = fgets($handle)) {
+        // Skip comments
+        if (str_starts_with($stream, '-- ')) {
+            continue;
+        }
+        // Add stream to accumulator
+        $curr_content .= $stream;
+        // Get queries
+        $queries = explode(';' . PHP_EOL, $curr_content);
+        // Replace line by remainders of the last element (incomplete line)
+        $curr_content = array_pop($queries);
+        //var_dump("queries", $queries);
+        foreach ($queries as $query) {
+            $queries_list[] = trim($query);
+        }
+    }
+    if (!feof($handle)) {
+        // Throw error
+    }
+    fclose($handle);
+    return $queries_list;
+}
 
 /*****************
  * Wrappers for PHP <8.0  

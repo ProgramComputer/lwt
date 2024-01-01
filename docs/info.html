@@ -2183,11 +2183,65 @@ other versions come from the canonical LWT ("official" branch on Git).
 For git tags, official releases are marked like "v1.0.0", while unofficial
 ones are marked like "v1.0.0-fork".</p>
 <h3>[Unreleased]</h3>
+<h4>Added</h4>
+<ul>
+<li>
+<code>unloadformcheck.js</code> now declares a new object <code>lwt_form_check</code> that contains all the functions needed.</li>
+<li>New globals (<a href="https://github.com/HugoFara/lwt/issues/163">#163</a>):
+<ul>
+<li>On <code>inc/kernel_utility.php</code>: <code>LWT_APP_VERSION</code> and <code>LWT_RELEASE_DATE</code>.</li>
+<li>On <code>api.php</code>: <code>LWT_API_VERSION</code> and <code>LWT_API_RELEASE_DATE</code>.</li>
+<li>
+<code>src/js/jq_pgm.js</code>: <code>LWT_DATA</code>.</li>
+</ul>
+</li>
+<li>Imprtant additions to Text-To-Speech (TTS):
+<ul>
+<li>Word can be read on hover or on click.
+Pull request <a href="https://github.com/HugoFara/lwt/pull/147">#147</a> by
+<a href="https://github.com/ProgramComputer">@ProgramComputer</a>.</li>
+<li>You can add a custom text reader with the new voice API feature!
+A courtesy of <a href="https://github.com/ProgramComputer">@ProgramComputer</a> on pull request
+<a href="https://github.com/HugoFara/lwt/pull/153">#153</a>.
+A feature first requested on <a href="https://github.com/HugoFara/lwt/issues/143">#143</a>.
+Discussion in open on <a href="https://github.com/HugoFara/lwt/discussions/174">#174</a>.</li>
+<li>New JS functions: <code>readTextWithExternal</code> to read a text with an external
+application and <code>speechDispatcher</code> that can choose a text reader
+(browser or third party).</li>
+</ul>
+</li>
+<li>Starts a cleaner database management. Database schema is defined in
+<code>db/schema/baseline.sql</code> and no longer in PHP code.</li>
+</ul>
+<h4>Changed</h4>
+<ul>
+<li>Adds missing documentation in the Docker image:
+<ul>
+<li>MarkDown files in the root folder are now included.
+See <a href="https://github.com/HugoFara/lwt/issues/160">#160</a>.
+It adds <code>README.md</code> and <code>UNLICENSE.md</code>.</li>
+<li>Adds <code>docs/info.html</code> and <code>docs/index.html</code> from <a href="https://github.com/HugoFara/lwt/pull/146">#146</a>.</li>
+</ul>
+</li>
+</ul>
 <h4>Fixed</h4>
 <ul>
 <li>The database wizard was broken since 2.9.0.</li>
 <li>It was impossible to change a word status on hover since 2.9.1.</li>
 <li>Avoids JavaScript error on editing a language when on dictionary field is empty.</li>
+<li>For some feeds, feed wizard session was not working due to ill-configured session.
+Solves <a href="https://github.com/HugoFara/lwt/issues/129">#129</a>, thanks to the help of PR
+<a href="https://github.com/HugoFara/lwt/pull/168">#168</a>.</li>
+<li>Text reading position was not working consistently when adding several known words.</li>
+<li>Japanese was always requiring MeCab for TTS, even if it was not used
+(<a href="https://github.com/HugoFara/lwt/pull/155">#155</a>).</li>
+</ul>
+<h4>Deprecated</h4>
+<ul>
+<li>Using any function from <code>unloadformcheck.js</code> without using <code>lwt_form_check</code> is deprecated.</li>
+<li>
+<code>get_database_prefixes</code> is deprecated, superseded by <code>getDatabasePrefix</code> which is much cleaner.</li>
+<li>Globals defined in <code>jq_pgm.js</code> are going into a single global <code>LWT_DATA</code>.</li>
 </ul>
 <h3>2.9.1-fork (December 29 2023)</h3>
 <h4>Added in 2.9.1-fork</h4>

@@ -217,7 +217,7 @@ function edit_mword_do_update($term, $newstatus)
         function update_mword(mword, oldstatus) {
             const context = window.parent.document;
             let title = '';
-            if (window.parent.JQ_TOOLTIP) 
+            if (window.parent.LWT_DATA.settings.jQuery_tooltip) 
                 title = make_tooltip(
                     mword.text, mword.trans, mword.roman, mword.status
                 );
@@ -336,7 +336,7 @@ function edit_mword_display_new($term, $tid, $ord, $len)
     ?>
 
     <script type="text/javascript">
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(window).on('beforeunload',function() {
             setTimeout(function() {
                 window.parent.frames['ru'].location.href = 'empty.html';
@@ -448,7 +448,7 @@ function edit_mword_display_change($term, $tid, $ord)
         ?>
     
     <script type="text/javascript">
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(window).on('beforeunload',function() {
             setTimeout(function() {
                 window.parent.frames['ru'].location.href = 'empty.html';

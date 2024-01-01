@@ -2409,16 +2409,23 @@ function get_annotation_position_selectoptions($v): string
 }
 // -------------------------------------------------------------
 
-function get_hts_selectoptions($v): string
+function get_hts_selectoptions($current_setting): string
 {
-    if (! isset($v) ) { $v = 1; 
+    if (!isset($current_setting)) { 
+        $current_setting = 1; 
     }
-    $r = "<option value=\"1\"" . get_selected($v, 1);
-    $r .= ">Never</option>";
-    $r .= "<option value=\"2\"" . get_selected($v, 2);
-    $r .= ">On Click</option>";
-    $r .= "<option value=\"3\"" . get_selected($v, 3);
-    $r .= ">On Hover</option>";
+    $options = array(
+        1 => "Never",
+        2 => "On Click",
+        3 => "On Hover"
+    );
+    $r = "";
+    foreach ($options as $key => $value) {
+        $r .= sprintf(
+            '<option value="%d"%s>%s</option>', 
+            $key, get_selected($current_setting, $key), $value
+        );
+    }
     return $r;
 }
 
@@ -4423,7 +4430,7 @@ function new_expression_interactable2($hex, $appendtext, $wid, $len): void
     let term = <?php echo json_encode($attrs); ?>;
 
     let title = '';
-    if (window.parent.JQ_TOOLTIP) 
+    if (window.parent.LWT_DATA.settings.jQuery_tooltip) 
         title = make_tooltip(
             <?php echo json_encode($appendtext); ?>, term.data_trans, term.data_rom, 
             parseInt(term.data_status, 10)
@@ -4586,7 +4593,7 @@ function restore_file($handle, $title): string
             if ($sql_line != "") {
                 if (!str_starts_with($query, '-- ')) {
                     $res = mysqli_query(
-                        $GLOBALS['DBCONNECTION'], insert_prefix_in_sql($query)
+                        $GLOBALS['DBCONNECTION'], prefixSQLQuery($query, $tbpref)
                     );
                     $install_status["queries"]++;
                     if ($res == false) {
@@ -4743,28 +4750,6 @@ function create_ann($textid): string
     }
     mysqli_free_result($res);
     return $ann;
-}
-
-
-// -------------------------------------------------------------
-
-function insert_prefix_in_sql($sql_line) 
-{
-    global $tbpref;
-    //                                 123456789012345678901
-    if (substr($sql_line, 0, 12) == "INSERT INTO ") {
-        return substr($sql_line, 0, 12) . $tbpref . substr($sql_line, 12); 
-    }
-    if (substr($sql_line, 0, 21) == "DROP TABLE IF EXISTS ") {
-        return substr($sql_line, 0, 21) . $tbpref . substr($sql_line, 21);
-    } 
-    if (substr($sql_line, 0, 14) == "CREATE TABLE `") {
-        return substr($sql_line, 0, 14) . $tbpref . substr($sql_line, 14);
-    } 
-    if (substr($sql_line, 0, 13) == "CREATE TABLE ") {
-        return substr($sql_line, 0, 13) . $tbpref . substr($sql_line, 13);
-    } 
-    return $sql_line; 
 }
 
 // -------------------------------------------------------------
