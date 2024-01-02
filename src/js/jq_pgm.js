@@ -38,7 +38,8 @@ LWT_DATA = {
     id: 0
   },
   test: {
-    solution: ''
+    solution: '',
+    answer_opened: false
   },
   settings: {
     jQuery_tooltip: false,
@@ -47,11 +48,9 @@ LWT_DATA = {
   }
 };
 
-TEXTPOS = -1;
-OPENED = 0;
-/** @var {int} WID - Word ID */
+/** Word ID, deprecated Since 2.10.0, use LWT_DATA.word.id instead */
 WID = 0;
-/** Text ID (int) */
+/** Text ID (int), deprecated Since 2.10.0, use LWT_DATA.text.id */
 TID = 0;
 /** First dictionary URL, deprecated in 2.10.0 use LWT_DATA.language.dict_link1 */
 WBLINK1 = '';
@@ -59,14 +58,8 @@ WBLINK1 = '';
 WBLINK2 = '';
 /** Translator URL, deprecated in 2.10.0 use LWT_DATA.language.translator_link */
 WBLINK3 = '';
-SOLUTION = '';
-ADDFILTER = '';
 /** Right-to-left indicator, deprecated in 2.10.0 use LWT_DATA.language.rtl */
 RTL = 0;
-ANN_ARRAY = {};
-DELIMITER = '';
-JQ_TOOLTIP = 0;
-HTS = 0;
 
 /**************************************************************
 LWT jQuery functions
@@ -541,50 +534,56 @@ function word_click_event_do_test_test () {
  * @returns {bool} true if nothing was done, false otherwise
  */
 function keydown_event_do_test_test (e) {
-  if (e.key == 'Space'  && OPENED == 0) { 
-    // space : show sol.
+  if ((e.key == 'Space' || e.which == 32) && !LWT_DATA.test.answer_opened) { 
+    // space : show solution
     $('.word').trigger('click');
     cleanupRightFrames();
     showRightFrames('show_word.php?wid=' + $('.word').attr('data_wid') + '&ann=');
-    OPENED = 1;
+    LWT_DATA.test.answer_opened = true;
     return false;
   }
-  if (e.which == 38) { 
+  if (e.key == "Escape" || e.which == 27) { 
+    // esc : skip term, don't change status
+		showRightFrames(
+      'set_test_status.php?wid=' + LWT_DATA.word.id + 
+      '&status=' + $('.word').attr('data_status')
+    );
+    return false;
+  }
+  if (e.key == "I" || e.which == 73) { 
+    // I : ignore, status=98
+		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&status=98');
+    return false;
+  }
+  if (e.key == "W" || e.which == 87) { 
+    // W : well known, status=99
+		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&status=99');
+    return false;
+  }
+  if (e.key == "E" || e.which == 69) { 
+    // E : edit
+		showRightFrames('edit_tword.php?wid=' + LWT_DATA.word.id);
+    return false;
+  }
+  // The next interactions should only be available with displayed solution
+  if (!LWT_DATA.test.answer_opened) 
+    return true;
+  if (e.key == "ArrowUp" || e.which == 38) { 
     // up : status+1
 		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&stchange=1');
     return false;
   }
-  if (e.which == 27) { 
-    // esc : dont change status
-		showRightFrames(
-      'set_test_status.php?wid=' + LWT_DATA.word.id + '&status=' + $('.word').attr('data_status')
-    );
-    return false;
-  }
-  if (e.which == 73) { 
-    // I : status=98
-		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&status=98');
-    return false;
-  }
-  if (e.which == 87) { 
-    // W : status=99
-		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&status=99');
-    return false;
-  }
-  if (e.which == 69) { 
-    // E : EDIT
-		showRightFrames('edit_tword.php?wid=' + LWT_DATA.word.id);
-    return false;
-  }
-  if (e.which == 40) { 
+  if (e.key == "ArrowDown" || e.which == 40) { 
     // down : status-1
 		showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&stchange=-1');
     return false;
   }
-  for (let i = 1; i <= 5; i++) {
-    if (e.which == (48 + i) || e.which == (96 + i)) { 
+  for (let i = 0; i < 5; i++) {
+    if (e.which == (49 + i) || e.which == (97 + i)) { 
       // 1,.. : status=i
-			showRightFrames('set_test_status.php?wid=' + LWT_DATA.word.id + '&status=' + i);
+			showRightFrames(
+        'set_test_status.php?wid=' + LWT_DATA.word.id + '&status=' + (i + 1)
+      );
       return false;
     }
   }
