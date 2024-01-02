@@ -1056,6 +1056,10 @@ function get_links_from_new_feed($NfSourceURI): array|false
             }
         }
     }
+    else{
+        $rss_data['feed_text'] = '';
+
+    }
     $rss_data['feed_title'] = $rss->getElementsByTagName('title')->item(0)->nodeValue;
     return $rss_data;
 }
@@ -4977,6 +4981,35 @@ function create_save_ann($textid): string
         from " . $tbpref . "texts 
         where TxID = " . $textid
     );
+}
+
+/**
+ * Truncate the database, remove all data belonging by the current user.
+ * 
+ * Keep settings.
+ * 
+ * @global $tbpref
+ */
+function truncateUserDatabase()
+{
+    global $tbpref;
+    runsql('TRUNCATE ' . $tbpref . 'archivedtexts', '');
+    runsql('TRUNCATE ' . $tbpref . 'archtexttags', '');
+    runsql('TRUNCATE ' . $tbpref . 'feedlinks', '');
+    runsql('TRUNCATE ' . $tbpref . 'languages', '');
+    runsql('TRUNCATE ' . $tbpref . 'textitems2', '');
+    runsql('TRUNCATE ' . $tbpref . 'newsfeeds', '');
+    runsql('TRUNCATE ' . $tbpref . 'sentences', '');
+    runsql('TRUNCATE ' . $tbpref . 'tags', '');
+    runsql('TRUNCATE ' . $tbpref . 'tags2', '');
+    runsql('TRUNCATE ' . $tbpref . 'texts', '');
+    runsql('TRUNCATE ' . $tbpref . 'texttags', '');
+    runsql('TRUNCATE ' . $tbpref . 'words', '');
+    runsql('TRUNCATE ' . $tbpref . 'wordtags', '');
+    runsql('DELETE FROM ' . $tbpref . 'settings where StKey = \'currenttext\'', '');
+    optimizedb();
+    get_tags(1);
+    get_texttags(1);
 }
 
 // -------------------------------------------------------------
