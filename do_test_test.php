@@ -3,14 +3,14 @@
 /**
  * \file
  * \brief Show test frame
- * 
+ *
  * Call: do_test_test.php?type=[testtype]&lang=[langid]
  * Call: do_test_test.php?type=[testtype]&text=[textid]
- * Call: do_test_test.php?type=[testtype]&selection=1  
+ * Call: do_test_test.php?type=[testtype]&selection=1
  *          (SQL via $_SESSION['testsql'])
- * 
+ *
  * PHP version 8.1
- * 
+ *
  * @package Lwt
  * @author  LWT Project <lwt-project@hotmail.com>
  * @license Unlicense <http://unlicense.org/>
@@ -53,30 +53,30 @@ function do_test_get_identifier($selection, $sess_testsql, $lang, $text): array
                     FROM $test_sql"
                 );
                 if ($cntlang > 1) {
-                    echo "<p>Sorry - The selected terms are in $cntlang languages," . 
+                    echo "<p>Sorry - The selected terms are in $cntlang languages," .
                     " but tests are only possible in one language at a time.</p>";
                     exit();
                 }
                 return array('raw_sql', $test_sql);
                 break;
-            }
-    } else if (isset($lang) && is_numeric($lang)) {
+        }
+    } elseif (isset($lang) && is_numeric($lang)) {
         return array("lang", $lang);
-    } 
+    }
     if (isset($text) && is_numeric($text)) {
         return array("text", $text);
     }
-    my_die("do_test_test.php called with wrong parameters"); 
+    my_die("do_test_test.php called with wrong parameters");
 }
 
 /**
  * Get the SQL string to perform tests.
- * 
+ *
  * @param bool|null   $selection    Test is of type selection
  * @param string|null $sess_testsql SQL string for test
  * @param int|null    $lang         Test is of type language, for the language $lang ID
  * @param int|null    $text         Testing text with ID $text
- * 
+ *
  * @return string SQL projection (selection) string
  */
 function do_test_get_test_sql($selection, $sess_testsql, $lang, $text)
@@ -88,9 +88,9 @@ function do_test_get_test_sql($selection, $sess_testsql, $lang, $text)
 
 /**
  * Get the test type clamped between 1 and 5 (included)
- * 
+ *
  * @param int $testype Initial test type value
- * 
+ *
  * @return int Clamped $testtype
  *                     - 1: Test type is ..[L2]..
  *                     - 2: Test type is ..[L1]..
@@ -111,11 +111,11 @@ function do_test_get_test_type($testtype)
 
 /**
  * Set sql request for the word test.
- * 
+ *
  * @return string SQL request string
- * 
- * @global string $tbpref 
- * 
+ *
+ * @global string $tbpref
+ *
  * @deprecated 2.9.0-fork Use do_test_get_sql instead
  */
 function get_test_sql()
@@ -130,9 +130,9 @@ function get_test_sql()
 
 /**
  * Give the test type.
- * 
+ *
  * @return int<1, 5> Test type between 1 and 5 (included)
- * 
+ *
  * @deprecated 2.9.0-fork Use do_test_get_test_type instead.
  */
 function get_test_type()
@@ -142,10 +142,10 @@ function get_test_type()
 
 /**
  * Prepare the css code for tests.
- * 
- * @deprecated 2.6.0-fork Do not use this function since it was causing wrong 
- *                        display. Will be removed in 3.0.0. 
- * 
+ *
+ * @deprecated 2.6.0-fork Do not use this function since it was causing wrong
+ *                        display. Will be removed in 3.0.0.
+ *
  * @return void
  */
 function do_test_test_css()
@@ -179,18 +179,19 @@ function do_test_get_tomorrow_tests_count($testsql): int
 
 /**
  * Output a message for a finished test, with the number of tests for tomorrow.
- * 
+ *
  * @param string $testsql    Query used to select words.
  * @param int    $totaltests Total number of tests.
  * @param bool   $ajax       AJAX mode, content will not be displayed.
- * 
+ *
  * @return void
  */
+function do_test_test_finished($testsql, $totaltests, $ajax = false)
 function do_test_test_finished($testsql, $totaltests, $ajax = false)
 {
     $tomorrow_tests = do_test_get_tomorrow_tests_count($testsql);
     echo '<p id="test-finished-area" class="center" style="display: ' .
-        ($ajax ? 'none' : 'inherit') . ';">
+    ($ajax ? 'none' : 'inherit') . ';">
             <img src="img/ok.png" alt="Done!" />
             <br /><br />
             <span class="red2">
@@ -200,7 +201,7 @@ function do_test_test_finished($testsql, $totaltests, $ajax = false)
                 <br /><br />
                 <span id="tests-tomorrow"">
                     Tomorrow you\'ll find here ' . $tomorrow_tests . ' test' .
-        ($tomorrow_tests == 1 ? '' : 's') . '!
+                    ($tomorrow_tests == 1 ? '' : 's') . '!
                 </span>
             </span>
         </p>
@@ -208,7 +209,7 @@ function do_test_test_finished($testsql, $totaltests, $ajax = false)
 }
 
 /**
- * Get a sentence containing the word. 
+ * Get a sentence containing the word.
  *
  * The sentence should contain at least 70% of known words.
  *
@@ -307,7 +308,7 @@ function do_test_get_term_test($wo_record, $sent, $testtype, $nosent, $regexword
     $wid = $wo_record['WoID'];
     $word = $wo_record['WoText'];
     $trans = repl_tab_nl($wo_record['WoTranslation']) .
-        getWordTagList($wid, ' ', 1, 0);
+    getWordTagList($wid, ' ', 1, 0);
     $roman = $wo_record['WoRomanization'];
     $status = $wo_record['WoStatus'];
 
@@ -318,12 +319,12 @@ function do_test_get_term_test($wo_record, $sent, $testtype, $nosent, $regexword
     $on_word = false;
 
     $preppend = ' <span style="word-break:normal;" ' .
-        'class="click todo todosty word wsty word'
-        . $wid .
-        '" data_wid="' . $wid . '" data_trans="' . tohtml($trans) .
-        '" data_text="' . tohtml($word) . '" data_rom="' . tohtml($roman) .
-        '" data_sent="' . tohtml($cleansent) . '" data_status="' . $status .
-        '" data_todo="1"';
+    'class="click todo todosty word wsty word'
+    . $wid .
+    '" data_wid="' . $wid . '" data_trans="' . tohtml($trans) .
+    '" data_text="' . tohtml($word) . '" data_rom="' . tohtml($roman) .
+    '" data_sent="' . tohtml($cleansent) . '" data_status="' . $status .
+    '" data_todo="1"';
     if ($testtype == 3) {
         $preppend .= ' title="' . tohtml($trans) . '"';
     }
@@ -382,7 +383,7 @@ function do_test_get_term_test($wo_record, $sent, $testtype, $nosent, $regexword
  */
 function print_term_test($wo_record, $sent, $testtype, $nosent, $regexword): string
 {
-    list($word, $_) = do_test_get_term_test(
+    list($word, $_) =  do_test_get_term_test(
         $wo_record,
         $sent,
         $testtype,
@@ -413,7 +414,7 @@ function do_test_get_word($testsql): array
         DATEDIFF( NOW( ), WoStatusChanged ) AS Days, WoTodayScore AS Score 
         FROM $testsql AND WoStatus BETWEEN 1 AND 5 
         AND WoTranslation != '' AND WoTranslation != '*' AND WoTodayScore < 0 " .
-            ($pass == 1 ? 'AND WoRandom > RAND()' : '') . ' 
+        ($pass == 1 ? 'AND WoRandom > RAND()' : '') . ' 
         ORDER BY WoTodayScore, WoRandom 
         LIMIT 1';
         $res = do_mysqli_query($sql);
@@ -429,19 +430,19 @@ function do_test_get_word($testsql): array
 
 /**
  * Get the solution to a test.
- * 
+ *
  * @param int    $testtype  Test type between 1 and 5
  * @param array  $wo_record Word record element
  * @param bool   $nosent    Test is in word mode
  * @param string $wo_text   Word text
- * 
- * @return string Solution to display.  
+ *
+ * @return string Solution to display.
  */
 function get_test_solution($testtype, $wo_record, $nosent, $wo_text)
 {
     if ($testtype == 1) {
         $trans = repl_tab_nl($wo_record['WoTranslation']) .
-            getWordTagList($wo_record['WoID'], ' ', 1, 0);
+        getWordTagList($wo_record['WoID'], ' ', 1, 0);
         return $nosent ? $trans : "[$trans]";
     }
     return $wo_text;
@@ -459,7 +460,7 @@ function get_test_solution($testtype, $wo_record, $nosent, $wo_text)
  *
  * @return int Number of tests left to do.
  *
- * @global string $tbpref Table prefix 
+ * @global string $tbpref Table prefix
  * @global int    $debug  Show the SQL query used if 1.
  * @global string $langDefs Languages definition array
  * @psalm-return int<0, max>
@@ -481,7 +482,7 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
     $lgid = (int) get_first_value(
         "SELECT WoLgID AS value FROM $testsql LIMIT 1"
     );
-    
+
     $sql = "SELECT LgName, LgDict1URI, LgDict2URI, LgGoogleTranslateURI, LgTextSize, 
     LgRemoveSpaces, LgRegexpWordCharacters, LgRightToLeft 
     FROM {$tbpref}languages WHERE LgID =" . convert_string_to_sqlsyntax_nonull($lgid);
@@ -557,8 +558,10 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
         $(get_new_word);
     </script>
 
-    <p id="term-test" dir="<?php echo ($lang['rtlScript'] ? 'rtl' : 'ltr'); ?>" style="<?php echo ($lang['removeSpaces'] ? 'word-break:break-all;' : ''); ?>
-    font-size: <?php echo $lang['textsize'] ?>%; line-height: 1.4; text-align:center; margin-bottom:300px;">
+    <p id="term-test" dir="<?php echo($lang['rtlScript'] ? 'rtl' : 'ltr'); ?>" 
+    style="<?php echo($lang['removeSpaces'] ? 'word-break:break-all;' : ''); ?>
+    font-size: <?php echo $lang['textsize'] ?>%; line-height: 1.4; text-align:center; margin-bottom:300px;"
+    >
     </p>
     <?php do_test_test_finished($testsql, $count, true); ?>
     </div>
@@ -580,7 +583,7 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
  *
  * @return int Number of tests left to do.
  *
- * @global string $tbpref Table prefix 
+ * @global string $tbpref Table prefix
  * @global int    $debug  Show the SQL query used if 1.
  *
  * @psalm-return int<0, max>
@@ -638,7 +641,7 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
         DATEDIFF( NOW( ), WoStatusChanged ) AS Days, WoTodayScore AS Score 
         FROM $testsql AND WoStatus BETWEEN 1 AND 5 
         AND WoTranslation != '' AND WoTranslation != '*' AND WoTodayScore < 0 " .
-            ($pass == 1 ? 'AND WoRandom > RAND()' : '') . ' 
+        ($pass == 1 ? 'AND WoRandom > RAND()' : '') . ' 
         ORDER BY WoTodayScore, WoRandom 
         LIMIT 1';
         if ($debug) {
@@ -688,8 +691,8 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
 
 
     echo '<p ' . ($rtlScript ? 'dir="rtl"' : '') .
-        ' style="' . ($removeSpaces ? 'word-break:break-all;' : '') .
-        'font-size:' . $textsize . '%;
+    ' style="' . ($removeSpaces ? 'word-break:break-all;' : '') .
+    'font-size:' . $textsize . '%;
     line-height: 1.4; text-align:center; margin-bottom:300px;">';
 
     list($r, $save) = do_test_get_term_test(
@@ -723,8 +726,8 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
 
 /**
  * Prepare JavaScript code globals so that you can click on words.
- * 
- * @param array  $wo_record Word record. Associative array with keys 'WoID', 
+ *
+ * @param array  $wo_record Word record. Associative array with keys 'WoID',
  *                          'WoTranslation'.
  * @param string $wb1       URL of the first dictionary.
  * @param string $wb2       URL of the secondary dictionary.
@@ -732,9 +735,9 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
  * @param int    $testtype  Type of test
  * @param int    $nosent    1 to use single word instead of sentence.
  * @param string $save      Word or sentence to use for the test
- * 
+ *
  * @return void
- * 
+ *
  * @global string $tbpref  Database table prefix
  * @global string $angDefs Languages definition array
  */
@@ -757,13 +760,13 @@ function do_test_test_interaction_globals($wb1, $wb2, $wb3)
 
 /**
  * Prepare JavaScript code so that you can click on words.
- * 
- * @param array  $wo_record Word record. Associative array with keys 'WoID', 
+ *
+ * @param array  $wo_record Word record. Associative array with keys 'WoID',
  *                          'WoTranslation'.
  * @param string $solution  solution to test
  * @param string $startSec  starting second of sentence audio
  * @param string $endSec ending second of sentence audio
- * 
+ *
  * @return void
  * 
  * @global string $tbpref  Database table prefix
@@ -803,8 +806,8 @@ function do_test_test_javascript_clickable($wo_record, $solution, $startSec, $en
 
 /**
  * Prepare JavaScript code so that you can click on words.
- * 
- * @param array  $wo_record Word record. Associative array with keys 'WoID', 
+ *
+ * @param array  $wo_record Word record. Associative array with keys 'WoID',
  *                          'WoTranslation'.
  * @param string $wb1       URL of the first dictionary.
  * @param string $wb2       URL of the secondary dictionary.
@@ -815,8 +818,9 @@ function do_test_test_javascript_clickable($wo_record, $solution, $startSec, $en
  * @param string $startSec  starting second of sentence audio
  * @param string $endSec ending second of sentence audio
  * 
+ *
  * @return void
- * 
+ *
  * @global string $tbpref  Database table prefix
  * @global string $angDefs Languages definition array
  */
@@ -838,9 +842,9 @@ function do_test_test_javascript_interaction(
 
 /**
  * Get the data and echoes the footer.
- * 
+ *
  * @param int $notyettested Number of words left to be tested.
- * 
+ *
  * @return void
  */
 function prepare_test_footer($notyettested)
@@ -852,11 +856,11 @@ function prepare_test_footer($notyettested)
 
 /**
  * Echoes HTML code for the footer of a words test page.
- * 
+ *
  * @param int $notyettested Number of words left to be tested
  * @param int $wrong        Number of failed tests
  * @param int $correct      Number of correct answers.
- * 
+ *
  * @return void
  */
 function do_test_footer($notyettested, $wrong, $correct)
@@ -915,9 +919,9 @@ function do_test_footer($notyettested, $wrong, $correct)
 
 /**
  * Prepare JavaScript code for interacting between the different frames.
- * 
+ *
  * @param int $count Total number of tests that were done today
- * 
+ *
  * @return void
  */
 function do_test_test_javascript($count)
@@ -1111,7 +1115,7 @@ playsentence.setAttribute('data-end-time',end_sec)
  * Do the main content of a test page.
  * Replaced by do_test_test_content_ajax()
  * @global int $debug Show debug informations
- * 
+ *
  * @return void
  * @deprecated 
  */
@@ -1147,18 +1151,18 @@ function do_test_test_content()
 
 /**
  * Do the main content of a test page.
- * 
+ *
  * @param string    $selector  Type of test to run
  * @param array|int $selection Items to run the test on
- * 
+ *
  * @global int $debug Show debug informations
- * 
+ *
  * @return void
  */
 function do_test_test_content_ajax($selector, $selection)
 {
     global $debug;
-    
+
     $testtype = do_test_get_test_type((int)getreq('type'));
     $test_sql = do_test_test_get_projection($selector, $selection);
     $count = get_first_value(
@@ -1175,7 +1179,10 @@ function do_test_test_content_ajax($selector, $selection)
     $notyettested = (int) $count;
 
     $total_tests = do_test_prepare_ajax_test_area(
-        $selector, $selection, $notyettested, $testtype
+        $selector,
+        $selection,
+        $notyettested,
+        $testtype
     );
     prepare_test_footer($notyettested);
     do_test_test_javascript($total_tests);
