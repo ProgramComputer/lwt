@@ -223,8 +223,8 @@ function adjustIframeHeights(entries) {
 
 
 
-            const heightDifference = $("#frames-r").height() - entry.contentRect.height - $('[name="ru"]').height();
-            $('[name="ru"]').height($('[name="ru"]').height() + heightDifference + 'px');
+            const heightDifference = $("#frames-r").height() - entry.contentRect.height - $('#ru').height();
+            $('#ru').height($('#ru').height() + heightDifference + 'px');
 }
         }
 
