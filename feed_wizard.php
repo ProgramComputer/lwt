@@ -518,7 +518,7 @@ function feed_wizard_select_text(): void
     ?>
 <script type="text/javascript">
     if (<?php echo json_encode($_SESSION['wizard']['maxim'] == 0); ?>) {
-        $(lwt_wiz_select_test.setMaxim());
+        $(lwt_wiz_select_test.setMaxim);
     }
 </script>
     <?php
@@ -836,7 +836,7 @@ function feed_wizard_filter_text(): void
                 <td>
                     <span>
                         <input type="button" value="Back" 
-                        onclick="wt_wizard_filter.clickBack()" />
+                        onclick="lwt_wizard_filter.clickBack()" />
                         <button id="next">Next</button>
                     </span>
                 </td>
@@ -870,7 +870,7 @@ function feed_wizard_filter_text(): void
     ?>
     <script type="text/javascript">
         if (<?php echo json_encode($_SESSION['wizard']['maxim'] == 0); ?>) {
-            $(lwt_wizard_filter.setMaxim());
+            $(lwt_wizard_filter.setMaxim);
         }
     </script>
     <?php
