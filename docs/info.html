@@ -2225,6 +2225,10 @@ It adds <code>README.md</code> and <code>UNLICENSE.md</code>.</li>
 <li>Adds <code>docs/info.html</code> and <code>docs/index.html</code> from <a href="https://github.com/HugoFara/lwt/pull/146">#146</a>.</li>
 </ul>
 </li>
+<li>Multi-word creation was reviewed to use a simpler code.</li>
+<li>On word review, status + 1 can be set only after word display. Before, you could
+press key up at any time to increase term status, but keydown was effective only
+after solution display (<a href="https://github.com/HugoFara/lwt/issues/159">#159</a>).</li>
 </ul>
 <h4>Fixed</h4>
 <ul>
@@ -2237,6 +2241,32 @@ Solves <a href="https://github.com/HugoFara/lwt/issues/129">#129</a>, thanks to 
 <li>Text reading position was not working consistently when adding several known words.</li>
 <li>Japanese was always requiring MeCab for TTS, even if it was not used
 (<a href="https://github.com/HugoFara/lwt/pull/155">#155</a>).</li>
+<li>Multi-words:
+<ul>
+<li>Tooltip was not properly saved (<a href="https://github.com/HugoFara/lwt/pull/170">#170</a>).</li>
+<li>Translation may be escaped two times (<a href="https://github.com/HugoFara/lwt/pull/170">#170</a>).</li>
+<li>Fixes <a href="https://github.com/HugoFara/lwt/pull/170">#170</a>: on creation,
+multi-word was always displayed before the text it encompasses,
+without removing this text.</li>
+<li>Tootltip title was not properly saved, normally without incidence on user display.</li>
+<li>Fixes <a href="https://github.com/HugoFara/lwt/issues/69">#69</a>: having the same
+multi-word on multiple texts was displaying it at many positions on creation.</li>
+</ul>
+</li>
+<li>Japanese:
+<ul>
+<li>Parsing Japanese texts with MeCab was creating warnings when the text was not
+finishing by a punctation mark.</li>
+<li>Multi-words were not saved with MeCab parsing on Japanese.</li>
+</ul>
+</li>
+<li>On word review (test):
+<ul>
+<li>the space keyboard shortcut may have been inoperating.</li>
+<li>On <code>api.php</code>, tests were always set to "multi-word" due to a missing variable
+type conversion. Pull request <a href="https://github.com/HugoFara/lwt/pull/175">#175</a>.</li>
+</ul>
+</li>
 </ul>
 <h4>Deprecated</h4>
 <ul>

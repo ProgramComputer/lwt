@@ -4149,22 +4149,19 @@ function getScriptDirectionTag($lid): string
 }
 
 /**
- * Insert an expression to the database using MeCab.
+ * Find all occurences of an expression using MeCab.
  *
  * @param string     $text Text to insert
  * @param string|int $lid  Language ID
- * @param string|int $wid  Word ID
  * @param int        $len  Number of words in the expression
  *
- * @return string[][] Append text and values to insert to the database
- *
- * @since 2.5.0-fork Function added.
+ * @return (string|int)[] Each found multi-word details
  *
  * @global string $tbpref Table name prefix
  *
  * @psalm-return list{array<int, string>, list{0?: string,...}}
  */
-function insert_expression_from_mecab($text, $lid, $wid, $len): array
+function findMecabExpression($text, $lid): array
 {
     global $tbpref;
 
@@ -4193,9 +4190,7 @@ function insert_expression_from_mecab($text, $lid, $wid, $len): array
         }
     }
 
-
-    $appendtext = array();
-    $sqlarray = array();
+    $occurences = array();
     // For each sentence in database containing $text
     while ($record = mysqli_fetch_assoc($res)) {
         $sent = trim((string) $record['SeText']);
@@ -4225,13 +4220,12 @@ function insert_expression_from_mecab($text, $lid, $wid, $len): array
             $pos = preg_match_all('/ /', mb_substr($parsed_sentence, 0, $seek)) * 2 + 
             (int) $record['SeFirstPos'];
             // Ti2WoID,Ti2LgID,Ti2TxID,Ti2SeID,Ti2Order,Ti2WordCount,Ti2Text
-            $sqlarray[] = "($wid, $lid, {$record['SeTxID']}, {$record['SeID']}, 
-            $pos, $len, " . convert_string_to_sqlsyntax_notrim_nonull($text) . ")";
-            if (getSettingZeroOrOne('showallwords', 1)) {
-                $appendtext[$pos] = "&nbsp;$len&nbsp";
-            } else { 
-                $appendtext[$pos] = $text;
-            }
+            $occurences[] = [
+                "SeID" => (int) $record['SeID'],
+                "TxID" => (int) $record['SeTxID'], 
+                "position" => $pos,
+                "term" => $text
+            ];
             $seek = mb_strpos($parsed_sentence, $parsed_text, $seek + 1);
         }
         pclose($handle);
@@ -4239,7 +4233,55 @@ function insert_expression_from_mecab($text, $lid, $wid, $len): array
     mysqli_free_result($res);
     unlink($db_to_mecab);
 
-    return array($appendtext, $sqlarray);
+    return $occurences;
+}
+
+/**
+ * Insert an expression to the database using MeCab.
+ *
+ * @param string     $text Text to insert
+ * @param string|int $lid  Language ID
+ * @param string|int $wid  Word ID
+ * @param int        $len  Number of words in the expression
+ *
+ * @return string[][] Append text and values to insert to the database
+ *
+ * @since 2.5.0-fork Function added.
+ * 
+ * @deprecated Since 2.10.0 Use insertMecabExpression
+ *
+ * @global string $tbpref Table name prefix
+ *
+ * @psalm-return list{array<int, string>, list{0?: string,...}}
+ */
+function insert_expression_from_mecab($text, $lid, $wid, $len): array
+{
+    $occurences = findMecabExpression($text, $lid);
+
+    $mwords = array();
+    foreach ($occurences as $occ) {
+        $mwords[$occ['SeTxID']] = array();
+        if (getSettingZeroOrOne('showallwords', 1)) {
+            $mwords[$occ['SeTxID']][$occ['position']] = "&nbsp;$len&nbsp";
+        } else {
+            $mwords[$occ['SeTxID']][$occ['position']] = $occ['term'];
+        }
+    }
+    $flat_mwords = array_reduce($mwords, function ($carry, $item) {
+        return $carry + $item;
+    }, []);
+
+    $sqlarr = array();
+    foreach ($occurences as $occ) {
+        $sqlarr[] = "(" . implode(",", 
+        [
+            $wid, $lid, $occ["SeTxID"], $occ["SeID"], 
+            $occ["position"], $len, 
+            convert_string_to_sqlsyntax_notrim_nonull($occ["term"])
+        ]) . ")";
+    }
+
+    return array($flat_mwords, array(), $sqlarr);
 }
 
 /**
@@ -4257,7 +4299,7 @@ function insert_expression_from_mecab($text, $lid, $wid, $len): array
  *                   $mode is unnused, data are always returned.
  *                   The second return argument is always empty array.
  *
- * @deprecated Use insert_expression_from_mecab instead.
+ * @deprecated Use insertMecabExpression instead.
  *
  * @global string $tbpref Table name prefix
  *
@@ -4268,29 +4310,21 @@ function insertExpressionFromMeCab($textlc, $lid, $wid, $len, $mode): array
     return insert_expression_from_mecab($textlc, $lid, $wid, $len);
 }
 
+
 /**
- * Insert an expression without using a tool like MeCab.
+ * Find all occurences of an expression, do not use parsers like MeCab.
  *
  * @param string     $textlc Text to insert in lower case
  * @param string|int $lid    Language ID
- * @param string|int $wid    Word ID
- * @param int        $len    Number of words in the expression
- * @param mixed      $mode   Unnused
  *
- * @return (null|string)[][] Append text, empty and sentence id
- *
- * @since 2.5.0-fork Mode is unnused and data are always added to the output.
- * @since 2.5.2-fork Fixed multi-words insertion for languages using no space
+ * @return (string|int)[] Each inserted mutli-word details
  *
  * @global string $tbpref Table name prefix
- *
- * @psalm-return list{array<int, null|string>, array<never, never>, list{0?: string,...}}
  */
-function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
+function findStandardExpression($textlc, $lid): array
 {
     global $tbpref;
-    $appendtext = array();
-    $sqlarr = array();
+    $occurences = array();
     $res = do_mysqli_query("SELECT * FROM {$tbpref}languages WHERE LgID=$lid");
     $record = mysqli_fetch_assoc($res);
     $removeSpaces = $record["LgRemoveSpaces"] == 1;
@@ -4300,7 +4334,7 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
     if ($removeSpaces && !$splitEachChar) {
         $sql = "SELECT 
         GROUP_CONCAT(Ti2Text ORDER BY Ti2Order SEPARATOR ' ') AS SeText, SeID, 
-        SeTxID, SeFirstPos 
+        SeTxID, SeFirstPos, SeTxID
         FROM {$tbpref}textitems2
         JOIN {$tbpref}sentences 
         ON SeID=Ti2SeID AND SeLgID = Ti2LgID
@@ -4340,7 +4374,8 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
         $last_pos = mb_strripos($string, $textlc, 0, 'UTF-8');
         // For each occurence of query in sentence
         while ($last_pos !== false) {
-            if ($splitEachChar || $removeSpaces  
+            if (
+                $splitEachChar || $removeSpaces  
                 || preg_match($notermchar, " $string ", $matches, 0, $last_pos - 1)
             ) {
                 // Number of terms before group
@@ -4354,16 +4389,18 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
                 if ($matches[1] != $textlc) {
                     $txt = $splitEachChar ? $wis : $matches[1]; 
                 }
-                $sqlarr[] = "($wid, $lid, {$record['SeTxID']},
-                {$record['SeID']}, $pos, $len, " . 
-                convert_string_to_sqlsyntax_notrim_nonull($txt) . ')';
-                if (getSettingZeroOrOne('showallwords', 1)) {
-                    $appendtext[$pos] = "&nbsp;$len&nbsp";
-                } else if ($splitEachChar || $removeSpaces) {
-                    $appendtext[$pos] = $wis;
+                if ($splitEachChar || $removeSpaces) {
+                    $display = $wis;
                 } else {
-                    $appendtext[$pos] = $matches[1];
+                    $display = $matches[1];
                 }
+                $occurences[] = [
+                    "SeID" => (int) $record['SeID'],
+                    "SeTxID" => (int) $record['SeTxID'], 
+                    "position" => $pos,
+                    "term" => $txt,
+                    "term_display" => $display
+                ];
             }
             // Cut the sentence to before the right-most term starts
             $string = mb_substr($string, 0, $last_pos, 'UTF-8');
@@ -4371,7 +4408,55 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
         }
     }
     mysqli_free_result($res);
-    return array($appendtext, array(), $sqlarr);
+    return $occurences;
+}
+
+/**
+ * Insert an expression without using a tool like MeCab.
+ *
+ * @param string     $textlc Text to insert in lower case
+ * @param string|int $lid    Language ID
+ * @param string|int $wid    Word ID
+ * @param int        $len    Number of words in the expression
+ * @param mixed      $mode   Unnused
+ *
+ * @return (null|string)[][] Append text, empty and sentence id
+ *
+ * @since 2.5.0-fork Mode is unnused and data are always added to the output.
+ * @since 2.5.2-fork Fixed multi-words insertion for languages using no space.
+ * 
+ * @deprecated Since 2.10.0-fork, use insertStandardExpression
+ *
+ * @psalm-return list{array<int, null|string>, array<never, never>, list{0?: string,...}}
+ */
+function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
+{
+    $occurences = findStandardExpression($textlc, $lid);
+
+    $mwords = array();
+    foreach ($occurences as $occ) {
+        $mwords[$occ['SeTxID']] = array();
+        if (getSettingZeroOrOne('showallwords', 1)) {
+            $mwords[$occ['SeTxID']][$occ['position']] = "&nbsp;$len&nbsp";
+        } else {
+            $mwords[$occ['SeTxID']][$occ['position']] = $occ['term_display'];
+        }
+    }
+    $flat_mwords = array_reduce($mwords, function ($carry, $item) {
+        return $carry + $item;
+    }, []);
+
+    $sqlarr = array();
+    foreach ($occurences as $occ) {
+        $sqlarr[] = "(" . implode(",", 
+        [
+            $wid, $lid, $occ["SeTxID"], $occ["SeID"], 
+            $occ["position"], $len, 
+            convert_string_to_sqlsyntax_notrim_nonull($occ["term"])
+        ]) . ")";
+    }
+
+    return array($flat_mwords, array(), $sqlarr);
 }
 
 
@@ -4379,27 +4464,28 @@ function insert_standard_expression($textlc, $lid, $wid, $len, $mode): array
  * Prepare a JavaScript dialog to insert a new expression. Use elements in
  * global JavaScript scope.
  * 
- * @deprecated Use new_expression_interactable2 instead. The new function does not
+ * @deprecated Use newMultiWordInteractable instead. The new function does not
  * use global JS variables.
  * 
  * @return void 
  */
 function new_expression_interactable($hex, $appendtext, $sid, $len): void 
 {
-    $showAll = getSettingZeroOrOne('showallwords', 1) ? "m" : "";
+    $showAll = (bool) getSettingZeroOrOne('showallwords', 1);
+    $showType = $showAll ? "m" : '';
 
     ?>
 <script type="text/javascript">
     newExpressionInteractable(
         <?php echo json_encode($appendtext); ?>, 
-        ' class="click mword <?php echo $showAll; ?>wsty TERM<?php echo $hex; ?> word' + 
+        ' class="click mword <?php echo $showType; ?>wsty TERM<?php echo $hex; ?> word' + 
     woid + ' status' + status + '" data_trans="' + trans + '" data_rom="' + 
     roman + '" data_code="<?php echo $len; ?>" data_status="' + 
     status + '" data_wid="' + woid + 
     '" title="' + title + '"' ,
         <?php echo json_encode($len); ?>, 
         <?php echo json_encode($hex); ?>,
-        <?php echo json_encode(!$showAll); ?>
+        <?php echo json_encode($showAll); ?>
     );
  </script>
     <?php
@@ -4418,11 +4504,14 @@ function new_expression_interactable($hex, $appendtext, $sid, $len): void
  * @return void
  * 
  * @global string $tbpref Database table prefix.
+ * 
+ * @since 2.10.0-fork Fixes a bug inserting wrong title in tooltip
  */
 function new_expression_interactable2($hex, $appendtext, $wid, $len): void 
 {
     global $tbpref;
-    $showAll = (bool)getSettingZeroOrOne('showallwords', 1) ? "m" : "";
+    $showAll = (bool)getSettingZeroOrOne('showallwords', 1);
+    $showType = $showAll ? "m" : "";
     
     $sql = "SELECT * FROM {$tbpref}words WHERE WoID=$wid";
     $res = do_mysqli_query($sql);
@@ -4430,7 +4519,75 @@ function new_expression_interactable2($hex, $appendtext, $wid, $len): void
     $record = mysqli_fetch_assoc($res);
 
     $attrs = array(
-        "class" => "click mword {$showAll}wsty TERM$hex word$wid status" . 
+        "class" => "click mword {$showType}wsty TERM$hex word$wid status" . 
+        $record["WoStatus"],
+        "data_trans" => $record["WoTranslation"],
+        "data_rom" => $record["WoRomanization"],
+        "data_code" => $len,
+        "data_status" => $record["WoStatus"],
+        "data_wid" => $wid
+    ); 
+    mysqli_free_result($res);
+
+    $term = array_values($appendtext)[0];
+
+    ?>
+<script type="text/javascript">
+    let term = <?php echo json_encode($attrs); ?>;
+
+    let title = '';
+    if (window.parent.LWT_DATA.settings.jQuery_tooltip) {
+        title = make_tooltip(
+            <?php echo json_encode($term); ?>, term.data_trans, term.data_rom, 
+            parseInt(term.data_status, 10)
+        );
+    }
+    term['title'] = title;
+    let attrs = ""; 
+    Object.entries(term).forEach(([k, v]) => attrs += " " + k + '="' + v + '"');
+    // keys(term).map((k) => k + '="' + term[k] + '"').join(" ");
+    
+    newExpressionInteractable(
+        <?php echo json_encode($appendtext); ?>, 
+        attrs,
+        <?php echo json_encode($len); ?>, 
+        <?php echo json_encode($hex); ?>,
+        <?php echo json_encode($showAll); ?>
+    );
+ </script>
+    <?php
+    flush();
+}
+
+
+
+/**
+ * Prepare a JavaScript dialog to insert a new expression.
+ * 
+ * @param string     $hex        Lowercase text, formatted version of the text.
+ * @param string[][] $multiwords Multi-words to happen, format [textid][position][text]
+ * @param int        $wid        Term ID
+ * @param int        $len        Words count.
+ * 
+ * @return void
+ * 
+ * @global string $tbpref Database table prefix.
+ * 
+ * @since 2.10.0-fork Fixes a bug inserting wrong title in tooltip
+ */
+function newMultiWordInteractable($hex, $multiwords, $wid, $len): void 
+{
+    global $tbpref;
+    $showAll = (bool)getSettingZeroOrOne('showallwords', 1);
+    $showType = $showAll ? "m" : "";
+    
+    $sql = "SELECT * FROM {$tbpref}words WHERE WoID=$wid";
+    $res = do_mysqli_query($sql);
+
+    $record = mysqli_fetch_assoc($res);
+
+    $attrs = array(
+        "class" => "click mword {$showType}wsty TERM$hex word$wid status" . 
         $record["WoStatus"],
         "data_trans" => $record["WoTranslation"],
         "data_rom" => $record["WoRomanization"],
@@ -4442,26 +4599,31 @@ function new_expression_interactable2($hex, $appendtext, $wid, $len): void
 
     ?>
 <script type="text/javascript">
-    let term = <?php echo json_encode($attrs); ?>;
+    (function () {
+        let term = <?php echo json_encode($attrs); ?>;
 
-    let title = '';
-    if (window.parent.LWT_DATA.settings.jQuery_tooltip) 
-        title = make_tooltip(
-            <?php echo json_encode($appendtext); ?>, term.data_trans, term.data_rom, 
-            parseInt(term.data_status, 10)
+        const multiWords = <?php echo json_encode($multiwords); ?>;
+
+        let title = '';
+        if (window.parent.LWT_DATA.settings.jQuery_tooltip) {
+            title = make_tooltip(
+                multiWords[window.parent.LWT_DATA.text.id][0], term.data_trans, 
+                term.data_rom, parseInt(term.data_status, 10)
+            );
+        }
+        term['title'] = title;
+        let attrs = ""; 
+        Object.entries(term).forEach(([k, v]) => attrs += " " + k + '="' + v + '"');
+        // keys(term).map((k) => k + '="' + term[k] + '"').join(" ");
+        
+        newExpressionInteractable(
+            multiWords[window.parent.LWT_DATA.text.id],
+            attrs,
+            term.data_code,
+            <?php echo json_encode($hex); ?>,
+            <?php echo json_encode($showAll); ?>
         );
-    term['title'] = title;
-    let attrs = ""; 
-    Object.entries(term).forEach(([k, v]) => attrs += " " + k + '="' + v + '"');
-    // keys(term).map((k) => k + '="' + term[k] + '"').join(" ");
-    
-    newExpressionInteractable(
-        <?php echo json_encode($appendtext); ?>, 
-        attrs,
-        <?php echo json_encode($len); ?>, 
-        <?php echo json_encode($hex); ?>,
-        <?php echo json_encode(!$showAll); ?>
-    );
+    })()
  </script>
     <?php
     flush();
@@ -4486,26 +4648,45 @@ function insertExpressions($textlc, $lid, $wid, $len, $mode): null|string
 {
     global $tbpref;
     $regexp = (string)get_first_value(
-        "SELECT LgRegexpWordCharacters FROM {$tbpref}languages WHERE LgID=$lid"
+        "SELECT LgRegexpWordCharacters AS value 
+        FROM {$tbpref}languages WHERE LgID=$lid"
     );
 
-    /*
-    * TODO:
-    * $appendtext: text to append to the current text
-    * $sqlarr: Expression to append to the database (text independent)
-    * Should separate the two
-    */ 
     if ('MECAB' == strtoupper(trim($regexp))) {
-        list($appendtext, $sqlarr) = insert_expression_from_mecab(
-            $textlc, $lid, $wid, $len
-        );
+        $occurences = findMecabExpression($textlc, $lid);
     } else {
-        list($appendtext, $_, $sqlarr) = insert_standard_expression(
-            $textlc, $lid, $wid, $len, null
-        );
+        $occurences = findStandardExpression($textlc, $lid);
+    }
+
+    // Update the term visually through JS
+    if ($mode == 0) {
+        $appendtext = array();
+        foreach ($occurences as $occ) {
+            $appendtext[$occ['SeTxID']] = array();
+            if (getSettingZeroOrOne('showallwords', 1)) {
+                $appendtext[$occ['SeTxID']][$occ['position']] = "&nbsp;$len&nbsp";
+            } else {
+                if ('MECAB' == strtoupper(trim($regexp))) {
+                    $appendtext[$occ['SeTxID']][$occ['position']] = $occ['term'];
+                } else {
+                    $appendtext[$occ['SeTxID']][$occ['position']] = $occ['term_display'];
+                }
+            }
+        }
+        $hex = strToClassName(prepare_textdata($textlc));
+        newMultiWordInteractable($hex, $appendtext, $wid, $len);
     }
     $sqltext = null;
-    if (!empty($sqlarr)) {
+    if (!empty($occurences)) {
+        $sqlarr = array();
+        foreach ($occurences as $occ) {
+            $sqlarr[] = "(" . implode(",", 
+            [
+                $wid, $lid, $occ["SeTxID"], $occ["SeID"], 
+                $occ["position"], $len, 
+                convert_string_to_sqlsyntax_notrim_nonull($occ["term"])
+            ]) . ")";
+        }
         $sqltext = '';
         if ($mode != 2) {
             $sqltext .= 
@@ -4517,10 +4698,6 @@ function insertExpressions($textlc, $lid, $wid, $len, $mode): null|string
         unset($sqlarr);
     }
 
-    if ($mode == 0) {
-        $hex = strToClassName(prepare_textdata($textlc));
-        new_expression_interactable2($hex, $appendtext, $wid, $len);
-    }
     if ($mode == 2) { 
         return $sqltext; 
     }

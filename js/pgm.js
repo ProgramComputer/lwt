@@ -54,7 +54,7 @@ $(document).on('click','.delete_selection',lwt_feed_wizard.deleteSelection);$(do
  * @author  andreask7 <andreasks7@users.noreply.github.com>
  * @since   1.6.16-fork
  */
-LWT_DATA={language:{dict_link1:'',dict_link2:'',translator_link:'',delimiter:'',word_parsing:'',rtl:!1,ttsVoiceApi:''},text:{id:0,reading_position:-1,annotations:{}},word:{id:0},test:{solution:''},settings:{jQuery_tooltip:!1,hts:0,word_status_filter:''}};TEXTPOS=-1;OPENED=0;WID=0;TID=0;WBLINK1='';WBLINK2='';WBLINK3='';SOLUTION='';ADDFILTER='';RTL=0;ANN_ARRAY={};DELIMITER='';JQ_TOOLTIP=0;HTS=0;function setTransRoman(tra,rom){let form_changed=!1;if($('textarea[name="WoTranslation"]').length==1){$('textarea[name="WoTranslation"]').val(tra);form_changed|=!0}
+LWT_DATA={language:{dict_link1:'',dict_link2:'',translator_link:'',delimiter:'',word_parsing:'',rtl:!1,ttsVoiceApi:''},text:{id:0,reading_position:-1,annotations:{}},word:{id:0},test:{solution:'',answer_opened:!1},settings:{jQuery_tooltip:!1,hts:0,word_status_filter:''}};WID=0;TID=0;WBLINK1='';WBLINK2='';WBLINK3='';RTL=0;function setTransRoman(tra,rom){let form_changed=!1;if($('textarea[name="WoTranslation"]').length==1){$('textarea[name="WoTranslation"]').val(tra);form_changed|=!0}
 if($('input[name="WoRomanization"]').length==1){$('input[name="WoRomanization"]').val(rom);form_changed|=!0}
 if(form_changed)
 lwt_form_check.makeDirty();}
@@ -92,15 +92,16 @@ $('input:submit').last().trigger('click');return!1}else{return!0}}
 function noShowAfter3Secs(){$('#hide3').slideUp()}
 function setTheFocus(){$('.setfocus').trigger('focus').trigger('select')}
 function word_click_event_do_test_test(){run_overlib_test(LWT_DATA.language.dict_link1,LWT_DATA.language.dict_link2,LWT_DATA.language.translator_link,$(this).attr('data_wid'),$(this).attr('data_text'),$(this).attr('data_trans'),$(this).attr('data_rom'),$(this).attr('data_status'),$(this).attr('data_sent'),$(this).attr('data_todo'));$('.todo').text(LWT_DATA.test.solution);return!1}
-function keydown_event_do_test_test(e){if(e.key=='Space'&&OPENED==0){$('.word').trigger('click');cleanupRightFrames();showRightFrames('show_word.php?wid='+$('.word').attr('data_wid')+'&ann=');OPENED=1;return!1}
-if(e.which==38){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&stchange=1');return!1}
-if(e.which==27){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status='+$('.word').attr('data_status'));return!1}
-if(e.which==73){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status=98');return!1}
-if(e.which==87){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status=99');return!1}
-if(e.which==69){showRightFrames('edit_tword.php?wid='+LWT_DATA.word.id);return!1}
-if(e.which==40){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&stchange=-1');return!1}
-for(let i=1;i<=5;i++){if(e.which==(48+i)||e.which==(96+i)){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status='+i);return!1}}
-if(OPENED==0)return!0;return!0}
+function keydown_event_do_test_test(e){if((e.key=='Space'||e.which==32)&&!LWT_DATA.test.answer_opened){$('.word').trigger('click');cleanupRightFrames();showRightFrames('show_word.php?wid='+$('.word').attr('data_wid')+'&ann=');LWT_DATA.test.answer_opened=!0;return!1}
+if(e.key=="Escape"||e.which==27){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status='+$('.word').attr('data_status'));return!1}
+if(e.key=="I"||e.which==73){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status=98');return!1}
+if(e.key=="W"||e.which==87){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status=99');return!1}
+if(e.key=="E"||e.which==69){showRightFrames('edit_tword.php?wid='+LWT_DATA.word.id);return!1}
+if(!LWT_DATA.test.answer_opened)
+return!0;if(e.key=="ArrowUp"||e.which==38){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&stchange=1');return!1}
+if(e.key=="ArrowDown"||e.which==40){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&stchange=-1');return!1}
+for(let i=0;i<5;i++){if(e.which==(49+i)||e.which==(97+i)){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status='+(i+1));return!1}}
+return!0}
 function word_each_do_text_text(_){const wid=$(this).attr('data_wid');if(wid!=''){const order=$(this).attr('data_order');if(order in LWT_DATA.text.annotations){if(wid==LWT_DATA.text.annotations[order][1]){const ann=LWT_DATA.text.annotations[order][2];const re=new RegExp('(['+LWT_DATA.language.delimiter+'][ ]{0,1}|^)('+ann.replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&')+')($|[ ]{0,1}['+LWT_DATA.language.delimiter+'])','');if(!re.test($(this).attr('data_trans').replace(/ \[.*$/,''))){const trans=ann+' / '+$(this).attr('data_trans');$(this).attr('data_trans',trans.replace(' / *',''))}
 $(this).attr('data_ann',ann)}}}
 if(!LWT_DATA.settings.jQuery_tooltip){this.title=make_tooltip($(this).text(),$(this).attr('data_trans'),$(this).attr('data_rom'),$(this).attr('data_status'))}}
@@ -426,7 +427,7 @@ theadrow=this.parentNode;forEach(theadrow.childNodes,function(cell){if(cell.node
 sortrevind=document.getElementById('sorttable_sortrevind');if(sortrevind){sortrevind.parentNode.removeChild(sortrevind)}
 this.className+=' sorttable_sorted';sortfwdind=document.createElement('span');sortfwdind.id="sorttable_sortfwdind";sortfwdind.innerHTML=stIsIE?'&nbsp<font face="webdings">6</font>':'&nbsp;&#x25BE;';this.appendChild(sortfwdind);row_array=[];col=this.sorttable_columnindex;rows=this.sorttable_tbody.rows;for(var j=0;j<rows.length;j++){row_array[row_array.length]=[sorttable.getInnerText(rows[j].cells[col]),rows[j]]}
 row_array.sort(this.sorttable_sortfunction);tb=this.sorttable_tbody;for(var j=0;j<row_array.length;j++){tb.appendChild(row_array[j][1])}
-delete row_array})}}},guessType:function(table,column){sortfn=sorttable.sort_alpha;for(var i=0;i<table.tBodies[0].rows.length;i++){text=sorttable.getInnerText(table.tBodies[0].rows[i].cells[column]);if(text!=''){if(text.match(/^-?[£$¤]?[\d,.]+%?$/)){return sorttable.sort_numeric}
+delete row_array})}}},guessType:function(table,column){sortfn=sorttable.sort_alpha;for(var i=0;i<table.tBodies[0].rows.length;i++){text=sorttable.getInnerText(table.tBodies[0].rows[i].cells[column]);if(text!=''){if(text.match(/^-?[ï¿½$ï¿½]?[\d,.]+%?$/)){return sorttable.sort_numeric}
 possdate=text.match(sorttable.DATE_RE)
 if(possdate){first=parseInt(possdate[1]);second=parseInt(possdate[2]);if(first>12){return sorttable.sort_ddmm}else if(second>12){return sorttable.sort_mmdd}else{sortfn=sorttable.sort_ddmm}}}}
 return sortfn},getInnerText:function(node){if(!node)return"";hasInputs=(typeof node.getElementsByTagName=='function')&&node.getElementsByTagName('input').length;if(node.getAttribute("sorttable_customkey")!=null){return node.getAttribute("sorttable_customkey")}else if(typeof node.textContent!='undefined'&&!hasInputs){return node.textContent.replace(/^\s+|\s+$/g,'')}else if(typeof node.innerText!='undefined'&&!hasInputs){return node.innerText.replace(/^\s+|\s+$/g,'')}else if(typeof node.text!='undefined'&&!hasInputs){return node.text.replace(/^\s+|\s+$/g,'')}else{switch(node.nodeType){case 3:if(node.nodeName.toLowerCase()=='input'){return node.value.replace(/^\s+|\s+$/g,'')}
@@ -452,9 +453,11 @@ resolve.forEach(object,block,context)}};/**
  */
 function quickMenuRedirection(value){const qm=document.getElementById('quickmenu');qm.selectedIndex=0;if(value=='')
 return;if(value=='INFO'){top.location.href='docs/info.html'}else if(value=='rss_import'){top.location.href='do_feeds.php?check_autoupdate=1'}else{top.location.href=value+'.php'}}
-function newExpressionInteractable(text,attrs,length,hex,showallwords){const context=window.parent.document;for(key in text){const words=$('span[id^="ID-'+key+'-"]',context).not(".hide");const text_refresh=(words.attr('data_code')!==undefined&&words.attr('data_code')<=length);$('#ID-'+key+'-'+length,context).remove();let i='';for(let j=length-1;j>0;j--){if(j==1)
-i='#ID-'+key+'-1';if($('#ID-'+key+'-'+j,context).length){i='#ID-'+key+'-'+j;break}}
-$(i,context).before('<span id="ID-'+key+'-'+length+'"'+attrs+'>'+text[key]+'</span>');const el=$('#ID-'+key+'-'+length,context);el.addClass('order'+key).attr('data_order',key);const txt=el.nextUntil($('#ID-'+(parseInt(key)+length*2-1)+'-1',context),'[id$="-1"]').map(function(){return $(this).text()}).get().join("");const pos=$('#ID-'+key+'-1',context).attr('data_pos');el.attr('data_text',txt).attr('data_pos',pos);if(!showallwords){if(!0||text_refresh){}else{el.addClass('hide')}}}}
+function newExpressionInteractable(text,attrs,length,hex,showallwords){const context=window.parent.document;for(key in text){$('#ID-'+key+'-'+length,context).remove();let next_term_key='';for(let j=length-1;j>0;j--){if(j==1)
+next_term_key='#ID-'+key+'-1';if($('#ID-'+key+'-'+j,context).length){next_term_key='#ID-'+key+'-'+j;break}}
+$(next_term_key,context).before('<span id="ID-'+key+'-'+length+'"'+attrs+'>'+text[key]+'</span>');const multi_word=$('#ID-'+key+'-'+length,context);multi_word.addClass('order'+key).attr('data_order',key);const txt=multi_word.nextUntil($('#ID-'+(parseInt(key)+length*2-1)+'-1',context),'[id$="-1"]').map(function(){return $(this).text()}).get().join("");const pos=$('#ID-'+key+'-1',context).attr('data_pos');multi_word.attr('data_text',txt).attr('data_pos',pos);if(showallwords){return}
+const next_words=[];for(let i=0;i<length*2-1;i++){next_words.push('span[id="ID-'+(parseInt(key)+i)+'-1"]')}
+$(next_words.join(','),context).hide()}}
 function prepareTextInteractions(){$('.word').each(word_each_do_text_text);$('.mword').each(mword_each_do_text_text);$('.word').on('click',word_click_event_do_text_text);$('#thetext').on('selectstart','span',!1).on('mousedown','.wsty',{annotation:LWT_DATA.settings.annotations_mode},mword_drag_n_drop_select);$('#thetext').on('click','.mword',mword_click_event_do_text_text);$('.word').on('dblclick',word_dblclick_event_do_text_text);$('#thetext').on('dblclick','.mword',word_dblclick_event_do_text_text);$(document).on('keydown',keydown_event_do_text_text);$('#thetext').hoverIntent({over:word_hover_over,out:word_hover_out,interval:150,selector:".wsty,.mwsty"})}
 function goToLastPosition(){const lookPos=LWT_DATA.text.reading_position;let pos=0;if(lookPos>0){let posObj=$(".wsty[data_pos="+lookPos+"]").not(".hide").eq(0);if(posObj.attr("data_pos")===undefined){pos=$(".wsty").not(".hide").filter(function(){return $(this).attr("data_pos")<=lookPos}).eq(-1)}}
 $(document).scrollTo(pos);focus();setTimeout(overlib,10);setTimeout(cClick,100)}

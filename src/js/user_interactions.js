@@ -32,8 +32,8 @@ function quickMenuRedirection(value) {
  * @param {string}   attrs        A group of attributes to add 
  * @param {int}      length       Number of words, should correspond to WoWordCount
  * @param {string}   hex          Lowercase formatted version of the text.
- * @param {bool}     showallwords Set to false if a group if multi-words should be 
- *                                displayed as index
+ * @param {bool}     showallwords true: multi-word is a superscript, show mw index + words
+ *                                false: only show the multiword, hide the words
  * @returns {undefined}
  * 
  * @since 2.5.2-fork Don't hide multi-word index when inserting new multi-word. 
@@ -41,27 +41,33 @@ function quickMenuRedirection(value) {
 function newExpressionInteractable(text, attrs, length, hex, showallwords) {
 
     const context = window.parent.document;
+    // From each multi-word group
     for (key in text) {
-        const words = $('span[id^="ID-'+ key +'-"]', context).not(".hide"); 
-        const text_refresh = (
-            words.attr('data_code') !== undefined 
-            && words.attr('data_code') <= length);
+        // Remove any previous multi-word of same length + same position
         $('#ID-' + key + '-' + length, context).remove();
-        let i = '';
+
+        // From text, select the first mword smaller than this one, or the first 
+        // word in this mword
+        let next_term_key = '';
         for (let j = length - 1; j > 0; j--) {
-            if (j==1)
-                i = '#ID-' + key + '-1';
+            if (j == 1)
+                next_term_key = '#ID-' + key + '-1';
             if ($('#ID-' + key + '-' + j, context).length) {
-                i = '#ID-' + key + '-' + j;
+                next_term_key = '#ID-' + key + '-' + j;
                 break;
             }
         }
-        $(i, context)
-        .before('<span id="ID-' + key + '-' + length + '"' + attrs + '>' 
-        + text[key] + '</span>');
-        const el = $('#ID-' + key + '-' + length, context);
-        el.addClass('order' + key).attr('data_order', key);
-        const txt = el
+        // Add the multi-word marker before
+        $(next_term_key, context)
+        .before(
+            '<span id="ID-' + key + '-' + length + '"' + attrs + '>' + text[key] + 
+            '</span>'
+        );
+
+        // Change multi-word properties
+        const multi_word = $('#ID-' + key + '-' + length, context);
+        multi_word.addClass('order' + key).attr('data_order', key);
+        const txt = multi_word
             .nextUntil(
                 $('#ID-' + (parseInt(key) + length * 2 - 1) + '-1', context),
                 '[id$="-1"]'
@@ -71,14 +77,18 @@ function newExpressionInteractable(text, attrs, length, hex, showallwords) {
             })
             .get().join("");
         const pos = $('#ID-' + key + '-1', context).attr('data_pos');
-        el.attr('data_text', txt).attr('data_pos', pos);
-        if (!showallwords) {
-            if (true || text_refresh) {
-                //refresh_text(el);
-            } else {
-                el.addClass('hide');
-            }
+        multi_word.attr('data_text', txt).attr('data_pos', pos);
+
+        // Hide the next words if necessary
+        if (showallwords) {
+            return;
         }
+        const next_words = [];
+        // TODO: overlapsing multi-words
+        for (let i = 0; i < length * 2 - 1; i++) {
+            next_words.push('span[id="ID-' + (parseInt(key) + i) + '-1"]');
+        }
+        $(next_words.join(','), context).hide();
     }
 }
 
