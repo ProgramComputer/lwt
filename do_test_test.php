@@ -187,7 +187,6 @@ function do_test_get_tomorrow_tests_count($testsql): int
  * @return void
  */
 function do_test_test_finished($testsql, $totaltests, $ajax = false)
-function do_test_test_finished($testsql, $totaltests, $ajax = false)
 {
     $tomorrow_tests = do_test_get_tomorrow_tests_count($testsql);
     echo '<p id="test-finished-area" class="center" style="display: ' .
