@@ -1473,11 +1473,6 @@ function splitCheckText($text, $lid, $id)
     }
     
     do_mysqli_query("TRUNCATE TABLE {$tbpref}temptextitems");
-
-
-
-
-    //Subtitle parsing starts here IF REMOVED make sure reparsing is not affected
     
     try {
         //TRY and see if file has timed text
@@ -1493,6 +1488,8 @@ function splitCheckText($text, $lid, $id)
                     $seid = get_first_value("SELECT seid AS value FROM sentences where selGID =". convert_string_to_sqlsyntax_notrim_nonull($lid)."
                     AND setxid =". convert_string_to_sqlsyntax_notrim_nonull($id)." and replace(".convert_string_to_sqlsyntax_notrim_nonull($line).",' ','') LIKE concat('%',setext,'%')
                     ". (empty($seids) ? "": " and seid not in (" . implode(",", $seids) . ")") ."ORDER BY seid asc;");
+                    if($seid === null)
+                    continue;
                     $seids[] = $seid;
                     runsql(
                         "UPDATE {$tbpref}sentences 
