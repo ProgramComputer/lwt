@@ -1508,6 +1508,8 @@ function reparse_all_texts(): void
  * @global 0|1    $debug  Output debug messages.
  * 
  * @return void
+ * 
+ * @since 2.10.0-fork Migrations are defined thourgh SQL, and not directly here
  */
 function update_database($dbname)
 {
@@ -1544,7 +1546,7 @@ function update_database($dbname)
             echo "<p>DEBUG: check DB collation: "; 
         }
         if ('utf8utf8_general_ci' != get_first_value(
-            'SELECT concat(default_character_set_name, default_collation_name) as value 
+            'SELECT concat(default_character_set_name, default_collation_name) AS value 
             FROM information_schema.SCHEMATA 
             WHERE schema_name = "' . $dbname . '"'
         )
@@ -1565,207 +1567,18 @@ function update_database($dbname)
         if ($debug) { 
             echo "<p>DEBUG: do DB updates: $dbversion --&gt; $currversion</p>"; 
         }
-        runsql(
-            "ALTER TABLE {$tbpref}words 
-            ADD WoTodayScore DOUBLE NOT NULL DEFAULT 0, 
-            ADD WoTomorrowScore DOUBLE NOT NULL DEFAULT 0, 
-            ADD WoRandom DOUBLE NOT NULL DEFAULT 0", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}words 
-            ADD WoWordCount tinyint(3) unsigned NOT NULL DEFAULT 0 AFTER WoSentence", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}words 
-            ADD INDEX WoTodayScore (WoTodayScore), 
-            ADD INDEX WoTomorrowScore (WoTomorrowScore), 
-            ADD INDEX WoRandom (WoRandom)", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}languages 
-            ADD LgRightToLeft tinyint(1) UNSIGNED NOT NULL DEFAULT 0", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}texts 
-            ADD TxAnnotatedText LONGTEXT NOT NULL AFTER TxText", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}archivedtexts 
-            ADD AtAnnotatedText LONGTEXT NOT NULL AFTER AtText", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}tags 
-            CHANGE TgComment TgComment VARCHAR(200) 
-            CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}tags2 
-            CHANGE T2Comment T2Comment VARCHAR(200) 
-            CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}languages 
-            CHANGE LgGoogleTTSURI LgExportTemplate VARCHAR(1000) 
-            CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}texts 
-            ADD TxSourceURI VARCHAR(1000) 
-            CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}archivedtexts 
-            ADD AtSourceURI VARCHAR(1000) 
-            CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}texts 
-            ADD TxPosition smallint(5) NOT NULL DEFAULT 0", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE {$tbpref}texts 
-            ADD TxAudioPosition float NOT NULL DEFAULT 0", 
-            '', 
-            false
-        );
-        runsql(
-            "ALTER TABLE `{$tbpref}wordtags` 
-            DROP INDEX WtWoID", '', false
-        );
-        runsql(
-            "ALTER TABLE `{$tbpref}texttags` 
-            DROP INDEX TtTxID", '', false
-        );
-        runsql(
-            "ALTER TABLE `{$tbpref}archtexttags` 
-            DROP INDEX AgAtID", '', false
-        );
+        
+        $changes = 0;
+        $res = do_mysqli_query("SELECT filename FROM _migrations");
+        while ($record = mysqli_fetch_assoc($res)) {
+            $queries = parseSQLFile(
+                __DIR__ . '/../db/migrations/' . $record["filename"]
+            );
+            foreach ($queries as $sql_query) {
+                $changes += (int) runsql($sql_query, '', false);
+            }
+        }
 
-        // Database manipulations to upgrade from the official LWT to the community 
-        // fork
-        runsql(
-            "ALTER TABLE `{$tbpref}archivedtexts` 
-            MODIFY COLUMN `AtLgID` tinyint(3) unsigned NOT NULL, 
-            MODIFY COLUMN `AtID` smallint(5) unsigned NOT NULL,
-            ADD INDEX AtLgIDSourceURI (AtSourceURI(20),AtLgID)", 
-            '', false
-        );
-        runsql(
-            "ALTER TABLE `{$tbpref}languages` 
-            MODIFY COLUMN `LgID` tinyint(3) unsigned NOT NULL AUTO_INCREMENT, 
-            MODIFY COLUMN `LgRemoveSpaces` tinyint(1) unsigned NOT NULL, 
-            MODIFY COLUMN `LgSplitEachChar` tinyint(1) unsigned NOT NULL, 
-            MODIFY COLUMN `LgRightToLeft` tinyint(1) unsigned NOT NULL",
-            '', false
-        );
-        runsql(
-            "ALTER TABLE `{$tbpref}sentences` 
-            MODIFY COLUMN `SeID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT, 
-            MODIFY COLUMN `SeLgID` tinyint(3) unsigned NOT NULL, 
-            MODIFY COLUMN `SeTxID` smallint(5) unsigned NOT NULL, 
-            MODIFY COLUMN `SeOrder` smallint(5) unsigned NOT NULL",
-            '', false
-        );
-        runsql(
-            "ALTER TABLE `{$tbpref}texts` 
-            MODIFY COLUMN `TxID` smallint(5) unsigned NOT NULL AUTO_INCREMENT, 
-            MODIFY COLUMN `TxLgID` tinyint(3) unsigned NOT NULL, 
-            ADD INDEX TxLgIDSourceURI (TxSourceURI(20),TxLgID)",
-            '', false
-        );
-        runsql(
-            "ALTER TABLE `{$tbpref}words` 
-            MODIFY COLUMN `WoID` mediumint(8) unsigned NOT NULL AUTO_INCREMENT, 
-            MODIFY COLUMN `WoLgID` tinyint(3) unsigned NOT NULL, 
-            MODIFY COLUMN `WoStatus` tinyint(4) NOT NULL", 
-            '', false
-        ); 
-        runsql(
-            "ALTER TABLE `{$tbpref}words` 
-            DROP INDEX WoTextLC",
-            '', false
-        );
-        runsql(
-            'ALTER TABLE `' . $tbpref . 'words` 
-            DROP INDEX WoLgIDTextLC, 
-            ADD UNIQUE INDEX WoTextLCLgID (WoTextLC, WoLgID)', 
-            '', false
-        );
-        runsql(
-            'ALTER TABLE `' . $tbpref . 'words` 
-            ADD INDEX WoWordCount (WoWordCount)', 
-            '', false
-        );
-        runsql(
-            'ALTER TABLE `' . $tbpref . 'archtexttags` 
-            MODIFY COLUMN `AgAtID` smallint(5) unsigned NOT NULL, 
-            MODIFY COLUMN `AgT2ID` smallint(5) unsigned NOT NULL', 
-            '', false
-        );
-        runsql(
-            'ALTER TABLE `' . $tbpref . 'tags` 
-            MODIFY COLUMN `TgID` smallint(5) unsigned NOT NULL AUTO_INCREMENT', 
-            '', false
-        );
-        runsql(
-            'ALTER TABLE `' . $tbpref . 'tags2` 
-            MODIFY COLUMN `T2ID` smallint(5) unsigned NOT NULL AUTO_INCREMENT', 
-            '', false
-        );
-        runsql(
-            'ALTER TABLE `' . $tbpref . 'wordtags` 
-            MODIFY COLUMN `WtTgID` smallint(5) unsigned NOT NULL AUTO_INCREMENT', 
-            '', false
-        );
-        runsql(
-            'ALTER TABLE `' . $tbpref . 'texttags` 
-            MODIFY COLUMN `TtTxID` smallint(5) unsigned NOT NULL, 
-            MODIFY COLUMN `TtT2ID` smallint(5) unsigned NOT NULL', 
-            '', false
-        );
-        runsql(
-            'ALTER TABLE `' . $tbpref . 'temptextitems` 
-            ADD TiCount smallint(5) unsigned NOT NULL, 
-            DROP TiLgID, 
-            DROP TiTxID',
-            '', false
-        );
-        runsql(
-            'ALTER TABLE `' . $tbpref . 'temptextitems` 
-            ADD TiCount smallint(5) unsigned NOT NULL', 
-            '', false
-        );
-        runsql(
-            "UPDATE {$tbpref}sentences 
-            JOIN {$tbpref}textitems2 
-            ON Ti2SeID = SeID AND Ti2Order=SeFirstPos AND Ti2WordCount=0 
-            SET SeFirstPos = SeFirstPos+1", 
-            '', false
-        );
         if ($debug) { 
             echo '<p>DEBUG: rebuilding tts</p>'; 
         }
@@ -1780,22 +1593,7 @@ function update_database($dbname)
             ''
         );
 
-        // Since 2.9.0, fixes the missing auto incrementation of texts
-        runsql(
-            "ALTER TABLE `{$tbpref}archivedtexts` 
-            MODIFY COLUMN `AtID` smallint(5) unsigned NOT NULL AUTO_INCREMENT", 
-            '', false
-        );
-
-        // Since 2.10.0, you can add a third-party voice API
-        runsql(
-            "ALTER TABLE `{$tbpref}languages` 
-            ADD COLUMN `LgTTSVoiceAPI` varchar(2048) NOT NULL",
-            '', false
-        );
-
-        
-        // set to current.
+        // Set database to current version
         saveSetting('dbversion', $currversion);
         saveSetting('lastscorecalc', '');  // do next section, too
     }
@@ -1809,20 +1607,15 @@ function prefixSQLQuery($sql_line, $prefix)
     if (substr($sql_line, 0, 12) == "INSERT INTO ") {
         return substr($sql_line, 0, 12) . $prefix . substr($sql_line, 12); 
     }
-    if (substr($sql_line, 0, 21) == "DROP TABLE IF EXISTS ") {
-        return substr($sql_line, 0, 21) . $prefix . substr($sql_line, 21);
-    } 
-    if (substr($sql_line, 0, 14) == "CREATE TABLE `") {
-        return substr($sql_line, 0, 14) . $prefix . substr($sql_line, 14);
-    } 
-    if (substr($sql_line, 0, 13) == "CREATE TABLE ") {
-        return substr($sql_line, 0, 13) . $prefix . substr($sql_line, 13);
-    }
-    if (str_starts_with("CREATE TABLE IF NOT EXISTS `", $sql_line)) {
-        return substr($sql_line, 0, 28) . $prefix . substr($sql_line, 28);
-    }
-    if (str_starts_with("CREATE TABLE IF NOT EXISTS ", $sql_line)) {
-        return substr($sql_line, 0, 27) . $prefix . substr($sql_line, 27);
+    if (
+        preg_match(
+            '/^(?:DROP|CREATE|ALTER) TABLE (?:IF NOT EXISTS )?`?/', 
+            $sql_line, 
+            $matches
+        )
+    ) {
+        return $matches[0] . $prefix . 
+        substr($sql_line, strlen($matches[0]));
     }
     return $sql_line; 
 }
@@ -1850,16 +1643,19 @@ function check_update_db($debug, $tbpref, $dbname): void
     }
     mysqli_free_result($res);
     
-    $count = 0;  /// counter for cache rebuild
+    /// counter for cache rebuild
+    $count = 0;
 
-    // Rebuild Tables if missing (current versions!)
-
-    $queries = SQLParser(__DIR__ . "/../db/schema/baseline.sql");
+    // Rebuild in missing table
+    $queries = parseSQLFile(__DIR__ . "/../db/schema/baseline.sql");
     foreach ($queries as $query) {
         $prefixed_query = prefixSQLQuery($query, $tbpref);
         // Increment count for new tables only
         $count += runsql($prefixed_query, "");
     }
+
+    // Update the database (if necessary)
+    update_database($dbname);
     
     if (!in_array("{$tbpref}textitems2", $tables)) {
         // Add data from the old database system
@@ -1886,12 +1682,6 @@ function check_update_db($debug, $tbpref, $dbname): void
         $count++;
     }
 
-    runsql(
-        "ALTER TABLE `{$tbpref}sentences` ADD SeFirstPos smallint(5) NOT NULL", 
-        '', 
-        false
-    );
-    
     if ($count > 0) {        
         // Rebuild Text Cache if cache tables new
         if ($debug) { 
@@ -1900,8 +1690,6 @@ function check_update_db($debug, $tbpref, $dbname): void
         reparse_all_texts();
     }
     
-    // Update the database
-    update_database($dbname);
 
     // Do Scoring once per day, clean Word/Texttags, and optimize db
     $lastscorecalc = getSetting('lastscorecalc');

@@ -11,12 +11,13 @@ ones are marked like "v1.0.0-fork".
 
 * Support for Japanese with MeCab on Mac! This was added thanks to 
 [quopquai](https://github.com/quopquai) on [#135](https://github.com/HugoFara/lwt/issues/135).
-* `unloadformcheck.js` now declares a new object `lwt_form_check` that contains all the functions needed.
 * New globals ([#163](https://github.com/HugoFara/lwt/issues/163)):
   * On `inc/kernel_utility.php`: `LWT_APP_VERSION` and `LWT_RELEASE_DATE`.
   * On `api.php`: `LWT_API_VERSION` and `LWT_API_RELEASE_DATE`.
   * `src/js/jq_pgm.js`: `LWT_DATA`.
-* Imprtant additions to Text-To-Speech (TTS):
+  * `unloadformcheck.js` now declares a new object `lwt_form_check` that contains 
+  all the functions needed.
+* Important additions to Text-To-Speech (TTS):
   * Word can be read on hover or on click. 
   Pull request [#147](https://github.com/HugoFara/lwt/pull/147) by 
   [@ProgramComputer](https://github.com/ProgramComputer).
@@ -30,6 +31,8 @@ ones are marked like "v1.0.0-fork".
   (browser or third party). 
 * Starts a cleaner database management. Database schema is defined in 
 `db/schema/baseline.sql` and no longer in PHP code.
+* You can choose to add romanization for languages that don't need it in the language 
+settings ([#119](https://github.com/HugoFara/lwt/issues/119)).
 
 ### Changed
 
@@ -47,6 +50,10 @@ after solution display ([#159](https://github.com/HugoFara/lwt/issues/159)).
   It should not lead to any code or behaviour change.
   * `src/js/overlib_interface.js`, stemmed from `src/js/pgm.js`. It contains all the 
   overlib interactions.
+* For audio URI, raises the characters length limit from 200 to 2048 
+([#144](https://github.com/HugoFara/lwt/issues/144)).
+* Database creation and migration is now handled directly in SQL, for a safer 
+behavior.
 
 ### Fixed
 
