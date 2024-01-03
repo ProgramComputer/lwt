@@ -3750,7 +3750,7 @@ function subtitles_from_uri($uri,$lang_id):array
     try{
     $fileContent = file_get_contents($filename);
     }catch(ValueError $e){
-        return array("subtitles" => "","error" => "No subtitles for this video","output"=>$out);
+        return array("subtitles" => "","error" => "No subtitles for this video","command"=>$youtubedl,"output"=>$out);
 
     }
 

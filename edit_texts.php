@@ -174,7 +174,7 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
         {
         if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'texts where TxID = ' . $id)) !== null)
         {
-    unlink(ltrim($uri,"lwt/"));
+    unlink(ltrim($uri,basename(getcwd())."/"));
         }
     }
         $message3 = runsql(
@@ -353,7 +353,7 @@ function edit_texts_delete($txid): string
 
     if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'texts where TxID = ' . $txid)) !== null)
     {
-unlink(ltrim($uri,"lwt/"));
+unlink(ltrim($uri,basename(getcwd())."/"));
     }
     $message3 = runsql(
         'DELETE FROM ' . $tbpref . 'textitems2 where Ti2TxID = ' . $txid,
@@ -556,7 +556,7 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
         if (feof($handle)) {
         pclose($handle);
     }
-    $new_media_uri = 'lwt/'.trim(fgets($handle));
+    $new_media_uri = basename(getcwd()).'/'.trim(fgets($handle));
     while(!feof($handle)){
         if ($debug){
             echo fgets($handle).'<br />';

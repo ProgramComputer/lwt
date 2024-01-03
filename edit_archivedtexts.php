@@ -141,7 +141,7 @@ if (isset($_REQUEST['markaction'])) {
                     foreach($_REQUEST['marked'] as $id) {
                         if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'archivedtexts where AtID = ' . $id)) !== null)
                         {
-                    unlink(ltrim($uri,"lwt/"));
+                    unlink(ltrim($uri,basename(getcwd())."/"));
                         }
                     }
                     $message = runsql(
@@ -234,7 +234,7 @@ if (isset($_REQUEST['markaction'])) {
 if (isset($_REQUEST['del'])) {
     if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'archivedtexts where AtID = ' . $_REQUEST['del'])) !== null)
     {
-unlink(ltrim($uri,"lwt/"));
+unlink(ltrim($uri,basename(getcwd())."/"));
     }
     // DEL
     $message = runsql(
