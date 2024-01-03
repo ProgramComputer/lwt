@@ -587,7 +587,6 @@ function keydown_event_do_test_test (e) {
       return false;
     }
   }
-  if (OPENED == 0) return true;
   return true;
 }
 
