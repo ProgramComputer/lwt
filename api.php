@@ -188,7 +188,7 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
     if (empty($word_record)) {
         $output = array(
             "word_id" => 0,
-            "word_lg_id" =>'',
+            "word_lg_id" => 0,
             "word_text" => '',
             "group" => ''
         );
