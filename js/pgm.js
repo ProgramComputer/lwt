@@ -54,7 +54,7 @@ $(document).on('click','.delete_selection',lwt_feed_wizard.deleteSelection);$(do
  * @author  andreask7 <andreasks7@users.noreply.github.com>
  * @since   1.6.16-fork
  */
-LWT_DATA={language:{dict_link1:'',dict_link2:'',translator_link:'',delimiter:'',rtl:!1,ttsVoiceApi:''},text:{id:0,reading_position:-1,annotations:{}},word:{id:0},test:{solution:''},settings:{jQuery_tooltip:!1,hts:0,word_status_filter:''}};TEXTPOS=-1;OPENED=0;WID=0;TID=0;WBLINK1='';WBLINK2='';WBLINK3='';SOLUTION='';ADDFILTER='';RTL=0;ANN_ARRAY={};DELIMITER='';JQ_TOOLTIP=0;HTS=0;function setTransRoman(tra,rom){let form_changed=!1;if($('textarea[name="WoTranslation"]').length==1){$('textarea[name="WoTranslation"]').val(tra);form_changed|=!0}
+LWT_DATA={language:{dict_link1:'',dict_link2:'',translator_link:'',delimiter:'',word_parsing:'',rtl:!1,ttsVoiceApi:''},text:{id:0,reading_position:-1,annotations:{}},word:{id:0},test:{solution:'',answer_opened:!1},settings:{jQuery_tooltip:!1,hts:0,word_status_filter:''}};WID=0;TID=0;WBLINK1='';WBLINK2='';WBLINK3='';RTL=0;function setTransRoman(tra,rom){let form_changed=!1;if($('textarea[name="WoTranslation"]').length==1){$('textarea[name="WoTranslation"]').val(tra);form_changed|=!0}
 if($('input[name="WoRomanization"]').length==1){$('input[name="WoRomanization"]').val(rom);form_changed|=!0}
 if(form_changed)
 lwt_form_check.makeDirty();}
@@ -92,14 +92,15 @@ $('input:submit').last().trigger('click');return!1}else{return!0}}
 function noShowAfter3Secs(){$('#hide3').slideUp()}
 function setTheFocus(){$('.setfocus').trigger('focus').trigger('select')}
 function word_click_event_do_test_test(){run_overlib_test(LWT_DATA.language.dict_link1,LWT_DATA.language.dict_link2,LWT_DATA.language.translator_link,$(this).attr('data_wid'),$(this).attr('data_text'),$(this).attr('data_trans'),$(this).attr('data_rom'),$(this).attr('data_status'),$(this).attr('data_sent'),$(this).attr('data_todo'));$('.todo').text(LWT_DATA.test.solution);return!1}
-function keydown_event_do_test_test(e){if(e.key=='Space'&&OPENED==0){$('.word').trigger('click');cleanupRightFrames();showRightFrames('show_word.php?wid='+$('.word').attr('data_wid')+'&ann=');OPENED=1;return!1}
-if(e.which==38){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&stchange=1');return!1}
-if(e.which==27){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status='+$('.word').attr('data_status'));return!1}
-if(e.which==73){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status=98');return!1}
-if(e.which==87){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status=99');return!1}
-if(e.which==69){showRightFrames('edit_tword.php?wid='+LWT_DATA.word.id);return!1}
-if(OPENED==0)return!0;if(e.which==40){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&stchange=-1');return!1}
-for(let i=1;i<=5;i++){if(e.which==(48+i)||e.which==(96+i)){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status='+i);return!1}}
+function keydown_event_do_test_test(e){if((e.key=='Space'||e.which==32)&&!LWT_DATA.test.answer_opened){$('.word').trigger('click');cleanupRightFrames();showRightFrames('show_word.php?wid='+$('.word').attr('data_wid')+'&ann=');LWT_DATA.test.answer_opened=!0;return!1}
+if(e.key=="Escape"||e.which==27){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status='+$('.word').attr('data_status'));return!1}
+if(e.key=="I"||e.which==73){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status=98');return!1}
+if(e.key=="W"||e.which==87){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status=99');return!1}
+if(e.key=="E"||e.which==69){showRightFrames('edit_tword.php?wid='+LWT_DATA.word.id);return!1}
+if(!LWT_DATA.test.answer_opened)
+return!0;if(e.key=="ArrowUp"||e.which==38){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&stchange=1');return!1}
+if(e.key=="ArrowDown"||e.which==40){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&stchange=-1');return!1}
+for(let i=0;i<5;i++){if(e.which==(49+i)||e.which==(97+i)){showRightFrames('set_test_status.php?wid='+LWT_DATA.word.id+'&status='+(i+1));return!1}}
 return!0}
 function word_each_do_text_text(_){const wid=$(this).attr('data_wid');if(wid!=''){const order=$(this).attr('data_order');if(order in LWT_DATA.text.annotations){if(wid==LWT_DATA.text.annotations[order][1]){const ann=LWT_DATA.text.annotations[order][2];const re=new RegExp('(['+LWT_DATA.language.delimiter+'][ ]{0,1}|^)('+ann.replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&')+')($|[ ]{0,1}['+LWT_DATA.language.delimiter+'])','');if(!re.test($(this).attr('data_trans').replace(/ \[.*$/,''))){const trans=ann+' / '+$(this).attr('data_trans');$(this).attr('data_trans',trans.replace(' / *',''))}
 $(this).attr('data_ann',ann)}}}
@@ -114,17 +115,17 @@ function word_click_event_do_text_text(){const status=$(this).attr('data_status'
 let hints;if(LWT_DATA.settings.jQuery_tooltip){hints=make_tooltip($(this).text(),$(this).attr('data_trans'),$(this).attr('data_rom'),status)}else{hints=$(this).attr('title')}
 const multi_words=Array(7);for(let i=0;i<7;i++){multi_words[i]=$(this).attr('data_mw'+(i+2))}
 if(status<1){run_overlib_status_unknown(LWT_DATA.language.dict_link1,LWT_DATA.language.dict_link2,LWT_DATA.language.translator_link,hints,LWT_DATA.text.id,$(this).attr('data_order'),$(this).text(),multi_words,LWT_DATA.language.rtl);showRightFrames('edit_word.php?tid='+LWT_DATA.text.id+'&ord='+$(this).attr('data_order')+'&wid=')}else if(status==99){run_overlib_status_99(LWT_DATA.language.dict_link1,LWT_DATA.language.dict_link2,LWT_DATA.language.translator_link,hints,LWT_DATA.text.id,$(this).attr('data_order'),$(this).text(),$(this).attr('data_wid'),multi_words,LWT_DATA.language.rtl,ann)}else if(status==98){run_overlib_status_98(LWT_DATA.language.dict_link1,LWT_DATA.language.dict_link2,LWT_DATA.language.translator_link,hints,LWT_DATA.text.id,$(this).attr('data_order'),$(this).text(),$(this).attr('data_wid'),multi_words,LWT_DATA.language.rtl,ann)}else{run_overlib_status_1_to_5(LWT_DATA.language.dict_link1,LWT_DATA.language.dict_link2,LWT_DATA.language.translator_link,hints,LWT_DATA.text.id,$(this).attr('data_order'),$(this).text(),$(this).attr('data_wid'),status,multi_words,LWT_DATA.language.rtl,ann)}
-if(LWT_DATA.settings.hts==2){const lg=getLangFromDict(LWT_DATA.language.translator_link);readTextAloud($(this).text(),lg)}
+if(LWT_DATA.settings.hts==2){const lg=getLangFromDict(LWT_DATA.language.translator_link);speechDispatcher($(this).text(),lg)}
 return!1}
 function mword_click_event_do_text_text(){const status=$(this).attr('data_status');if(status!=''){let ann='';if((typeof $(this).attr('data_ann'))!=='undefined'){ann=$(this).attr('data_ann')}
 run_overlib_multiword(LWT_DATA.language.dict_link1,LWT_DATA.language.dict_link2,LWT_DATA.language.translator_link,LWT_DATA.settings.jQuery_tooltip?make_tooltip($(this).text(),$(this).attr('data_trans'),$(this).attr('data_rom'),status):$(this).attr('title'),LWT_DATA.text.id,$(this).attr('data_order'),$(this).attr('data_text'),$(this).attr('data_wid'),status,$(this).attr('data_code'),ann)}
-if(LWT_DATA.settings.hts==2){const lg=getLangFromDict(LWT_DATA.language.translator_link);readTextAloud($(this).text(),lg)}
+if(LWT_DATA.settings.hts==2){const lg=getLangFromDict(LWT_DATA.language.translator_link);speechDispatcher($(this).text(),lg)}
 return!1}
 function mword_drag_n_drop_select(event){if(LWT_DATA.settings.jQuery_tooltip)$('.ui-tooltip').remove();const context=$(this).parent();context.one('mouseup mouseout',$(this),function(){clearTimeout(to);$('.nword').removeClass('nword');$('.tword').removeClass('tword');$('.lword').removeClass('lword');$('.wsty',context).css('background-color','').css('border-bottom-color','');$('#pe').remove()});to=setTimeout(function(){let pos;context.off('mouseout');$('.wsty',context).css('background-color','inherit').css('border-bottom-color','rgba(0,0,0,0)').not('.hide,.word').each(function(){f=parseInt($(this).attr('data_code'))*2+parseInt($(this).attr('data_order'))-1;h='';$(this).nextUntil($('[id^="ID-'+f+'-"]',context),'[id$="-1"]').each(function(){l=$(this).attr('data_order');if(typeof l!=='undefined'){h+='<span class="tword" data_order="'+l+'">'+$(this).text()+'</span>'}else{h+='<span class="nword" data_order="'+$(this).attr('id').split('-')[1]+'">'+$(this).text()+'</span>'}});$(this).html(h)});$('#pe').remove();$('body').append('<style id="pe">#'+context.attr('id')+' .wsty:after,#'+context.attr('id')+' .wsty:before{opacity:0}</style>');$('[id$="-1"]',context).not('.hide,.wsty').addClass('nword').each(function(){$(this).attr('data_order',$(this).attr('id').split('-')[1])});$('.word',context).not('.hide').each(function(){$(this).html('<span class="tword" data_order="'+$(this).attr('data_order')+'">'+$(this).text()+'</span>')});if(event.data.annotation==1){$('.wsty',context).not('.hide').each(function(){$(this).children('.tword').last().attr('data_ann',$(this).attr('data_ann')).attr('data_trans',$(this).attr('data_trans')).addClass('content'+$(this).removeClass('status1 status2 status3 status4 status5 status98 status99').attr('data_status'))})}else if(event.data.annotation==3){$('.wsty',context).not('.hide').each(function(){$(this).children('.tword').first().attr('data_ann',$(this).attr('data_ann')).attr('data_trans',$(this).attr('data_trans')).addClass('content'+$(this).removeClass('status1 status2 status3 status4 status5 status98 status99').attr('data_status'))})}
 $(context).one('mouseover','.tword',function(){$('html').one('mouseup',function(){$('.wsty',context).each(function(){$(this).addClass('status'+$(this).attr('data_status'))});if(!$(this).hasClass('tword')){$('span',context).removeClass('nword tword lword');$('.wsty',context).css('background-color','').css('border-bottom-color','');$('#pe').remove()}});pos=parseInt($(this).attr('data_order'));$('.lword',context).removeClass('lword');$(this).addClass('lword');$(context).on('mouseleave',function(){$('.lword',context).removeClass('lword')});$(context).one('mouseup','.nword,.tword',function(ev){if(ev.handled!==!0){const len=$('.lword.tword',context).length;if(len>0){g=$('.lword',context).first().attr('data_order');if(len>1){const text=$('.lword',context).map(function(){return $(this).text()}).get().join('');if(text.length>250){alert('selected text is too long!!!')}else{showRightFrames('edit_mword.php?tid='+LWT_DATA.text.id+'&len='+len+'&ord='+g+'&txt='+text)}}else{showRightFrames('edit_word.php?tid='+LWT_DATA.text.id+'&ord='+g+'&txt='+$('#ID-'+g+'-1').text())}}
 $('span',context).removeClass('tword nword');ev.handled=!0}})});$(context).hoverIntent({over:function(){$('.lword',context).removeClass('lword');const lpos=parseInt($(this).attr('data_order'));$(this).addClass('lword');if(lpos>pos){for(var i=pos;i<lpos;i++){$('.tword[data_order="'+i+'"],.nword[data_order="'+i+'"]',context).addClass('lword')}}else{for(var i=pos;i>lpos;i--){$('.tword[data_order="'+i+'"],.nword[data_order="'+i+'"]',context).addClass('lword')}}},out:function(){},sensitivity:18,selector:'.tword'})},300)}
 function word_hover_over(){if(!$('.tword')[0]){const v=$(this).attr('class').replace(/.*(TERM[^ ]*)( .*)*/,'$1');$('.'+v).addClass('hword');if(LWT_DATA.settings.jQuery_tooltip){$(this).trigger('mouseover')}
-if(LWT_DATA.settings.hts==3){const lg=getLangFromDict(LWT_DATA.language.translator_link);readTextAloud($(this).text(),lg)}}}
+if(LWT_DATA.settings.hts==3){const lg=getLangFromDict(LWT_DATA.language.translator_link);speechDispatcher($(this).text(),lg)}}}
 function word_hover_out(){$('.hword').removeClass('hword');if(LWT_DATA.settings.jQuery_tooltip)$('.ui-helper-hidden-accessible>div[style]').remove();}
 jQuery.fn.extend({tooltip_wsty_content:function(){var re=new RegExp('(['+LWT_DATA.language.delimiter+'])(?! )','g');let title='';if($(this).hasClass('mwsty')){title="<p><b style='font-size:120%'>"+$(this).attr('data_text')+'</b></p>'}else{title="<p><b style='font-size:120%'>"+$(this).text()+'</b></p>'}
 const roman=$(this).attr('data_rom');let trans=$(this).attr('data_trans').replace(re,'$1 ');let statname='';const status=parseInt($(this).attr('data_status'));if(status==0)statname='Unknown [?]';else if(status<5)statname='Learning ['+status+']';if(status==5)statname='Learned [5]';if(status==98)statname='Ignored [Ign]';if(status==99)statname='Well Known [WKn]';if(roman!=''){title+='<p><b>Roman.</b>: '+roman+'</p>'}
@@ -150,7 +151,7 @@ showRightFrames('set_word_on_hover.php?text='+txt+'&tid='+LWT_DATA.text.id+'&sta
 if(e.which==73){if(stat=='0'){showRightFrames('set_word_on_hover.php?text='+txt+'&tid='+LWT_DATA.text.id+'&status=98')}else{showRightFrames('set_word_status.php?wid='+wid+'&tid='+LWT_DATA.text.id+'&ord='+ord+'&status=98');return!1}}
 if(e.which==87){if(stat=='0'){showRightFrames('set_word_on_hover.php?text='+txt+'&tid='+LWT_DATA.text.id+'&status=99')}else{showRightFrames('set_word_status.php?wid='+wid+'&tid='+LWT_DATA.text.id+'&ord='+ord+'&status=99')}
 return!1}
-if(e.which==80){const lg=getLangFromDict(LWT_DATA.language.translator_link);readTextAloud(txt,lg);return!1}
+if(e.which==80){const lg=getLangFromDict(LWT_DATA.language.translator_link);speechDispatcher(txt,lg);return!1}
 if(e.which==84){let popup=!1;let dict_link=LWT_DATA.language.translator_link;if(LWT_DATA.language.translator_link.startsWith('*')){popup=!0;dict_link=substring(dict_link,1)}
 if(dict_link.startsWith('ggl.php')){dict_link="http://"+dict_link}
 let open_url=!0;let final_url;try{final_url=new URL(dict_link);popup|=final_url.searchParams.has("lwt_popup")}catch(err){if(err instanceof TypeError){open_url=!1}}
@@ -255,37 +256,8 @@ window.setTimeout(noShowAfter3Secs,3000)}
 $(window).on('load',wrapRadioButtons);$(document).ready(prepareMainAreas);/**
  * LWT Javascript functions
  * 
- * @author  andreask7 <andreasks7@users.noreply.github.com>
+ * @author  HugoFara <HugoFara@users.noreply.github.com>
  * @license Unlicense <http://unlicense.org/>
- * @since   1.6.16-fork
- * 
- * "Learning with Texts" (LWT) is free and unencumbered software
- * released into the PUBLIC DOMAIN.
- * 
- * Anyone is free to copy, modify, publish, use, compile, sell, or
- * distribute this software, either in source code form or as a
- * compiled binary, for any purpose, commercial or non-commercial,
- * and by any means.
- * 
- * In jurisdictions that recognize copyright laws, the author or
- * authors of this software dedicate any and all copyright
- * interest in the software to the public domain. We make this
- * dedication for the benefit of the public at large and to the
- * detriment of our heirs and successors. We intend this
- * dedication to be an overt act of relinquishment in perpetuity
- * of all present and future rights to this software under
- * copyright law.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
- * AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- * 
- * For more information, please refer to [http://unlicense.org/].
  */
 var ol_textfont='"Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu';var ol_textsize=3;var ol_sticky=1;var ol_captionfont='"Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu';var ol_captionsize=3;var ol_width=260;var ol_close='Close';var ol_offsety=30;var ol_offsetx=3;var ol_fgcolor='#FFFFE8';var ol_closecolor='#FFFFFF';function run_overlib_status_98(wblink1,wblink2,wblink3,hints,txid,torder,txt,wid,multi_words,rtl,ann){const lang=getLangFromDict(wblink3);return overlib(make_overlib_audio(txt,lang)+'<b>'+escape_html_chars_2(hints,ann)+'</b><br/>'+make_overlib_link_new_word(txid,torder,wid)+' | '+make_overlib_link_delete_word(txid,wid)+make_overlib_link_new_multiword(txid,torder,multi_words,rtl)+' <br /> '+make_overlib_link_wb(wblink1,wblink2,wblink3,txt,txid,torder),CAPTION,'Word')}
 function run_overlib_status_99(wblink1,wblink2,wblink3,hints,txid,torder,txt,wid,multi_words,rtl,ann){const lang=getLangFromDict(wblink3);return overlib(make_overlib_audio(txt,lang)+'<b>'+escape_html_chars_2(hints,ann)+'</b><br/> '+make_overlib_link_new_word(txid,torder,wid)+' | '+make_overlib_link_delete_word(txid,wid)+make_overlib_link_new_multiword(txid,torder,multi_words,rtl)+' <br /> '+make_overlib_link_wb(wblink1,wblink2,wblink3,txt,txid,torder),CAPTION,'Word')}
@@ -322,7 +294,41 @@ function make_overlib_link_delete_word(txid,wid){return' <a onclick="showRightFr
 function make_overlib_link_delete_multiword(txid,wid){return' <a onclick="showRightFrames(); return confirmDelete();" '+'href="delete_mword.php?wid='+wid+'&amp;tid='+txid+'" target="ro">Delete term</a> '}
 function make_overlib_link_wellknown_word(txid,torder){return' <a href="insert_word_wellknown.php?tid='+txid+'&amp;ord='+torder+'" target="ro" onclick="showRightFrames();">I know this term well</a> '}
 function make_overlib_link_ignore_word(txid,torder){return' <a href="insert_word_ignore.php?tid='+txid+'&amp;ord='+torder+'" target="ro" onclick="showRightFrames();">Ignore this term</a> '}
-function make_overlib_audio(txt,lang){let img=document.createElement("img");img.title="Click to read!";img.src="icn/speaker-volume.png";img.style.cursor="pointer";img.setAttribute("onclick","readTextAloud('"+escape_html_chars(txt)+"', '"+(lang||"")+"')");return img.outerHTML}
+function make_overlib_audio(txt,lang){let img=document.createElement("img");img.title="Click to read!";img.src="icn/speaker-volume.png";img.style.cursor="pointer";img.setAttribute("onclick","speechDispatcher('"+escape_html_chars(txt)+"', '"+(lang||"")+"')");return img.outerHTML};/**
+ * LWT Javascript functions
+ * 
+ * @author  andreask7 <andreasks7@users.noreply.github.com>
+ * @license Unlicense <http://unlicense.org/>
+ * @since   1.6.16-fork
+ * 
+ * "Learning with Texts" (LWT) is free and unencumbered software
+ * released into the PUBLIC DOMAIN.
+ * 
+ * Anyone is free to copy, modify, publish, use, compile, sell, or
+ * distribute this software, either in source code form or as a
+ * compiled binary, for any purpose, commercial or non-commercial,
+ * and by any means.
+ * 
+ * In jurisdictions that recognize copyright laws, the author or
+ * authors of this software dedicate any and all copyright
+ * interest in the software to the public domain. We make this
+ * dedication for the benefit of the public at large and to the
+ * detriment of our heirs and successors. We intend this
+ * dedication to be an overt act of relinquishment in perpetuity
+ * of all present and future rights to this software under
+ * copyright law.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ * AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * 
+ * For more information, please refer to [http://unlicense.org/].
+ */
 function getStatusName(status){return STATUSES[status]?STATUSES[status].name:'Unknown'}
 function getStatusAbbr(status){return STATUSES[status]?STATUSES[status].abbr:'?'}
 function translateSentence(url,sentctl){if(sentctl!==undefined&&url!=''){const text=sentctl.value;if(typeof text==='string'){showRightFrames(undefined,createTheDictUrl(url,text.replace(/[{}]/g,'')))}}}
@@ -452,9 +458,11 @@ resolve.forEach(object,block,context)}};/**
  */
 function quickMenuRedirection(value){const qm=document.getElementById('quickmenu');qm.selectedIndex=0;if(value=='')
 return;if(value=='INFO'){top.location.href='docs/info.html'}else if(value=='rss_import'){top.location.href='do_feeds.php?check_autoupdate=1'}else{top.location.href=value+'.php'}}
-function newExpressionInteractable(text,attrs,length,hex,showallwords){const context=window.parent.document;for(key in text){const words=$('span[id^="ID-'+key+'-"]',context).not(".hide");const text_refresh=(words.attr('data_code')!==undefined&&words.attr('data_code')<=length);$('#ID-'+key+'-'+length,context).remove();let i='';for(let j=length-1;j>0;j--){if(j==1)
-i='#ID-'+key+'-1';if($('#ID-'+key+'-'+j,context).length){i='#ID-'+key+'-'+j;break}}
-$(i,context).before('<span id="ID-'+key+'-'+length+'"'+attrs+'>'+text[key]+'</span>');const el=$('#ID-'+key+'-'+length,context);el.addClass('order'+key).attr('data_order',key);const txt=el.nextUntil($('#ID-'+(parseInt(key)+length*2-1)+'-1',context),'[id$="-1"]').map(function(){return $(this).text()}).get().join("");const pos=$('#ID-'+key+'-1',context).attr('data_pos');el.attr('data_text',txt).attr('data_pos',pos);if(!showallwords){if(!0||text_refresh){}else{el.addClass('hide')}}}}
+function newExpressionInteractable(text,attrs,length,hex,showallwords){const context=window.parent.document;for(key in text){$('#ID-'+key+'-'+length,context).remove();let next_term_key='';for(let j=length-1;j>0;j--){if(j==1)
+next_term_key='#ID-'+key+'-1';if($('#ID-'+key+'-'+j,context).length){next_term_key='#ID-'+key+'-'+j;break}}
+$(next_term_key,context).before('<span id="ID-'+key+'-'+length+'"'+attrs+'>'+text[key]+'</span>');const multi_word=$('#ID-'+key+'-'+length,context);multi_word.addClass('order'+key).attr('data_order',key);const txt=multi_word.nextUntil($('#ID-'+(parseInt(key)+length*2-1)+'-1',context),'[id$="-1"]').map(function(){return $(this).text()}).get().join("");const pos=$('#ID-'+key+'-1',context).attr('data_pos');multi_word.attr('data_text',txt).attr('data_pos',pos);if(showallwords){return}
+const next_words=[];for(let i=0;i<length*2-1;i++){next_words.push('span[id="ID-'+(parseInt(key)+i)+'-1"]')}
+$(next_words.join(','),context).hide()}}
 function prepareTextInteractions(){$('.word').each(word_each_do_text_text);$('.mword').each(mword_each_do_text_text);$('.word').on('click',word_click_event_do_text_text);$('#thetext').on('selectstart','span',!1).on('mousedown','.wsty',{annotation:LWT_DATA.settings.annotations_mode},mword_drag_n_drop_select);$('#thetext').on('click','.mword',mword_click_event_do_text_text);$('.word').on('dblclick',word_dblclick_event_do_text_text);$('#thetext').on('dblclick','.mword',word_dblclick_event_do_text_text);$(document).on('keydown',keydown_event_do_text_text);$('#thetext').hoverIntent({over:word_hover_over,out:word_hover_out,interval:150,selector:".wsty,.mwsty"})}
 function goToLastPosition(){const lookPos=LWT_DATA.text.reading_position;let pos=0;if(lookPos>0){let posObj=$(".wsty[data_pos="+lookPos+"]").not(".hide").eq(0);if(posObj.attr("data_pos")===undefined){pos=$(".wsty").not(".hide").filter(function(){return $(this).attr("data_pos")<=lookPos}).eq(-1)}}
 $(document).scrollTo(pos);focus();setTimeout(overlib,10);setTimeout(cClick,100)}
@@ -465,16 +473,18 @@ async function getPhoneticTextAsync(text,lang){return $.getJSON('api.php/v1/phon
 function deepReplace(obj,searchValue,replaceValue){for(let key in obj){if(typeof obj[key]==='object'){deepReplace(obj[key],searchValue,replaceValue)}else if(typeof obj[key]==='string'&&obj[key].includes(searchValue)){obj[key]=obj[key].replace(searchValue,replaceValue)}}}
 function deepFindValue(obj,searchValue){for(const key in obj){if(obj.hasOwnProperty(key)){if(typeof obj[key]==='string'&&obj[key].startsWith(searchValue)){return obj[key]}else if(typeof obj[key]==='object'){const result=deepFindValue(obj[key],searchValue);if(result){return result}}}}
 return null}
-function readTextWithExternalApp(text,lang){let fetchRequest=JSON.parse(LWT_DATA.language.ttsVoiceApi);deepReplace(fetchRequest,'lwt_term',text)
+function readTextWithExternal(text,voice_api,lang){let fetchRequest=JSON.parse(voice_api);deepReplace(fetchRequest,'lwt_term',text)
 deepReplace(fetchRequest,'lwt_lang',lang)
 fetchRequest.options.body=JSON.stringify(fetchRequest.options.body)
 fetch(fetchRequest.input,fetchRequest.options).then(response=>response.json()).then(data=>{const encodeString=deepFindValue(data,'data:')
 const utter=new Audio(encodeString)
 utter.play()}).catch(error=>{console.error(error)})}
-function readRawTextAloud(text,lang,rate,pitch,voice){let msg=new SpeechSynthesisUtterance();const trimmed=lang.substring(0,2);const prefix='tts['+trimmed;msg.text=text;if(lang){msg.lang=lang}
-const useVoice=voice||getCookie(prefix+'Voice]');if(useVoice){const voices=window.speechSynthesis.getVoices();for(let i=0;i<voices.length;i++){if(voices[i].name===useVoice){msg.voice=voices[i]}}}
-if(rate){msg.rate=rate}else if(getCookie(prefix+'Rate]')){msg.rate=parseInt(getCookie(prefix+'Rate]'),10)}
-if(pitch){msg.pitch=pitch}else if(getCookie(prefix+'Pitch]')){msg.pitch=parseInt(getCookie(prefix+'Pitch]'),10)}
-if(LWT_DATA.language.ttsVoiceApi){readTextWithExternalApp(text,lang)}else{window.speechSynthesis.speak(msg)}
-return msg}
-function readTextAloud(text,lang,rate,pitch,voice){if(lang.startsWith('ja')){getPhoneticTextAsync(text,lang).then(function(data){readRawTextAloud(data.phonetic_reading,lang,rate,pitch,voice)})}else{readRawTextAloud(text,lang,rate,pitch,voice)}}
+function cookieTTSSettings(language){const prefix='tts['+language;let lang_settings={};const num_vals=['Rate','Pitch'];const cookies=['Rate','Pitch','Voice'];let cookie_val;for(let cook in cookies){cookie_val=getCookie(prefix+cook+']');if(cookie_val){if(num_vals.includes(cook)){lang_settings[cook.toLowerCase()]=parseFloat(cookie_val)}else{lang_settings[cook.toLowerCase()]=cookie_val}}}
+return lang_settings}
+function readRawTextAloud(text,lang,rate,pitch,voice){let msg=new SpeechSynthesisUtterance();const tts_settings=cookieTTSSettings(lang.substring(0,2));msg.text=text;if(lang){msg.lang=lang}
+const useVoice=voice||tts_settings.voice;if(useVoice){const voices=window.speechSynthesis.getVoices();for(let i=0;i<voices.length;i++){if(voices[i].name===useVoice){msg.voice=voices[i]}}}
+if(rate){msg.rate=rate}else if(tts_settings.rate){msg.rate=tts_settings.rate}
+if(pitch){msg.pitch=pitch}else if(tts_settings.pitch){msg.pitch=tts_settings.pitch}
+window.speechSynthesis.speak(msg);return msg}
+function readTextAloud(text,lang,rate,pitch,voice,convert_to_phonetic){if(convert_to_phonetic){getPhoneticTextAsync(text,lang).then(function(data){readRawTextAloud(data.phonetic_reading,lang,rate,pitch,voice)})}else{readRawTextAloud(text,lang,rate,pitch,voice)}}
+function speechDispatcher(term,lang_abbr,lang_data){const loc_data=lang_data??LWT_DATA.language;const loc_lang_abbr=lang_abbr??loc_data.abbr;if(loc_data.ttsVoiceApi){readTextWithExternal(term,loc_data.ttsVoiceApi,loc_lang_abbr)}else{const convert_to_phonetic=loc_data.word_parsing=='mecab';const lang_settings=cookieTTSSettings(loc_lang_abbr.substring(0,2));readTextAloud(term,loc_lang_abbr,lang_settings.rate,lang_settings.pitch,lang_settings.voice,convert_to_phonetic)}}
