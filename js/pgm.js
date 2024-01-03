@@ -468,8 +468,8 @@ function goToLastPosition(){const lookPos=LWT_DATA.text.reading_position;let pos
 $(document).scrollTo(pos);focus();setTimeout(overlib,10);setTimeout(cClick,100)}
 function saveReadingPosition(text_id,position){$.post('api.php/v1/texts/'+text_id+'/reading-position',{position:position})}
 function saveAudioPosition(text_id,pos){$.post('api.php/v1/texts/'+text_id+'/audio-position',{position:pos})}
-function getPhoneticText(text,lang_id){let phoneticText;$.ajax('api.php/v1/phonetic-reading',{async:!1,data:{text:text,lang:lang_id},dataType:"json",type:"GET",}).done(function(data){phoneticText=data.phonetic_reading});return phoneticText}
-async function getPhoneticTextAsync(text,lang_id){return $.getJSON('api.php/v1/phonetic-reading',{text:text,lang:lang_id})}
+function getPhoneticText(text,lang_id){let phoneticText;$.ajax('api.php/v1/phonetic-reading',{async:!1,data:{text:text,lang_id:lang_id},dataType:"json",type:"GET",}).done(function(data){phoneticText=data.phonetic_reading});return phoneticText}
+async function getPhoneticTextAsync(text,lang_id){return $.getJSON('api.php/v1/phonetic-reading',{text:text,lang_id:lang_id})}
 function deepReplace(obj,searchValue,replaceValue){for(let key in obj){if(typeof obj[key]==='object'){deepReplace(obj[key],searchValue,replaceValue)}else if(typeof obj[key]==='string'&&obj[key].includes(searchValue)){obj[key]=obj[key].replace(searchValue,replaceValue)}}}
 function deepFindValue(obj,searchValue){for(const key in obj){if(obj.hasOwnProperty(key)){if(typeof obj[key]==='string'&&obj[key].startsWith(searchValue)){return obj[key]}else if(typeof obj[key]==='object'){const result=deepFindValue(obj[key],searchValue);if(result){return result}}}}
 return null}

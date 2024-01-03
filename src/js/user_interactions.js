@@ -188,7 +188,7 @@ function getPhoneticText(text, lang_id) {
             async: false,
             data: {
                 text: text,
-                lang: lang_id
+                lang_id: lang_id
             },
             dataType: "json",
             type: "GET",
@@ -213,7 +213,7 @@ async function getPhoneticTextAsync(text, lang_id) {
         'api.php/v1/phonetic-reading',
         {
             text: text, 
-            lang: lang_id
+            lang_id: lang_id
         }
     );
 }
