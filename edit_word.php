@@ -389,6 +389,7 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
         const TRANS_URI = <?php echo json_encode($trans_uri); ?> 
         const LANG_SHORT = <?php echo json_encode($lang_short); ?> || 
         getLangFromDict(TRANS_URI);
+        const LANG_ID = <?php echo json_encode($lang); ?>
 
         /**
          * Sets the translation of a term.
@@ -415,7 +416,7 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
          */
         const autoRomanization = function () {
             const term = $('#wordfield').val();
-            getPhoneticTextAsync(term, LANG_SHORT)
+            getPhoneticTextAsync(term, LANG_ID)
             .then(function (phonetic) {
                 newword.WoRomanization.value = phonetic["phonetic_reading"];
             });

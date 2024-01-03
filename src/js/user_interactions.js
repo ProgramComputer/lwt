@@ -176,11 +176,11 @@ function saveAudioPosition(text_id, pos) {
  * Get the phonetic version of a text.
  * 
  * @param {string} text Text to convert to phonetics.
- * @param {string} lang Language, either two letters code or four letters (BCP 47).
+ * @param {string} lang_id language id
  * 
  * @deprecated Since 2.10.0 use getPhoneticTextAsync
  */
-function getPhoneticText(text, lang) {
+function getPhoneticText(text, lang_id) {
     let phoneticText;
     $.ajax(
         'api.php/v1/phonetic-reading',
@@ -188,7 +188,7 @@ function getPhoneticText(text, lang) {
             async: false,
             data: {
                 text: text,
-                lang: lang 
+                lang: lang_id
             },
             dataType: "json",
             type: "GET",
@@ -206,14 +206,14 @@ function getPhoneticText(text, lang) {
  * Get the phonetic version of a text, asynchronous.
  * 
  * @param {string} text Text to convert to phonetics.
- * @param {string} lang Language, either two letters code or four letters (BCP 47)
+ * @param {string} lang Language id
  */
-async function getPhoneticTextAsync(text, lang) {
+async function getPhoneticTextAsync(text, lang_id) {
     return $.getJSON(
         'api.php/v1/phonetic-reading',
         {
             text: text, 
-            lang: lang 
+            lang: lang_id
         }
     );
 }

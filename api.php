@@ -188,6 +188,7 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
     if (empty($word_record)) {
         $output = array(
             "word_id" => 0,
+            "word_lg_id" =>'',
             "word_text" => '',
             "group" => ''
         );
@@ -217,6 +218,7 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
 
     return array(
         "word_id" => $word_record['WoID'],
+        "word_lg_id" => $word_record['WoLgID'],
         "solution" => $solution,
         "word_text" => $save,
         "group" => $html_sentence

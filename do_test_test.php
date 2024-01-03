@@ -468,18 +468,20 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
     );
 
     $sql = "SELECT LgName, LgDict1URI, LgDict2URI, LgGoogleTranslateURI, LgTextSize, 
-    LgRemoveSpaces, LgRegexpWordCharacters, LgRightToLeft 
-    FROM {$tbpref}languages WHERE LgID = $lgid";
+    LgRemoveSpaces, LgRegexpWordCharacters, LgRightToLeft, LgTTSVoiceAPI
+    FROM {$tbpref}languages WHERE LgID =" . convert_string_to_sqlsyntax_nonull($lgid);
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     $lang = array(
         'wb1' => isset($record['LgDict1URI']) ? $record['LgDict1URI'] : "",
         'wb2' => isset($record['LgDict2URI']) ? $record['LgDict2URI'] : "",
-        'wb3' => isset($record['LgGoogleTranslateURI']) ? $record['LgGoogleTranslateURI'] : "",
-        'textsize' => $record['LgTextSize'],
-        'removeSpaces' => $record['LgRemoveSpaces'],
-        'regexword' => $record['LgRegexpWordCharacters'],
-        'rtlScript' => $record['LgRightToLeft']
+        'wb3' => isset($record['LgGoogleTranslateURI'])?$record['LgGoogleTranslateURI']:"",
+        'word_parsing' => isset($record['LgRegexpWordCharacters'])?$record['LgRegexpWordCharacters']:"",
+        'ttsVoiceApi' => isset($record['LgTTSVoiceAPI'])?$record['LgTTSVoiceAPI']:"",
+        'textsize' =>isset($record['textsize'])?$record['textsize']:"",
+        'removeSpaces' =>isset($record['removeSpaces'])?$record['removeSpaces']:"" ,
+        'regexword' => isset($record['regexword'])?$record['regexword']:"",
+        'rtlScript' =>isset($record['rtlScript'])?$record['rtlScript']:""
     );
     mysqli_free_result($res);
 
@@ -518,7 +520,7 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
     </div>
     <?php
 
-    do_test_test_interaction_globals($lang['wb1'], $lang['wb2'], $lang['wb3']);
+    do_test_test_interaction_globals($lang['wb1'], $lang['wb2'], $lang['wb3'],$lang['word_parsing'],$lang['ttsVoiceApi']);
 
     return $count;
 }
@@ -536,7 +538,7 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
  *
  * @global string $tbpref Table prefix
  * @global int    $debug  Show the SQL query used if 1.
- *
+ * @deprecated use do_test_prepare_ajax_test_area
  * @psalm-return int<0, max>
  */
 function prepare_test_area($testsql, $totaltests, $count, $testtype): int
@@ -678,6 +680,8 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
  * @param string $wb1       URL of the first dictionary.
  * @param string $wb2       URL of the secondary dictionary.
  * @param string $wb3       URL of the google translate dictionary.
+ * @param string $word_parsing  Word parsing strategy, usually regular expression or 'mecab' 
+ * @param string $ttsWordApi       Third-party voice API 
  * @param int    $testtype  Type of test
  * @param int    $nosent    1 to use single word instead of sentence.
  * @param string $save      Word or sentence to use for the test
@@ -687,13 +691,15 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
  * @global string $tbpref  Database table prefix
  * @global string $angDefs Languages definition array
  */
-function do_test_test_interaction_globals($wb1, $wb2, $wb3)
+function do_test_test_interaction_globals($wb1, $wb2, $wb3,$word_parsing,$ttsWordApi)
 {
     ?>
 <script type="text/javascript">
     LWT_DATA.language.dict_link1 = <?php echo json_encode($wb1); ?>;
     LWT_DATA.language.dict_link2 = <?php echo json_encode($wb2); ?>;
     LWT_DATA.language.translator_link = <?php echo json_encode($wb3); ?>;
+    LWT_DATA.language.word_parsing = <?php echo json_encode($word_parsing); ?>;
+    LWT_DATA.language.ttsVoiceApi = <?php echo json_encode($ttsWordApi); ?>;
     LANG = getLangFromDict(LWT_DATA.language.translator_link);
     if (LANG && LANG != LWT_DATA.language.translator_link) {
         $("html").attr('lang', LANG);
@@ -715,7 +721,7 @@ function do_test_test_interaction_globals($wb1, $wb2, $wb3)
  * @param int    $testtype  Type of test
  * @param int    $nosent    1 to use single word instead of sentence.
  * @param string $save      Word or sentence to use for the test
- *
+ * @deprecated
  * @return void
  */
 function do_test_test_javascript_clickable($wo_record, $solution)
@@ -723,24 +729,13 @@ function do_test_test_javascript_clickable($wo_record, $solution)
     global $tbpref;
     $wid = $wo_record['WoID'];
     $abbr = getLanguageCode($wo_record['WoLgID'], LWT_LANGUAGES_ARRAY);
-    $phoneticText = phonetic_reading($wo_record['WoText'], $wo_record['WoLgID']);
+    $text = $wo_record['WoText'];
     $voiceApi = get_first_value(
         "SELECT LgTTSVoiceAPI AS value FROM {$tbpref}languages 
         WHERE LgID = " . $wo_record['WoLgID']
     );
     ?>
-<script type="text/javascript">
-    /** 
-     * Read the word aloud
-     */
-    function read_word() {
-        if (('speechSynthesis' in window) && 
-        document.getElementById('utterance-allowed').checked) {
-            const text = <?php echo json_encode($phoneticText); ?>;
-            const lang = <?php echo json_encode($abbr); ?>;
-            readRawTextAloud(text, lang);
-        }
-    }
+    <script type="text/javascript">
 
     LWT_DATA.test.solution = <?php echo prepare_textdata_js($solution); ?>;
     LWT_DATA.word.id = <?php echo $wid; ?>;
@@ -765,7 +760,8 @@ function do_test_test_javascript_clickable($wo_record, $solution)
  * @param int    $testtype  Type of test
  * @param int    $nosent    1 to use single word instead of sentence.
  * @param string $save      Word or sentence to use for the test
- *
+ * 
+ * @deprecated use do_test_prepare_ajax_test_area
  * @return void
  *
  * @global string $tbpref  Database table prefix
@@ -903,9 +899,27 @@ function do_test_test_javascript($count)
      * 
      * @param {number} word_id  Word ID
      * @param {string} solution Test answer
+     * @param {string} word_text  word text
+     * @param {string} word_lg_id  word language id
      * @param {string} group    
      */
-    function insert_new_word(word_id, solution, group) {
+    function insert_new_word(word_id, word_text,word_lg_id,solution, group) {
+        
+        
+
+                    /** 
+                    * Read the word aloud
+                    */
+                    function read_word() {
+                        if (('speechSynthesis' in window) &&
+                            document.getElementById('utterance-allowed').checked) {
+                            const text = word_text;
+                            const lang_id = word_lg_id;
+                            speechDispatcher(text, lang_id);
+                        }
+                    }
+ 
+
 
         LWT_DATA.test.solution = solution;
         LWT_DATA.word.id = word_id;
@@ -915,6 +929,8 @@ function do_test_test_javascript($count)
         $(document).on('keydown', keydown_event_do_test_test);
         $('.word')
         .on('click', word_click_event_do_test_test)
+        $('.word').on('click', read_word);
+
     }
 
     /**
@@ -947,7 +963,7 @@ function do_test_test_javascript($count)
             );
         } else {
             insert_new_word(
-                current_test.word_id, current_test.solution, current_test.group
+                current_test.word_id,current_test.word_text,current_test.word_lg_abbr,current_test.solution, current_test.group
             );
         }
     }

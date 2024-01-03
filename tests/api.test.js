@@ -41,7 +41,7 @@ describe('Calls on GET', function() {
   it('GET /phonetic-reading', function(done) {
     supertest(host)
       .get(api_path + '/phonetic-reading')
-      .query({text: 'test', lang: 'en'})
+      .query({text: 'test', lang_id: '1'})
       .expect('Content-Type', 'application/json')
       .expect(function(res) {
         expect(res.body.phonetic_reading).equal('test');

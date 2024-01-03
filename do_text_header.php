@@ -187,8 +187,7 @@ function browser_tts($text, $languageName): void
         WHERE LgName = " . convert_string_to_sqlsyntax($languageName)
     );
     $languageCode = getLanguageCode($lg_id, LWT_LANGUAGES_ARRAY);
-    // Phonetic reading for this text
-    $phoneticText = phonetic_reading($text, $lg_id);
+
     $voiceApi = get_first_value(
         "SELECT LgTTSVoiceAPI AS value FROM {$tbpref}languages 
         WHERE LgID = $lg_id"
@@ -199,7 +198,7 @@ function browser_tts($text, $languageName): void
     /// Main object for text-to-speech interaction with SpeechSynthesisUtterance
     const text_reader = {
         /// The text to read
-        text: <?php echo json_encode($phoneticText); ?>,
+        text: <?php echo json_encode($text) ?>,
 
         /// {string} ISO code for the language
         lang: getLangFromDict(LWT_DATA.language.translator_link) || <?php echo json_encode($languageCode); ?>,
@@ -218,9 +217,7 @@ function browser_tts($text, $languageName): void
             alert('Your browser does not support speechSynthesis!');
             return;
         } 
-        readRawTextAloud(
-            text_reader.text, getLangFromDict(LWT_DATA.language.translator_link) || text_reader.lang 
-        );
+            speechDispatcher(text_reader.text, getLangFromDict(LWT_DATA.language.translator_link) || text_reader.lang );
     }
 
     /** Start and stop the reading feature. */
