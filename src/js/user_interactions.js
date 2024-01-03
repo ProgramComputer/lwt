@@ -157,7 +157,7 @@ function getPhoneticText(text, lang_id) {
                 lang_id: lang_id
             },
             dataType: 'json',
-            type: 'GET',
+            type: 'GET'
         }
     )
     .done(
