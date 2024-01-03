@@ -469,7 +469,7 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
 
     $sql = "SELECT LgName, LgDict1URI, LgDict2URI, LgGoogleTranslateURI, LgTextSize, 
     LgRemoveSpaces, LgRegexpWordCharacters, LgRightToLeft, LgTTSVoiceAPI
-    FROM {$tbpref}languages WHERE LgID =" . convert_string_to_sqlsyntax_nonull($lgid);
+    FROM {$tbpref}languages WHERE LgID = $lgid";
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     $lang = array(
