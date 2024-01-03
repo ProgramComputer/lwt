@@ -9,6 +9,8 @@ ones are marked like "v1.0.0-fork".
 
 ### Added
 
+* Support for Japanese with MeCab on Mac! This was added thanks to 
+[quopquai](https://github.com/quopquai) on [#135](https://github.com/HugoFara/lwt/issues/135).
 * `unloadformcheck.js` now declares a new object `lwt_form_check` that contains all the functions needed.
 * New globals ([#163](https://github.com/HugoFara/lwt/issues/163)):
   * On `inc/kernel_utility.php`: `LWT_APP_VERSION` and `LWT_RELEASE_DATE`.
@@ -40,6 +42,11 @@ ones are marked like "v1.0.0-fork".
 * On word review, status + 1 can be set only after word display. Before, you could 
 press key up at any time to increase term status, but keydown was effective only 
 after solution display ([#159](https://github.com/HugoFara/lwt/issues/159)).
+* New files:
+  * `inc/feeds.php` and `inc/tags.php`, stemmed from `inc/session_utility.php`. 
+  It should not lead to any code or behaviour change.
+  * `src/js/overlib_interface.js`, stemmed from `src/js/pgm.js`. It contains all the 
+  overlib interactions.
 
 ### Fixed
 
