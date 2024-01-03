@@ -207,15 +207,30 @@ function do_test_desktop_page($property=null)
 style="position: fixed; top: 2%; right: 0; height: 98vh; 
 width: <?php echo 100 - $frame_l_width; ?>%;display:flex; flex-direction: column;">
     <!-- iFrames wrapper for events -->
-    <iframe src="empty.html" scrolling="auto" name="ro" 
+    <iframe src="empty.html" scrolling="auto"  id="ro" name="ro" 
     style="height: 50%; width: 100%;resize:vertical;">
         Your browser doesn't support iFrames, update it!
     </iframe>
-    <iframe src="empty.html" scrolling="auto" name="ru" 
-    style="height: 50%; width: 100%; resize:vertical;">
+    <iframe src="empty.html" scrolling="auto"  id="ru" name="ru" 
+    style="height: 50%; width: 100%;">
         Your browser doesn't support iFrames, update it!
     </iframe>
 </div>
+<script>
+function adjustIframeHeights(entries) {
+  for (const entry of entries) {
+
+
+
+
+            const heightDifference = $("#frames-r").height() - entry.contentRect.height - $('#ru').height();
+            $('#ru').height($('#ru').height() + heightDifference + 'px');
+}
+        }
+
+        var iframeObserver = new ResizeObserver(adjustIframeHeights);
+        iframeObserver.observe(document.getElementById("ro"));
+</script>
 <audio id="success_sound">
     <source src="<?php print_file_path("sounds/success.mp3") ?>" type="audio/mpeg" />
     Your browser does not support audio element!
