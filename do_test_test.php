@@ -719,7 +719,7 @@ function do_test_test_interaction_globals($wb1, $wb2, $wb3, $lg_id,$voiceApi)
  * @param array  $wo_record Word record. Associative array with keys 'WoID',
  *                          'WoTranslation'.
  * @param string $solution Solution to the test (as HTML)
- *
+ * @deprecated
  * @return void
  */
 function do_test_test_javascript_clickable($wo_record, $solution)
@@ -766,7 +766,7 @@ function do_test_test_javascript_clickable($wo_record, $solution)
  * @param int    $testtype  Type of test
  * @param int    $nosent    1 to use single word instead of sentence.
  * @param string $save      Word or sentence to use for the test
- *
+ * @deprecated
  * @return void
  *
  * @global string $tbpref  Database table prefix
@@ -1024,7 +1024,7 @@ function do_test_test_javascript($count)
  * Do the main content of a test page.
  *
  * @global int $debug Show debug informations
- *
+ * @deprecated
  * @return void
  */
 function do_test_test_content()
