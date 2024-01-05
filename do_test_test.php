@@ -1024,7 +1024,7 @@ function do_test_test_javascript($count)
  * Do the main content of a test page.
  *
  * @global int $debug Show debug informations
- * @deprecated
+ * @deprecated use do_test_test_content_ajax
  * @return void
  */
 function do_test_test_content()
