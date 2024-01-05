@@ -228,7 +228,7 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
     if (empty($word_record)) {
         $output = array(
             "word_id" => 0,
-            "word_lg_id" => 0,
+            "word_lg_abbr" => 0,
             "word_text" => '',
             "group" => '',
             "startSec" => 0,
@@ -259,10 +259,10 @@ function get_word_test_ajax($testsql, $word_mode, $lgid, $wordregex, $testtype):
         $wordregex
     );
     $solution = get_test_solution($testtype, $word_record, $word_mode, $save);
-
+    $abbr = getLanguageCode($word_record['WoLgID'],LWT_LANGUAGES_ARRAY);
     return array(
         "word_id" => $word_record['WoID'],
-        "word_lg_id" =>$word_record['WoLgID'],
+        "word_lg_abbr" =>$abbr,
         "solution" => $solution,
         "word_text" => $save,
         "group" => $html_sentence,        

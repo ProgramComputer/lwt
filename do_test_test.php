@@ -964,12 +964,13 @@ function do_test_test_javascript($count)
      * @param {number} start_sec  starting second
      * @param {number} end_sec  ending second
      * @param {string} word_text  word text
-     * @param {string} word_lg_id  Word ID
+     * @param {string} word_lg_abbr  Word abbr
      * @param {string} solution Test answer
      * @param {string} group    
      */
-    function insert_new_word(word_id,tx_id,start_sec,end_sec,word_text,word_lg_id, solution, group) {
-
+    function insert_new_word(word_id,tx_id,start_sec,end_sec,word_text,word_lg_abbr, solution, group) {
+        
+        
 
                     /** 
                     * Read the word aloud
@@ -978,8 +979,8 @@ function do_test_test_javascript($count)
                         if (('speechSynthesis' in window) &&
                             document.getElementById('utterance-allowed').checked) {
                             const text = word_text;
-                            const lang_id = word_lg_id;
-                            speechDispatcher(text, lang_id);
+                            const lang = word_lg_abbr;
+                            speechDispatcher(text, lang);
                         }
                     }
                 
@@ -1055,7 +1056,7 @@ playsentence.setAttribute('data-end-time',end_sec)
             );
         } else {
             insert_new_word(
-                current_test.word_id,current_test.txID,current_test.startSec,current_test.endSec,current_test.word_text,current_test.word_lg_id,current_test.solution, current_test.group
+                current_test.word_id,current_test.txID,current_test.startSec,current_test.endSec,current_test.word_text,current_test.word_lg_abbr,current_test.solution, current_test.group
             );
         }
     }
