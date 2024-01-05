@@ -474,11 +474,12 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
     $lang = array(
         'wb1' => isset($record['LgDict1URI']) ? $record['LgDict1URI'] : "",
         'wb2' => isset($record['LgDict2URI']) ? $record['LgDict2URI'] : "",
-        'wb3' => isset($record['LgGoogleTranslateURI']) ? $record['LgGoogleTranslateURI'] : "",
-        'textsize' => $record['LgTextSize'],
-        'removeSpaces' => $record['LgRemoveSpaces'],
-        'regexword' => $record['LgRegexpWordCharacters'],
-        'rtlScript' => $record['LgRightToLeft']
+        'ttsVoiceApi' => isset($record['LgTTSVoiceAPI'])?$record['LgTTSVoiceAPI']:"",
+        'wb3' => isset($record['LgGoogleTranslateURI'])?$record['LgGoogleTranslateURI']:"",
+        'textsize' =>isset($record['textsize'])?$record['textsize']:"",
+        'removeSpaces' =>isset($record['removeSpaces'])?$record['removeSpaces']:"" ,
+        'regexword' => isset($record['regexword'])?$record['regexword']:"",
+        'rtlScript' =>isset($record['rtlScript'])?$record['rtlScript']:""
     );
     mysqli_free_result($res);
 
@@ -524,8 +525,7 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
     do_test_test_interaction_globals(
         $lang['wb1'],
         $lang['wb2'],
-        $lang['wb3'],
-        $lgid
+        $lang['wb3'],$lgid,$lang['ttsVoiceApi'],
     );
 
     return $count;
@@ -684,6 +684,8 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
  * @param string $wb1   URL of the first dictionary.
  * @param string $wb2   URL of the secondary dictionary.
  * @param string $wb3   URL of the google translate dictionary.
+ * @param string $voiceApi Third-party voice API 
+
  * @param int    $lg_id Language ID (since 2.10.0-fork)
  *
  * @return void
@@ -692,10 +694,11 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
  *
  * @since 2.10.0-fork Takes a language ID as the fourth argument
  */
-function do_test_test_interaction_globals($wb1, $wb2, $wb3, $lg_id)
+function do_test_test_interaction_globals($wb1, $wb2, $wb3, $lg_id,$voiceApi)
 {
     ?>
 <script type="text/javascript">
+    LWT_DATA.language.ttsVoiceApi = <?php echo json_encode($voiceApi); ?>;
     LWT_DATA.language.id = <?php echo json_encode($lg_id); ?>;
     LWT_DATA.language.dict_link1 = <?php echo json_encode($wb1); ?>;
     LWT_DATA.language.dict_link2 = <?php echo json_encode($wb2); ?>;
