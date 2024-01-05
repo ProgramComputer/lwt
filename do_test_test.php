@@ -980,7 +980,7 @@ function do_test_test_javascript($count)
                             document.getElementById('utterance-allowed').checked) {
                             const text = word_text;
                             const lang = word_lg_abbr;
-                            readRawTextAloud(text, lang);
+                            speechDispatcher(text, lang);
                         }
                     }
                 
