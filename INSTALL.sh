@@ -4,7 +4,7 @@
 apt_get_cmd=$(which apt-get)
 yum_cmd=$(which yum)
 
-packages="apache2 libapache2-mod-php php php-mbstring php-mysql mysql-server"
+packages="apache2 libapache2-mod-php php php-xml php-mbstring php-mysql mysql-server"
 
 echo "Installing dependencies"
 if [ ! -z $apt_get_cmd ]; then
@@ -27,7 +27,8 @@ echo
 
 # Database access settings
 echo "LWT needs to know how to access the database. You can change this options later in 'connect.inc.php'."
-host=127.0.0.1
+read -p "Database host [localhost]: " -r host
+host=${host:-localhost}
 read -p "Database User Name [lwt]: " -r user
 user=${user:-lwt}
 read -p "Database Password [abcxyz]: " -r passwd

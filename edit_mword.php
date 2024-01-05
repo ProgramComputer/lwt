@@ -31,14 +31,13 @@ require_once 'inc/classes/Term.php';
  */
 function export_term_js_dict($term): string 
 {
+    $translation = $term->translation . getWordTagList($term->id, ' ', 1, 0);
     $raw_answer = json_encode(
         array(
             "woid" => $term->id,
-            "text" =>  $term->text,
+            "text" => $term->text,
             "romanization" => $term->roman,
-            "translation" => prepare_textdata_js(
-                $term->translation . getWordTagList($term->id, ' ', 1, 0)
-            ),
+            "translation" => $translation,
             "status" => $term->status
         )
     );
@@ -213,17 +212,16 @@ function edit_mword_do_update($term, $newstatus)
     $term->status = (int) $_REQUEST["WoStatus"];
     ?>
     <script type="text/javascript">
-    //<![CDATA[
         function update_mword(mword, oldstatus) {
             const context = window.parent.document;
             let title = '';
-            if (window.parent.JQ_TOOLTIP) 
+            if (window.parent.LWT_DATA.settings.jQuery_tooltip) 
                 title = make_tooltip(
-                    mword.text, mword.trans, mword.roman, mword.status
+                    mword.text, mword.translation, mword.romanization, mword.status
                 );
             $('.word' + mword.woid, context)
-            .attr('data_trans', mword.trans)
-            .attr('data_rom', mword.roman)
+            .attr('data_trans', mword.translation)
+            .attr('data_rom', mword.romanization)
             .attr('title', title)
             .removeClass('status' + oldstatus)
             .addClass('status' + mword.status)
@@ -234,7 +232,6 @@ function edit_mword_do_update($term, $newstatus)
             <?php echo export_term_js_dict($term); ?>, 
             <?php echo (int) $_REQUEST['WoOldStatus']; ?>
         );
-    //]]>
     </script>
     <?php
     return $message;
@@ -336,7 +333,7 @@ function edit_mword_display_new($term, $tid, $ord, $len)
     ?>
 
     <script type="text/javascript">
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(window).on('beforeunload',function() {
             setTimeout(function() {
                 window.parent.frames['ru'].location.href = 'empty.html';
@@ -448,7 +445,7 @@ function edit_mword_display_change($term, $tid, $ord)
         ?>
     
     <script type="text/javascript">
-        $(document).ready(ask_before_exiting);
+        $(document).ready(lwt_form_check.askBeforeExit);
         $(window).on('beforeunload',function() {
             setTimeout(function() {
                 window.parent.frames['ru'].location.href = 'empty.html';

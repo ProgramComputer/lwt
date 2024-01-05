@@ -15,7 +15,9 @@
     "require": {
         "php": "^8.0 | ^8.1 | ^8.2",
         "ext-mbstring": "*",
-        "ext-mysqli": "*"
+        "ext-mysqli": "*",
+        "mantas-done/subtitles": "^1.0",
+        "ext-dom": "*"
     },
     "require-dev": {
         "vimeo/psalm": "^5.6",

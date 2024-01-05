@@ -141,7 +141,7 @@ if (isset($_REQUEST['markaction'])) {
                     foreach($_REQUEST['marked'] as $id) {
                         if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'archivedtexts where AtID = ' . $id)) !== null)
                         {
-                    unlink(ltrim($uri,"lwt/"));
+                    unlink(ltrim($uri,basename(getcwd())."/"));
                         }
                     }
                     $message = runsql(
@@ -234,7 +234,7 @@ if (isset($_REQUEST['markaction'])) {
 if (isset($_REQUEST['del'])) {
     if(($uri = get_first_value("SELECT TxAudioURI as value from " . $tbpref . 'archivedtexts where AtID = ' . $_REQUEST['del'])) !== null)
     {
-unlink(ltrim($uri,"lwt/"));
+unlink(ltrim($uri,basename(getcwd())."/"));
     }
     // DEL
     $message = runsql(
@@ -349,7 +349,7 @@ if (isset($_REQUEST['chg'])) {
         ?>
     
      <script type="text/javascript" charset="utf-8">
-         $(document).ready(ask_before_exiting);
+         $(document).ready(lwt_form_check.askBeforeExit);
      </script>
      <h2>Edit Archived Text</h2>
      <form class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>#rec<?php echo $_REQUEST['chg']; ?>" method="post">
@@ -408,7 +408,7 @@ if (isset($_REQUEST['chg'])) {
         </tr>
         <tr>
             <td class="td1 right" colspan="2">
-                <input type="button" value="Cancel" onclick="{resetDirty(); location.href='edit_archivedtexts.php#rec<?php echo $_REQUEST['chg']; ?>';}" /> 
+                <input type="button" value="Cancel" onclick="{lwt_form_check.resetDirty(); location.href='edit_archivedtexts.php#rec<?php echo $_REQUEST['chg']; ?>';}" /> 
                 <input type="submit" name="op" value="Change" />
             </td>
         </tr>
