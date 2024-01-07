@@ -14,7 +14,7 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
     echo 'mysqli.allow_local_infile = On' >> "$PHP_INI_DIR/php.ini"
 
 RUN docker-php-ext-install pdo pdo_mysql mysqli
-RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod a+rx /usr/local/bin/yt-dlp 
+RUN apt-get update -y && apt-get install python3.6 -y  && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod a+rx /usr/local/bin/yt-dlp 
 RUN mkdir media && chmod -R 777 media
 COPY . /var/www/html/lwt
 
