@@ -20,7 +20,6 @@ plugins
 # Backup files (Doxygen)
 *.bak
 
-vendor/
 .phpunit.result.cache
 
 composer.phar

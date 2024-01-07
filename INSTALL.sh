@@ -23,7 +23,6 @@ echo
 echo "Enabling mbstring and mysqli (PHP extensions necessary for LWT)..."
 sudo phpenmod -s apache2 mbstring
 sudo phpenmod -s apache2 mysqli
-sudo composer install
 echo 
 
 # Database access settings

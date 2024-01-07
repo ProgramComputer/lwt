@@ -14,7 +14,6 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
     echo 'mysqli.allow_local_infile = On' >> "$PHP_INI_DIR/php.ini"
 
 RUN docker-php-ext-install pdo pdo_mysql mysqli
-RUN apt update &&  apt install composer && composer install
 
 COPY . /var/www/html/lwt
 
