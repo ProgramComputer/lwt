@@ -4,7 +4,7 @@
 apt_get_cmd=$(which apt-get)
 yum_cmd=$(which yum)
 
-packages="apache2 libapache2-mod-php php php-xml php-mbstring php-mysql mysql-server"
+packages="apache2 libapache2-mod-php php php-xml php-mbstring php-mysql mysql-server composer"
 
 echo "Installing dependencies"
 if [ ! -z $apt_get_cmd ]; then
@@ -23,6 +23,7 @@ echo
 echo "Enabling mbstring and mysqli (PHP extensions necessary for LWT)..."
 sudo phpenmod -s apache2 mbstring
 sudo phpenmod -s apache2 mysqli
+sudo composer install
 echo 
 
 # Database access settings
