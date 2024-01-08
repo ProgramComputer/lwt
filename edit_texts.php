@@ -264,7 +264,8 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
             );
             $count += (int) runsql(
                 'UPDATE ' . $tbpref . 'words 
-                SET WoSentence = ' . convert_string_to_sqlsyntax(repl_tab_nl($sent[1])) . ' 
+                SET WoSentence = ' . convert_string_to_sqlsyntax(repl_tab_nl($sent[1])) . '
+                , WoSeID = ' . $record['SeID'] . '
                 WHERE WoID = ' . $record['WoID'], 
                 ''
             );
@@ -291,6 +292,7 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
             $count += (int) runsql(
                 'update ' . $tbpref . 'words 
                 set WoSentence = ' . convert_string_to_sqlsyntax(repl_tab_nl($sent[1])) . ' 
+                , WoSeID = ' . $record['SeID'] . '
                 where WoID = ' . $record['WoID'], 
                 ''
             );

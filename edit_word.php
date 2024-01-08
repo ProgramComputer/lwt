@@ -47,7 +47,7 @@ function insert_new_word($textlc, $translation): array
         'INSERT INTO ' . $tbpref . 'words 
         (
             WoLgID, WoTextLC, WoText, WoStatus, WoTranslation, 
-            WoSentence, WoWordCount, WoRomanization, WoStatusChanged,' 
+            WoSentence, WoSeID, WoWordCount, WoRomanization, WoStatusChanged,' 
             .  make_score_random_insert_update('iv') . '
         ) VALUES( 
             ' . $_REQUEST["WoLgID"] . ', ' .
@@ -55,7 +55,7 @@ function insert_new_word($textlc, $translation): array
             convert_string_to_sqlsyntax($_REQUEST["WoText"]) . ', ' .
             $_REQUEST["WoStatus"] . ', ' .
             convert_string_to_sqlsyntax($translation) . ', ' .
-            convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . ', 1, ' .
+            convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . ', ' .$_REQUEST["WoSeID"]  . ', 1, ' .
             convert_string_to_sqlsyntax($_REQUEST["WoRomanization"]) . ', NOW(), ' .  
             make_score_random_insert_update('id') . 
         ')', 
@@ -96,7 +96,8 @@ function edit_term($translation)
         'update ' . $tbpref . 'words set WoText = ' . 
         convert_string_to_sqlsyntax($_REQUEST["WoText"]) . ', WoTranslation = ' . 
         convert_string_to_sqlsyntax($translation) . ', WoSentence = ' . 
-        convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . ', WoRomanization = ' .
+        convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) .', WoSeID = ' . 
+        $_REQUEST["WoSeID"] .', WoRomanization = ' .
         convert_string_to_sqlsyntax($_REQUEST["WoRomanization"]) . $xx . ',' . 
         make_score_random_insert_update('u') . 
         ' where WoID = ' . $_REQUEST["WoID"], "Updated"
@@ -325,6 +326,8 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
  <form name="newword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
  <input type="hidden" name="fromAnn" value="<?php echo $fromAnn; ?>" />
  <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $lang; ?>" />
+ <!--  WOSeID changes when sentences copy -->
+ <input type="hidden" name="WoSeID" value="" />
  <input type="hidden" name="WoTextLC" value="<?php echo tohtml($termlc); ?>" />
  <input type="hidden" name="tid" value="<?php echo $text_id; ?>" />
  <input type="hidden" name="ord" value="<?php echo $ord; ?>" />
@@ -432,10 +435,10 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
     </script>
         <?php
         // Display example sentence button
-        example_sentences_area($lang, $termlc, 'document.forms.newword.WoSentence', 0);
+        example_sentences_area($lang, $termlc, 'document.forms.newword.WoSentence', 'document.forms.newword.WoSeID',0);
     } else {
         // CHG
-        $sql = "SELECT WoTranslation, WoSentence, WoRomanization, WoStatus 
+        $sql = "SELECT WoTranslation, WoSentence, WoRomanization, WoStatus, WoSeID 
         FROM {$tbpref}words WHERE WoID = $wid";
         $res = do_mysqli_query($sql);
         if ($record = mysqli_fetch_assoc($res)) {
@@ -468,6 +471,7 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
      <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $lang; ?>" />
      <input type="hidden" name="fromAnn" value="<?php echo $fromAnn; ?>" />
      <input type="hidden" name="WoID" value="<?php echo $wid; ?>" />
+     <input type="hidden" name="WoSeID" value="<?php echo  $record['WoSeID']?>" />
      <input type="hidden" name="WoOldStatus" value="<?php echo $record['WoStatus']; ?>" />
      <input type="hidden" name="WoTextLC" value="<?php echo tohtml($termlc); ?>" />
      <input type="hidden" name="tid" value="<?php echo getreq('tid'); ?>" />
@@ -550,7 +554,7 @@ function edit_word_do_form($wid, $text_id, $ord, $fromAnn)
             <?php
             // Display example sentences button
             example_sentences_area(
-                $lang, $termlc, 'document.forms.editword.WoSentence', $wid
+                $lang, $termlc, 'document.forms.editword.WoSentence','document.forms.editword.WoSeID', $wid
             );
         }
         mysqli_free_result($res);

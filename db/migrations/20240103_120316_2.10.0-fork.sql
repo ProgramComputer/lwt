@@ -15,7 +15,10 @@ ALTER TABLE `languages`
 ALTER TABLE `texts` 
     MODIFY COLUMN `TxAudioURI` VARCHAR(2048) NOT NULL;
 
+ALTER TABLE `sentences` 
+    ADD COLUMN `SeStartSec` int(11) unsigned NOT NULL DEFAULT '0',  
+    ADD COLUMN `SeEndSec` int(11) unsigned NOT NULL DEFAULT '0';
+ALTER TABLE `words` 
+    ADD COLUMN `WoSeID` mediumint(8) unsigned DEFAULT NULL;
 
-ALTER TABLE `{$tbpref}sentences` 
-    ADD  SeStartSec int(11) unsigned NOT NULL DEFAULT '0',  
-    ADD SeEndSec int(11) unsigned NOT NULL DEFAULT '0';
+     
