@@ -24,6 +24,4 @@ ARG DB_PASSWORD=root
 ARG DB_DATABASE=learning-with-texts
 
 RUN printf '<?php\n$server = "%s";\n$userid = "%s";\n$passwd = "%s";\n$dbname = "%s";\n?>' "$DB_HOSTNAME" "$DB_USER" "$DB_PASSWORD" "$DB_DATABASE" > /var/www/html/lwt/connect.inc.php
-
-ENTRYPOINT chmod -R 777 /var/www/html/lwt/media
-
+ENTRYPOINT ["/bin/bash", "-c", "chmod -R 777 /var/www/html/lwt/media"]
