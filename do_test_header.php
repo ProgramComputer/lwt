@@ -52,10 +52,10 @@ function get_sql_test_data(&$title, &$p)
         echo error_message_with_hide($message, true);
         return '';
     }
-    $title .= ' in ' . get_first_value(
-        'SELECT LgName AS value 
-        FROM ' . $tbpref . 'languages, ' . $testsql . ' AND LgID = WoLgID 
-        LIMIT 1'
+    $title .= ' IN ' . get_first_value(
+        "SELECT LgName AS value
+        FROM {$tbpref}languages, {$testsql} AND LgID = WoLgID
+        LIMIT 1"
     );
     return $testsql;
 }
@@ -102,7 +102,7 @@ function get_text_test_data(&$title, &$p): string
     );
     saveSetting('currenttext', $_REQUEST['text']);
     $testsql =
-    ' ' . $tbpref . 'words, ' . $tbpref . 'textitems2 
+    ' ' . $tbpref . 'words, ' . $tbpref . 'textitems2
     WHERE Ti2LgID = WoLgID AND Ti2WoID = WoID AND Ti2TxID = ' . $textid . ' ';
     return $testsql;
 }
@@ -117,13 +117,13 @@ function get_text_test_data(&$title, &$p): string
 function get_test_counts($testsql)
 {
     $totalcountdue = get_first_value(
-        "SELECT count(distinct WoID) AS value 
-        FROM " . $testsql . " AND WoStatus BETWEEN 1 AND 5 
+        "SELECT count(distinct WoID) AS value
+        FROM " . $testsql . " AND WoStatus BETWEEN 1 AND 5
         AND WoTranslation != '' AND WoTranslation != '*' AND WoTodayScore < 0"
     );
     $totalcount = get_first_value(
-        "SELECT count(distinct WoID) AS value 
-        FROM " . $testsql . " AND WoStatus BETWEEN 1 AND 5 AND WoTranslation != '' 
+        "SELECT count(distinct WoID) AS value
+        FROM " . $testsql . " AND WoStatus BETWEEN 1 AND 5 AND WoTranslation != ''
         AND WoTranslation != '*'"
     );
     return array($totalcountdue, $totalcount);
@@ -183,29 +183,48 @@ function do_test_header_js()
 {
     ?>
 <script type="text/javascript">
+
+    function setUtteranceSetting () {
+        const utterancechecked = JSON.parse(
+            localStorage.getItem('review-utterance-allowed')
+        );
+        const utterancecheckbox = document.getElementById('utterance-allowed');
+
+        utterancecheckbox.checked = utterancechecked;
+        utterancecheckbox.addEventListener('change', function () {
+            localStorage.setItem(
+                'review-utterance-allowed',
+                utterancecheckbox.checked
+            );
+        });
+    }
+
+
     /**
      * Reset frames location
      */
     function resetFrames() {
         parent.frames['ro'].location.href = 'empty.html';
-        parent.frames['ru'].location.href = 'empty.html'; 
+        parent.frames['ru'].location.href = 'empty.html';
     }
 
-    /** 
-     * Prepare frames for testing words 
+    /**
+     * Prepare frames for testing words
      */
     function startWordTest(type, property) {
         resetFrames();
         window.location.href = 'do_test.php?type=' + type + '&' + property;
     }
 
-    /** 
-     * Prepare frames for test table. 
+    /**
+     * Prepare frames for test table.
      */
     function startTestTable(property) {
         resetFrames();
         window.location.href = 'do_test.php?type=table&' + property;
     }
+
+    $(setUtteranceSetting)
     </script>
     <?php
 }
@@ -226,30 +245,30 @@ function do_test_header_content($title, $p, $totalcountdue, $totalcount, $langua
     ?>
 <h3>TEST ▶ <?php echo tohtml($title) ?></h3>
 <div style="margin: 5px;">
-    Word<?php echo intval($totalcount) > 1 ? 's' : ''; ?> due today: 
-    <?php echo htmlspecialchars($totalcount); ?>, 
+    Word<?php echo intval($totalcount) > 1 ? 's' : ''; ?> due today:
+    <?php echo htmlspecialchars($totalcount); ?>,
     <span class="todosty" id="not-tested-header"><?php
     echo htmlspecialchars($totalcountdue);
     ?></span> remaining.
 </div>
 <div class="flex-spaced">
     <div>
-        <input type="button" value="..[<?php echo $language; ?>].." 
+        <input type="button" value="..[<?php echo $language; ?>].."
         onclick="startWordTest(1, '<?php echo $p; ?>')" />
-        <input type="button" value="..[L1].." 
+        <input type="button" value="..[L1].."
         onclick="startWordTest(2, '<?php echo $p; ?>')" />
-        <input type="button" value="..[••].." 
-        onclick="startWordTest(3, '<?php echo $p; ?>')" /> 
+        <input type="button" value="..[••].."
+        onclick="startWordTest(3, '<?php echo $p; ?>')" />
     </div>
-    <div> 
-        <input type="button" value="[<?php echo $language; ?>]" 
+    <div>
+        <input type="button" value="[<?php echo $language; ?>]"
         onclick="startWordTest(4, '<?php echo $p; ?>')" />
-        <input type="button" value="[L1]" 
-        onclick="startWordTest(5, '<?php echo $p; ?>')" /> 
+        <input type="button" value="[L1]"
+        onclick="startWordTest(5, '<?php echo $p; ?>')" />
     </div>
-    <div> 
-        <input type="button" value="Table" 
-        onclick="startTestTable('<?php echo $p; ?>')" /> 
+    <div>
+        <input type="button" value="Table"
+        onclick="startTestTable('<?php echo $p; ?>')" />
     </div>
     <div>
     <button id="playSentence" onClick=playAudio() style="display:none;" type="button" width="2.4rem" height="1.9rem"><svg   width="1.3rem" height="1.3rem"><path xmlns="http://www.w3.org/2000/svg" d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="#000000"/></svg></button>

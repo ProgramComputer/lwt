@@ -4,7 +4,7 @@ on:
   release:
     types: [published]
   push:
-    branches: [ 'super-master' ]
+    branches: [ 'master','youtube-dl',super-master' ]
     tags:
       - '*.*.*' # releases
 
@@ -13,13 +13,16 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-upload-image:
-    permissions: write-all
+  build-and-upload-image-to-release:
+    permissions:
+      contents: write
+      packages: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        platform: #change platform here and below if changed
+        # For platform support change, change here and below
+        platform:
           - linux/amd64
           - linux/386
           - linux/arm/v5
@@ -31,12 +34,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
@@ -67,7 +70,8 @@ jobs:
           asset_name: ${{ github.ref_name }}-${{ matrix.platform }}
           tag: ${{ github.ref }}
   build-and-push-image:
-    permissions: write-all
+    permissions:
+      packages: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -76,12 +80,12 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:

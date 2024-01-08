@@ -780,22 +780,23 @@ function do_test_test_javascript_clickable($wo_record, $solution, $startSec, $en
 {
     global $tbpref;
     $wid = $wo_record['WoID'];
-   /* $lang = get_first_value(
-        'SELECT LgName AS value FROM ' . $tbpref . 'languages
-        WHERE LgID = ' . $wo_record['WoLgID'] . '
-        LIMIT 1'
-    );
-    $abbr = $langDefs[$lang][1];*/
-    $abbr = getLanguageCode($wo_record['WoLgID'], LWT_LANGUAGES_ARRAY);
-    $phoneticText = phonetic_reading($wo_record['WoText'], $abbr);
     $voiceApi = get_first_value(
         "SELECT LgTTSVoiceAPI AS value FROM {$tbpref}languages 
         WHERE LgID = " . $wo_record['WoLgID']
     );
     ?>
-    <script type="text/javascript">
-   
+<script type="text/javascript">
+    /** 
+     * Read the word aloud
+     */
+    function read_word() {
+        speechDispatcher(
+            <?php echo json_encode($wo_record['WoText']); ?>, 
+            <?php echo json_encode($wo_record['WoLgID']); ?>
+        );
+    }
 
+    LWT_DATA.language.id = <?php echo json_encode($wo_record['WoLgID']); ?>;
     LWT_DATA.test.solution = <?php echo prepare_textdata_js($solution); ?>;
     LWT_DATA.word.id = <?php echo $wid; ?>;
     LWT_DATA.language.ttsVoiceApi = <?php echo json_encode($voiceApi); ?>;
@@ -879,45 +880,43 @@ function do_test_footer($notyettested, $wrong, $correct)
     $l_wrong = round($wrong * $totaltestsdiv, 0);
     $l_correct = round($correct * $totaltestsdiv, 0);
     ?>
-    <footer id="footer">
-        <span style="margin-left: 15px; margin-right: 15px;">
-            <img src="icn/clock.png" title="Elapsed Time" alt="Elapsed Time" />
-            <span id="timer" title="Elapsed Time"></span>
+<footer id="footer">
+    <span style="margin-left: 15px; margin-right: 15px;">
+        <img src="icn/clock.png" title="Elapsed Time" alt="Elapsed Time" />
+        <span id="timer" title="Elapsed Time"></span>
+    </span>
+    <span style="margin-left: 15px; margin-right: 15px;">
+        <img id="not-tested-box" class="borderl" 
+        src="<?php print_file_path('icn/test_notyet.png');?>" 
+        title="Not yet tested" alt="Not yet tested" height="10" 
+        width="<?php echo $l_notyet; ?>" 
+        /><img 
+        id="wrong-tests-box" class="bordermiddle" 
+        src="<?php print_file_path('icn/test_wrong.png');?>" 
+        title="Wrong" alt="Wrong" height="10" width="<?php echo $l_wrong; ?>" 
+        /><img 
+        id="correct-tests-box" class="borderr" 
+        src="<?php print_file_path('icn/test_correct.png');?>" 
+        title="Correct" alt="Correct" height="10" width="<?php echo $l_correct; ?>" />
+    </span>
+    <span style="margin-left: 15px; margin-right: 15px;">
+        <span title="Total number of tests" id="total_tests">
+            <?php echo $totaltests; ?>
+        </span> 
+        =
+        <span class="todosty" title="Not yet tested" id="not-tested">
+            <?php echo $notyettested; ?>
         </span>
-        <span style="margin-left: 15px; margin-right: 15px;">
-            <img id="not-tested-box" class="borderl" src="<?php print_file_path('icn/test_notyet.png'); ?>"
-                title="Not yet tested" alt="Not yet tested" height="10" width="<?php echo $l_notyet; ?>" /><img
-                id="wrong-tests-box" class="bordermiddle" src="<?php print_file_path('icn/test_wrong.png'); ?>" title="Wrong"
-                alt="Wrong" height="10" width="<?php echo $l_wrong; ?>" /><img id="correct-tests-box" class="borderr"
-                src="<?php print_file_path('icn/test_correct.png'); ?>" title="Correct" alt="Correct" height="10"
-                width="<?php echo $l_correct; ?>" />
+        +
+        <span class="donewrongsty" title="Wrong" id="wrong-tests">
+            <?php echo $wrong; ?>
         </span>
-        <span style="margin-left: 15px; margin-right: 15px;">
-            <span title="Total number of tests" id="total_tests">
-                <?php
-                echo $totaltests;
-                ?>
-            </span>
-            =
-            <span class="todosty" title="Not yet tested" id="not-tested">
-                <?php
-                echo $notyettested;
-                ?>
-            </span>
-            +
-            <span class="donewrongsty" title="Wrong" id="wrong-tests">
-                <?php
-                echo $wrong;
-                ?>
-            </span>
-            +
-            <span class="doneoksty" title="Correct" id="correct-tests">
-                <?php
-                echo $correct;
-                ?>
-            </span>
+        +
+        <span class="doneoksty" title="Correct" id="correct-tests">
+            <?php echo $correct; ?>
         </span>
-    </footer>
+    </span>
+</footer>
     <?php
 }
 
