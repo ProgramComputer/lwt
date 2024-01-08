@@ -1773,9 +1773,9 @@ function check_update_db($debug, $tbpref, $dbname): void
     $queries = parseSQLFile(__DIR__ . "/../db/schema/baseline.sql");
     foreach ($queries as $query) {
         $prefixed_query = prefixSQLQuery($query, $tbpref);
-        // Increment count for new tables only
+        $pre_row_count = runsql($prefixed_query, "");
         if (!str_starts_with($query, "INSERT INTO _migrations")) {
-            $count += runsql($prefixed_query, "");
+            $count += $pre_row_count;
         }
     }
 
