@@ -976,7 +976,7 @@ function do_test_test_javascript($count)
             );
         } else {
             insert_new_word(
-                current_test.word_id,current_test.word_text,current_test.word_lg_id current_test.solution, current_test.group
+                current_test.word_id,current_test.word_text,current_test.word_lg_id, current_test.solution, current_test.group
             );
             if ($('#utterance-allowed').prop('checked')) {
                 prepareWordReading(current_test.word_text, LWT_DATA.language.id);
