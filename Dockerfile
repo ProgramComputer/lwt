@@ -11,10 +11,10 @@ LABEL org.opencontainers.image.source="https://github.com/HugoFara/lwt"
 
 # creating config file php.ini 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
-    echo 'mysqli.allow_local_infile = On' >> "$PHP_INI_DIR/php.ini"
+    echo 'mysqli.allow_local_infile = On' >> "$PHP_INI_DIR/php.ini" && \
+    docker-php-ext-install pdo pdo_mysql mysqli && apt-get update -y && \
+    apt-get install python3 -y  && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod a+rx /usr/local/bin/yt-dlp 
 
-RUN docker-php-ext-install pdo pdo_mysql mysqli
-RUN apt-get update -y && apt-get install python3 -y  && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod a+rx /usr/local/bin/yt-dlp 
 COPY . /var/www/html/lwt
 
 # creating connect.inc.php
