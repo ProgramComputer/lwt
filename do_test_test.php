@@ -508,9 +508,16 @@ function do_test_prepare_ajax_test_area(
         'regexword' => isset($record['regexword'])?$record['regexword']:"",
         'rtlScript' =>isset($record['rtlScript'])?$record['rtlScript']:""
     );
-    $abbr = isset($record['LgName'])?$langDefs[$record['LgName'] ][1]:"";
     mysqli_free_result($res);
-
+    $review_data = array(
+        "total_tests" => $count,
+        "test_key" => $selector,
+        "selection" => $selection,
+        "word_mode" => $nosent,
+        "lg_id" => $lgid,
+        "word_regex" => (string)$lang['regexword'],
+        "type" => $testtype
+    );
     ?>
     <script type="text/javascript">
             var sentenceaudio = new Audio();
@@ -539,7 +546,7 @@ function do_test_prepare_ajax_test_area(
         /**
          * Get a new word test.
          */
-        function get_new_word()
+        function get_new_word(review_data)
         {
             
 
