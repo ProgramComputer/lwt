@@ -37,6 +37,9 @@ settings ([#119](https://github.com/HugoFara/lwt/issues/119)).
 [#169](https://github.com/HugoFara/lwt/pull/169), closing discussion 
 [#141](https://github.com/HugoFara/lwt/discussions/141). 
 Many thanks to [@ProgramComputer](https://github.com/ProgramComputer)!
+* On word review: 
+  * The "Read words aloud" setting is now saved, PR [#185](https://github.com/HugoFara/lwt/pull/185).
+  * UX change: You can click on "Read words aloud" text to check the checkbox.
 
 ### Changed
 
@@ -96,6 +99,7 @@ Solves [#129](https://github.com/HugoFara/lwt/issues/129), thanks to the help of
   * the space keyboard shortcut may have been inoperating.
   * On `api.php`, tests were always set to "multi-word" due to a missing variable 
   type conversion. Pull request [#175](https://github.com/HugoFara/lwt/pull/175).
+  * Text-To-Speech was not working (suggested by [#187](https://github.com/HugoFara/lwt/pull/187)).
 * An explicit dependency to [php-dom](https://www.php.net/manual/en/book.dom.php) was 
 missing in `INSTALL.sh` (and `composer.json`), as stated in 
 [#178](https://github.com/HugoFara/lwt/pull/178).

@@ -24,7 +24,7 @@ require_once 'inc/langdefs.php';
 /**
  * Get the SQL string to perform tests.
  *
- * @param int|null   $selection    Test is of type selection
+ * @param int|null    $selection    Test is of type selection
  * @param string|null $sess_testsql SQL string for test
  * @param int|null    $lang         Test is of type language, for the language $lang ID
  * @param int|null    $text         Testing text with ID $text
@@ -39,25 +39,25 @@ function do_test_get_identifier($selection, $sess_testsql, $lang, $text): array
         $data_string_array = explode(",", trim($sess_testsql, "()"));
         $data_int_array = array_map('intval', $data_string_array);
         switch ((int)$selection) {
-            case 2:
-                return array('words', $data_int_array);
+        case 2:
+            return array('words', $data_int_array);
                 break;
-            case 3:
-                return array('texts', $data_int_array);
+        case 3:
+            return array('texts', $data_int_array);
                 break;
-            default:
-                // Deprecated behavior in 2.9.0, to be removed on 3.0.0
-                $test_sql = $sess_testsql;
-                $cntlang = get_first_value(
-                    "SELECT COUNT(DISTINCT WoLgID) AS value 
+        default:
+            // Deprecated behavior in 2.9.0, to be removed on 3.0.0
+            $test_sql = $sess_testsql;
+            $cntlang = get_first_value(
+                "SELECT COUNT(DISTINCT WoLgID) AS value 
                     FROM $test_sql"
-                );
-                if ($cntlang > 1) {
-                    echo "<p>Sorry - The selected terms are in $cntlang languages," .
-                    " but tests are only possible in one language at a time.</p>";
-                    exit();
-                }
-                return array('raw_sql', $test_sql);
+            );
+            if ($cntlang > 1) {
+                echo "<p>Sorry - The selected terms are in $cntlang languages," .
+                " but tests are only possible in one language at a time.</p>";
+                exit();
+            }
+            return array('raw_sql', $test_sql);
                 break;
         }
     } elseif (isset($lang) && is_numeric($lang)) {
@@ -451,11 +451,10 @@ function get_test_solution($testtype, $wo_record, $nosent, $wo_text)
 /**
  * Preforms the HTML of the test area, to update through AJAX.
  *
- * @param string    $selector   Type of test to run.
- * @param array|int $selection  Items to run the test on.
- * @param int       $totaltests Total number of tests to do.
- * @param int       $count      Number of tests left.
- * @param int       $testtype   Type of test.
+ * @param string    $selector  Type of test to run.
+ * @param array|int $selection Items to run the test on.
+ * @param int       $count     Number of tests left.
+ * @param int       $testtype  Type of test.
  *
  * @return int Number of tests left to do.
  *
@@ -499,19 +498,20 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
     );
     mysqli_free_result($res);
 
+    $review_data = array(
+        "total_tests" => $count,
+        "test_key" => $selector,
+        "selection" => $selection,
+        "word_mode" => $nosent,
+        "lg_id" => $lgid,
+        "word_regex" => (string)$lang['regexword'],
+        "type" => $testtype
+    );
+
     ?>
     <script type="text/javascript">
-        window.onload = (event) => {
-            var utterancecheckbox = document.getElementById('utterance-allowed')
 
-            var utterancechecked = JSON.parse(localStorage.getItem('utterance-allowed'));
-            utterancecheckbox.checked = utterancechecked;
-            utterancecheckbox.addEventListener('change', function () {
-                localStorage.setItem('utterance-allowed', utterancecheckbox.checked);
-            });
-        };
-
-        var sentenceaudio = new Audio();
+var sentenceaudio = new Audio();
         /** 
          * Play audio for sentence
          */
@@ -536,26 +536,20 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
         }
         /**
          * Get a new word test.
+         * 
+         * @param {array} review_data Data to use
          */
-        function get_new_word()
+        function get_new_word(review_data)
         {
-            const review_data = <?php echo json_encode(array(
-                "total_tests" => $count,
-                "test_key" => $selector,
-                "selection" => $selection,
-                "word_mode" => $nosent,
-                "lg_id" => $lgid,
-                "word_regex" => (string)$lang['regexword'],
-                "type" => $testtype
-            )); ?>;
-
             query_next_term(review_data);
 
             // Close any previous tooltip
             cClick();
         }
 
-        $(get_new_word);
+        $(function () {
+            get_new_word(<?php echo json_encode($review_data); ?>)
+        });
     </script>
 
     <p id="term-test" dir="<?php echo($lang['rtlScript'] ? 'rtl' : 'ltr'); ?>" 
@@ -567,7 +561,12 @@ function do_test_prepare_ajax_test_area($selector, $selection, $count, $testtype
     </div>
     <?php
 
-    do_test_test_interaction_globals($lang['wb1'], $lang['wb2'], $lang['wb3'],$lang['ttsVoiceApi']);
+    do_test_test_interaction_globals(
+        $lang['wb1'],
+        $lang['wb2'],
+        $lang['wb3'],
+        $lgid
+    );
 
     return $count;
 }
@@ -727,27 +726,22 @@ function prepare_test_area($testsql, $totaltests, $count, $testtype): int
 /**
  * Prepare JavaScript code globals so that you can click on words.
  *
- * @param array  $wo_record Word record. Associative array with keys 'WoID',
- *                          'WoTranslation'.
- * @param string $wb1       URL of the first dictionary.
- * @param string $wb2       URL of the secondary dictionary.
- * @param string $wb3       URL of the google translate dictionary.
- * @param string $voiceApi Third-party voice API 
-
- * @param int    $testtype  Type of test
- * @param int    $nosent    1 to use single word instead of sentence.
- * @param string $save      Word or sentence to use for the test
+ * @param string $wb1   URL of the first dictionary.
+ * @param string $wb2   URL of the secondary dictionary.
+ * @param string $wb3   URL of the google translate dictionary.
+ * @param int    $lg_id Language ID (since 2.10.0-fork)
  *
  * @return void
  *
- * @global string $tbpref  Database table prefix
- * @global string $angDefs Languages definition array
+ * @global string $tbpref
+ *
+ * @since 2.10.0-fork Takes a language ID as the fourth argument
  */
-function do_test_test_interaction_globals($wb1, $wb2, $wb3,$voiceApi)
+function do_test_test_interaction_globals($wb1, $wb2, $wb3, $lg_id)
 {
     ?>
 <script type="text/javascript">
-    LWT_DATA.language.ttsVoiceApi = <?php echo json_encode($voiceApi); ?>;
+    LWT_DATA.language.id = <?php echo json_encode($lg_id); ?>;
     LWT_DATA.language.dict_link1 = <?php echo json_encode($wb1); ?>;
     LWT_DATA.language.dict_link2 = <?php echo json_encode($wb2); ?>;
     LWT_DATA.language.translator_link = <?php echo json_encode($wb3); ?>;
@@ -766,7 +760,7 @@ function do_test_test_interaction_globals($wb1, $wb2, $wb3,$voiceApi)
  *
  * @param array  $wo_record Word record. Associative array with keys 'WoID',
  *                          'WoTranslation'.
- * @param string $solution  solution to test
+ * @param string $solution Solution to the test (as HTML)
  * @param string $startSec  starting second of sentence audio
  * @param string $endSec ending second of sentence audio
  *
@@ -839,7 +833,7 @@ function do_test_test_javascript_interaction(
     $startSec,
     $endSec
 ) {
-    do_test_test_interaction_globals($wb1, $wb2, $wb3);
+    do_test_test_interaction_globals($wb1, $wb2, $wb3, (int) $wo_record['WoLgID']);
     $solution = get_test_solution($testtype, $wo_record, (bool) $nosent, $save);
     do_test_test_javascript_clickable($wo_record, $solution, $startSec, $endSec);
 }
@@ -879,45 +873,44 @@ function do_test_footer($notyettested, $wrong, $correct)
     $l_wrong = round($wrong * $totaltestsdiv, 0);
     $l_correct = round($correct * $totaltestsdiv, 0);
     ?>
-    <footer id="footer">
-        <span style="margin-left: 15px; margin-right: 15px;">
-            <img src="icn/clock.png" title="Elapsed Time" alt="Elapsed Time" />
-            <span id="timer" title="Elapsed Time"></span>
+<footer id="footer">
+    <span style="margin-left: 15px; margin-right: 15px;">
+        <img src="icn/clock.png" title="Elapsed Time" alt="Elapsed Time" />
+        <span id="timer" title="Elapsed Time"></span>
+    </span>
+    <span style="margin-left: 15px; margin-right: 15px;">
+        <img id="not-tested-box" class="borderl" 
+        src="<?php print_file_path('icn/test_notyet.png');?>" 
+        title="Not yet tested" alt="Not yet tested" height="10" 
+        width="<?php echo $l_notyet; ?>" 
+        /><img 
+        id="wrong-tests-box" class="bordermiddle" 
+        src="<?php print_file_path('icn/test_wrong.png');?>" 
+        title="Wrong" alt="Wrong" height="10" width="<?php echo $l_wrong; ?>" 
+        /><img 
+        id="correct-tests-box" class="borderr" 
+        src="<?php print_file_path('icn/test_correct.png');?>" 
+        title="Correct" alt="Correct" height="10" 
+        width="<?php echo $l_correct; ?>" />
+    </span>
+    <span style="margin-left: 15px; margin-right: 15px;">
+        <span title="Total number of tests" id="total_tests">
+            <?php echo $totaltests; ?>
+        </span> 
+        =
+        <span class="todosty" title="Not yet tested" id="not-tested">
+            <?php echo $notyettested; ?>
         </span>
-        <span style="margin-left: 15px; margin-right: 15px;">
-            <img id="not-tested-box" class="borderl" src="<?php print_file_path('icn/test_notyet.png'); ?>"
-                title="Not yet tested" alt="Not yet tested" height="10" width="<?php echo $l_notyet; ?>" /><img
-                id="wrong-tests-box" class="bordermiddle" src="<?php print_file_path('icn/test_wrong.png'); ?>" title="Wrong"
-                alt="Wrong" height="10" width="<?php echo $l_wrong; ?>" /><img id="correct-tests-box" class="borderr"
-                src="<?php print_file_path('icn/test_correct.png'); ?>" title="Correct" alt="Correct" height="10"
-                width="<?php echo $l_correct; ?>" />
+        +
+        <span class="donewrongsty" title="Wrong" id="wrong-tests">
+            <?php echo $wrong; ?>
         </span>
-        <span style="margin-left: 15px; margin-right: 15px;">
-            <span title="Total number of tests" id="total_tests">
-                <?php
-                echo $totaltests;
-                ?>
-            </span>
-            =
-            <span class="todosty" title="Not yet tested" id="not-tested">
-                <?php
-                echo $notyettested;
-                ?>
-            </span>
-            +
-            <span class="donewrongsty" title="Wrong" id="wrong-tests">
-                <?php
-                echo $wrong;
-                ?>
-            </span>
-            +
-            <span class="doneoksty" title="Correct" id="correct-tests">
-                <?php
-                echo $correct;
-                ?>
-            </span>
+        +
+        <span class="doneoksty" title="Correct" id="correct-tests">
+            <?php echo $correct; ?>
         </span>
-    </footer>
+    </span>
+</footer>
     <?php
 }
 
@@ -930,7 +923,14 @@ function do_test_footer($notyettested, $wrong, $correct)
  */
 function do_test_test_javascript($count)
 {
-    
+    $time_data = array(
+        "wait_time" => (int) getSettingWithDefault(
+            'set-test-edit-frame-waiting-time'
+        ),
+        "time" => time(),
+        "start_time" => $_SESSION['teststart'],
+        "show_timer" => ($count ? 0 : 1)
+    );
     ?>
 <script type="text/javascript">
     /**
@@ -938,12 +938,7 @@ function do_test_test_javascript($count)
      */
     function prepare_test_frames()
     {
-        const time_data = <?php echo json_encode(array(
-            "wait_time" => (int)getSettingWithDefault('set-test-edit-frame-waiting-time'),
-            "time" => time(),
-            "start_time" => $_SESSION['teststart'],
-            "show_timer" => ($count ? 0 : 1)
-        )) ?>;
+        const time_data = <?php echo json_encode($time_data) ?>;
 
         window.parent.frames['ru'].location.href = 'empty.html';
         if (time_data.wait_time <= 0) {
@@ -959,18 +954,32 @@ function do_test_test_javascript($count)
         );
     }
 
+    /**
+     * Adds a word reading event.
+     * 
+     * @param {string} term_text Term to read
+     * @param {int}    lang_id   Language ID
+     */
+    function prepareWordReading (term_text, lang_id) {
+        $('.word')
+        .on('click', function() {
+            speechDispatcher(term_text, lang_id)
+        });
+    }
+
 
     /**
      * Insert a new word test.
      * 
-     * @param {number} word_id  Word ID
+     * @param {number} word_id   Word ID
      * @param {number} tx_id  transaction ID
      * @param {number} start_sec  starting second
      * @param {number} end_sec  ending second
      * @param {string} word_text  word text
      * @param {string} word_lg_abbr  Word abbr
-     * @param {string} solution Test answer
-     * @param {string} group    
+     * @param {string} solution  Test answer
+     * @param {string} group     HTML group to display (either term, translation, 
+     *                           sentence...)
      */
     function insert_new_word(word_id,tx_id,start_sec,end_sec,word_text,word_lg_abbr, solution, group) {
         
@@ -1026,9 +1035,7 @@ playsentence.setAttribute('data-end-time',end_sec)
 
         $(document).on('keydown', keydown_event_do_test_test);
         $('.word')
-        .on('click', word_click_event_do_test_test)
-        $('.word').on('click', read_word);
-
+        .on('click', word_click_event_do_test_test);
     }
 
     /**
@@ -1063,6 +1070,9 @@ playsentence.setAttribute('data-end-time',end_sec)
             insert_new_word(
                 current_test.word_id,current_test.txID,current_test.startSec,current_test.endSec,current_test.word_text,current_test.word_lg_abbr,current_test.solution, current_test.group
             );
+            if ($('#utterance-allowed').prop('checked')) {
+                prepareWordReading(current_test.word_text, LWT_DATA.language.id);
+            };
         }
     }
 
@@ -1176,13 +1186,13 @@ function do_test_test_content_ajax($selector, $selection)
     }
     $notyettested = (int) $count;
 
+    prepare_test_footer($notyettested);
     $total_tests = do_test_prepare_ajax_test_area(
         $selector,
         $selection,
         $notyettested,
         $testtype
     );
-    prepare_test_footer($notyettested);
     do_test_test_javascript($total_tests);
 }
 
