@@ -268,7 +268,7 @@ if (isset($_REQUEST['markaction'])) {
                 } elseif ($markaction == 'delsent' ) {
                     $message = runsql(
                         'update ' . $tbpref . 'words 
-                        set WoSentence = NULL 
+                        set WoSentence = NULL, WoSeID = NULL
                         where WoID in ' . $list, 
                         "Term Sentence(s) deleted"
                     );
@@ -292,7 +292,7 @@ if (isset($_REQUEST['markaction'])) {
                     anki_export(
                         'select distinct WoID, LgRightToLeft, 
                         LgRegexpWordCharacters, LgName, WoText, WoTranslation, 
-                        WoRomanization, WoSentence, 
+                        WoRomanization, WoSentence, TxAudioURI, SeStartSec, SeEndSec,
                         ifnull(
                             group_concat(
                                 distinct TgText 
@@ -300,7 +300,8 @@ if (isset($_REQUEST['markaction'])) {
                             ),
                             \'\'
                         ) as taglist 
-                        from (
+                        from ((
+                            (
                             (
                                 ' . $tbpref . 'words 
                                 left JOIN ' . $tbpref . 'wordtags 
@@ -308,6 +309,11 @@ if (isset($_REQUEST['markaction'])) {
                             ) 
                             left join ' . $tbpref . 'tags 
                             on TgID = WtTgID
+                            ) 
+                            left join ' . $tbpref . 'sentences 
+                            on WoSeID = SeID 
+                            ) left join ' . $tbpref . 'texts
+                            on SeTxID = TxID 
                         ), 
                         ' . $tbpref . 'languages 
                         where WoLgID = LgID AND WoTranslation != \'\' AND 
@@ -476,7 +482,7 @@ if (isset($_REQUEST['allaction'])) {
             } elseif ($allaction == 'delsentall' ) {
                 $message = runsql(
                     'update ' . $tbpref . 'words 
-                    set WoSentence = NULL where WoID = ' . $id, 
+                    set WoSentence = NULL, WoSeID = NULL where WoID = ' . $id, 
                     ""
                 );
             } elseif ($allaction == 'lowerall' ) {
@@ -520,18 +526,26 @@ if (isset($_REQUEST['allaction'])) {
         if ($currenttext == '') {
             anki_export(
                 'select distinct WoID, LgRightToLeft, LgRegexpWordCharacters, 
-                LgName, WoText, WoTranslation, WoRomanization, WoSentence, 
+                LgName, WoText, WoTranslation, WoRomanization, WoSentence,  TxAudioURI, SeStartSec, SeEndSec,
                 ifnull(
                     group_concat(distinct TgText order by TgText separator \' \'),
                     \'\') as taglist 
                 from (
                     (
+                        (
+                    (
                         ' . $tbpref . 'words 
                         left JOIN ' . $tbpref . 'wordtags 
                         ON WoID = WtWoID
+                        
                     ) 
                     left join ' . $tbpref . 'tags 
                     on TgID = WtTgID
+                    ) 
+                    left join ' . $tbpref . 'sentences 
+                    on WoSeID = SeID 
+                    ) left join ' . $tbpref . 'texts
+                    on SeTxID = TxID 
                 ), ' . $tbpref . 'languages 
                 where WoLgID = LgID AND WoTranslation != \'*\' and 
                 WoSentence like concat(\'%{\',WoText,\'}%\') ' . $wh_lang . 
@@ -541,9 +555,13 @@ if (isset($_REQUEST['allaction'])) {
         } else {
             anki_export(
                 'select distinct WoID, LgRightToLeft, LgRegexpWordCharacters, 
-                LgName, WoText, WoTranslation, WoRomanization, WoSentence, 
+                LgName, WoText, WoTranslation, WoRomanization, WoSentence,  TxAudioURI, SeStartSec, SeEndSec,
                 ifnull(group_concat(distinct TgText order by TgText separator \' \'),\'\') as taglist 
-                from ((' . $tbpref . 'words left JOIN ' . $tbpref . 'wordtags ON WoID = WtWoID) left join ' . $tbpref . 'tags on TgID = WtTgID), ' . $tbpref . 'languages, ' . $tbpref . 'textitems2 where Ti2LgID = WoLgID and Ti2WoID = WoID and Ti2TxID in (' . $currenttext . ')' . ' and WoLgID = LgID AND WoTranslation != \'*\' and WoSentence like concat(\'%{\',WoText,\'}%\') ' . $wh_lang . $wh_stat . $wh_query . ' group by WoID ' . $wh_tag);
+                from ((((' . $tbpref . 'words left JOIN ' . $tbpref . 'wordtags ON WoID = WtWoID) left join ' . $tbpref . 'tags on TgID = WtTgID   ) 
+                left join ' . $tbpref . 'sentences 
+                on WoSeID = SeID 
+                ) left join ' . $tbpref . 'texts
+                on SeTxID = TxID ), ' . $tbpref . 'languages, ' . $tbpref . 'textitems2 where Ti2LgID = WoLgID and Ti2WoID = WoID and Ti2TxID in (' . $currenttext . ')' . ' and WoLgID = LgID AND WoTranslation != \'*\' and WoSentence like concat(\'%{\',WoText,\'}%\') ' . $wh_lang . $wh_stat . $wh_query . ' group by WoID ' . $wh_tag);
         }
     } elseif ($allaction == 'expall2' ) {
         if ($currenttext == '') {
@@ -613,14 +631,14 @@ if (isset($_REQUEST['allaction'])) {
         // INSERT
         $message = runsql(
             'insert into ' . $tbpref . 'words (WoLgID, WoTextLC, WoText, ' .
-            'WoStatus, WoTranslation, WoSentence, WoRomanization, WoStatusChanged,' . 
+            'WoStatus, WoTranslation, WoSentence, WoSeID, WoRomanization, WoStatusChanged,' . 
             make_score_random_insert_update('iv') . ') values( ' . 
             $_REQUEST["WoLgID"] . ', ' .
             convert_string_to_sqlsyntax(mb_strtolower($_REQUEST["WoText"], 'UTF-8')) . ', ' .
             convert_string_to_sqlsyntax($_REQUEST["WoText"]) . ', ' .
             $_REQUEST["WoStatus"] . ', ' .
             convert_string_to_sqlsyntax($translation) . ', ' .
-            convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . ', ' .
+            convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"]))  . ', ' .$_REQUEST["WoSeID"] . ', ' .
             convert_string_to_sqlsyntax($_REQUEST["WoRomanization"]) . ', NOW(), ' .  
             make_score_random_insert_update('id') . ')', "Saved", $sqlerrdie = false
         );
@@ -655,7 +673,7 @@ if (isset($_REQUEST['allaction'])) {
             convert_string_to_sqlsyntax($_REQUEST["WoText"]) . ', WoTextLC = ' . 
             convert_string_to_sqlsyntax(mb_strtolower($_REQUEST["WoText"], 'UTF-8')) . 
             ', WoTranslation = ' . 
-            convert_string_to_sqlsyntax($translation) . ', WoSentence = ' . 
+            convert_string_to_sqlsyntax($translation) . ', WoSeID = ' .$_REQUEST["WoSeID"]. ', WoSentence = ' . 
             convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . 
             ', WoRomanization = ' .
             convert_string_to_sqlsyntax($_REQUEST["WoRomanization"]) . $xx . ',' . 
@@ -764,6 +782,7 @@ if (isset($_REQUEST['new']) && isset($_REQUEST['lang'])) {
      <form name="editword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>#rec<?php echo $_REQUEST['chg']; ?>" method="post">
      <input type="hidden" name="WoID" value="<?php echo $record['WoID']; ?>" />
      <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $record['WoLgID']; ?>" />
+     <input type="hidden" name="WoSeID" value="<?php echo  $record['WoSeID']?>" />
      <input type="hidden" name="WoOldStatus" value="<?php echo $record['WoStatus']; ?>" />
      <table class="tab1" cellspacing="0" cellpadding="5">
      <tr>
@@ -817,7 +836,7 @@ if (isset($_REQUEST['new']) && isset($_REQUEST['lang'])) {
      </form>
     <?php
         // Display example sentence button
-        example_sentences_area($record['LgID'], $wordlc, "document.forms['editword'].WoSentence", $_REQUEST['chg']);
+        example_sentences_area($record['LgID'], $wordlc, "document.forms['editword'].WoSentence","document.forms['editword'].WoSeID", $_REQUEST['chg']);
     }
     mysqli_free_result($res);
 } else {

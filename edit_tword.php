@@ -59,7 +59,7 @@ if (isset($_REQUEST['op'])) {
             runsql(
                 'update ' . $tbpref . 'words set WoText = ' . 
                 convert_string_to_sqlsyntax($_REQUEST["WoText"]) . ', WoTranslation = ' . 
-                convert_string_to_sqlsyntax($translation) . ', WoSentence = ' . 
+                convert_string_to_sqlsyntax($translation) . ', WoSeID = ' .$_REQUEST["WoSeID"]. ', WoSentence = ' . 
                 convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . 
                 ', WoRomanization = ' .
                 convert_string_to_sqlsyntax($_REQUEST["WoRomanization"]) . $xx . 
@@ -141,7 +141,7 @@ else {  // if (! isset($_REQUEST['op']))
     if ($wid == '') { my_die("Term ID missing in edit_tword.php"); 
     }
     
-    $sql = 'select WoText, WoLgID, WoTranslation, WoSentence, WoRomanization, WoStatus from ' . $tbpref . 'words where WoID = ' . $wid;
+    $sql = 'select WoText, WoLgID, WoTranslation, WoSentence, WoRomanization, WoStatus, WoSeID from ' . $tbpref . 'words where WoID = ' . $wid;
     $res = do_mysqli_query($sql);
     $record = mysqli_fetch_assoc($res);
     if ($record) {
@@ -180,6 +180,7 @@ else {  // if (! isset($_REQUEST['op']))
 <form name="editword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $lang; ?>" />
 <input type="hidden" name="WoID" value="<?php echo $wid; ?>" />
+<input type="hidden" name="WoSeID" value="<?php echo $record['WoSeID']; ?>" />
 <input type="hidden" name="WoOldStatus" value="<?php echo $status; ?>" />
 <input type="hidden" name="WoTextLC" value="<?php echo tohtml($termlc); ?>" />
 <table class="tab2" cellspacing="0" cellpadding="5">
@@ -224,7 +225,7 @@ else {  // if (! isset($_REQUEST['op']))
 </form>
     <?php
             // Display example sentence button
-            example_sentences_area($lang, $termlc, 'document.forms.editword.WoSentence', $wid);
+            example_sentences_area($lang, $termlc, 'document.forms.editword.WoSentence','document.forms.editword.WoSeID', $wid);
 } // if (! isset($_REQUEST['op']))
 
 pageend();

@@ -405,7 +405,7 @@ function edit_mword_display_new($term, $tid, $ord, $len)
     </form>
     <?php
     // Display example sentences button
-    example_sentences_area($term->lgid, $term->textlc, 'document.forms.newword.WoSentence', -1);
+    example_sentences_area($term->lgid, $term->textlc, 'document.forms.newword.WoSentence', 'document.forms.newword.WoSeID', -1);
 }
 
 /**
@@ -423,7 +423,7 @@ function edit_mword_display_change($term, $tid, $ord)
 {
     global $tbpref;
     $scrdir = getScriptDirectionTag($term->lgid);
-    $sql = 'SELECT WoTranslation, WoSentence, WoRomanization, WoStatus 
+    $sql = 'SELECT WoTranslation, WoSentence, WoRomanization, WoStatus, WoSeID 
     FROM ' . $tbpref . 'words WHERE WoID = ' . $term->id;
     $res = do_mysqli_query($sql);
     $showRoman = (bool) get_first_value(
@@ -470,6 +470,7 @@ function edit_mword_display_change($term, $tid, $ord)
     <input type="hidden" name="WoLgID" id="langfield" value="<?php echo $term->lgid; ?>" />
     <input type="hidden" name="WoID" value="<?php echo $term->id; ?>" />
     <input type="hidden" name="WoOldStatus" value="<?php echo $record['WoStatus']; ?>" />
+    <input type="hidden" name="WoSeID" value="<?php echo $record['WoSeID']; ?>" />
     <input type="hidden" name="WoStatus" value="<?php echo $status; ?>" />
     <input type="hidden" name="WoTextLC" value="<?php echo tohtml($term->textlc); ?>" />
     <input type="hidden" name="tid" value="<?php echo $tid; ?>" />
@@ -534,7 +535,7 @@ function edit_mword_display_change($term, $tid, $ord)
     </form>
         <?php
         // Display example sentences button
-        example_sentences_area($term->lgid, $term->textlc, 'document.forms.editword.WoSentence', $term->id);
+        example_sentences_area($term->lgid, $term->textlc, 'document.forms.editword.WoSentence','document.forms.editword.WoSeID', $term->id);
     }
     mysqli_free_result($res);
 }

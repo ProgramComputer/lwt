@@ -1951,6 +1951,9 @@ function anki_export($sql)
         $span1 . $sent2 . $span2 . "\t" . 
         tohtml(repl_tab_nl($record["LgName"])) . "\t" . 
         tohtml($record["WoID"]) . "\t" . 
+        tohtml(basename($record["TxAudioURI"])) . "\t" .
+        tohtml($record["SeStartSec"]/1000) . "\t" . 
+        tohtml($record["SeEndSec"]/1000) . "\t" . 
         tohtml($record["taglist"]) .  
         "\r\n";
     }
@@ -2561,7 +2564,7 @@ function getSentence($seid, $wordlc, $mode): array
  *
  * @return string[][] Array of sentences found
  *
- * @psalm-return list{0?: array{0: string, 1: string},...}
+ * @psalm-return list{0?: array{0: string, 1: string},...,1?:int}
  */
 function sentences_with_word($lang, $wordlc, $wid, $mode=0, $limit=20): array 
 {
@@ -2575,7 +2578,7 @@ function sentences_with_word($lang, $wordlc, $wid, $mode=0, $limit=20): array
         if ($last != $record['SeText']) {
             $sent = getSentence($record['SeID'], $wordlc, $mode);
             if (mb_strstr($sent[1], '}', false, 'UTF-8')) {
-                $r[] = $sent;
+                $r[] = array("sentence"=>$sent,"SeID"=>$record['SeID']);
             }
         }
         $last = $record['SeText'];
@@ -2587,7 +2590,7 @@ function sentences_with_word($lang, $wordlc, $wid, $mode=0, $limit=20): array
 /**
  * Prepare the area to for examples sentences of a word.
  */
-function example_sentences_area($lang, $termlc, $selector, $wid): void
+function example_sentences_area($lang, $termlc, $selector, $sentenceSelector, $wid): void
 {
     ?>
 <div id="exsent">
@@ -2595,7 +2598,7 @@ function example_sentences_area($lang, $termlc, $selector, $wid): void
     <div id="exsent-interactable">
         <span class="click" onclick="do_ajax_show_sentences(
             <?php echo $lang; ?>, <?php echo prepare_textdata_js($termlc); ?>, 
-            <?php echo htmlentities(json_encode($selector)); ?>, <?php echo $wid; ?>);">
+            <?php echo htmlentities(json_encode($selector)); ?>,<?php echo htmlentities(json_encode($sentenceSelector)); ?>, <?php echo $wid; ?>);">
             <img src="icn/sticky-notes-stack.png" title="Show Sentences" alt="Show Sentences" /> 
             Show Sentences
         </span>

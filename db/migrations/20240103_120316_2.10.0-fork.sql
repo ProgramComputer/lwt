@@ -18,4 +18,8 @@ ALTER TABLE `texts`
 ALTER TABLE `sentences` 
     ADD COLUMN `SeStartSec` int(11) unsigned NOT NULL DEFAULT '0',  
     ADD COLUMN `SeEndSec` int(11) unsigned NOT NULL DEFAULT '0';
+
+ALTER TABLE `words` 
+    ADD COLUMN `WoSeID` mediumint(8) unsigned DEFAULT NULL;
+
      
