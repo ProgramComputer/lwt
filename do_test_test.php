@@ -1031,7 +1031,8 @@ function do_test_test_javascript($count)
 if(parseInt(end_sec) == 0 || end_sec == null )
 {
     playsentence.style.display = 'none';
-
+    playsentence.removeAttribute('data-start-time');
+    playsentence.removeAttribute('data-end-time');
 }
 else{
 playsentence.style.display = '';
