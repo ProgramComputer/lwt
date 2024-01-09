@@ -1098,13 +1098,13 @@ function do_test_test_content_ajax($selector, $selection)
     }
     $notyettested = (int) $count;
 
-    prepare_test_footer($notyettested);
     $total_tests = do_test_prepare_ajax_test_area(
         $selector,
         $selection,
         $notyettested,
         $testtype
     );
+    prepare_test_footer($notyettested);
     do_test_test_javascript($total_tests);
 }
 
