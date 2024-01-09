@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/mantas-done/subtitles/src/Subtitles.php';
 use \Done\Subtitles\Subtitles;
 /**
  * \file
