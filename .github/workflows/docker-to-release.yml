@@ -3,10 +3,6 @@ name: Add Docker images to release
 on:
   release:
     types: [ published ]
-  push:
-    tags:
-       # Release attempt
-      - '*.*.*'
 
 env:
   REGISTRY: ghcr.io
@@ -60,9 +56,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=oci,dest=/tmp/image.tar
-        if: ${{ github.event_name == 'release'}}
       - name: Upload binaries to release
-        if: ${{ github.event_name == 'release'}}
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{secrets.GITHUB_TOKEN }}
