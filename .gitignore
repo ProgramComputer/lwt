@@ -21,6 +21,7 @@ plugins
 *.bak
 
 vendor/
+!vendor/mantas-done/
 .phpunit.result.cache
 
 composer.phar
