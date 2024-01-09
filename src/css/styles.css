@@ -502,7 +502,7 @@ img.lwtlogoright
 /**
 * General footer style.
 */
-/* footer 
+ footer 
 {
   position: fixed;
   width: 100%;
@@ -513,7 +513,7 @@ img.lwtlogoright
   height: 45px;
   line-height: 30px;
   border-top: 1px solid #000000;
-} */
+} 
 
 /** 
 * Separate a footer section from the document 
