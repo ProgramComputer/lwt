@@ -2,6 +2,7 @@
 
 -- Migration files to update the database
 DROP TABLE IF EXISTS _migrations;
+
 CREATE TABLE _migrations (
 	filename VARCHAR(255) NOT NULL,
 	PRIMARY KEY (filename)
