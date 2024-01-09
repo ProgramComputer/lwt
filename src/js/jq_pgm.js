@@ -805,9 +805,10 @@ function do_ajax_update_subtitles () {
  *
  * @param {JSON}   sentences    A list of sentences to display.
  * @param {string} click_target The selector for the element that should change value on click
+ * @param {string} second_click_target The selector for the element that should change value on click
  * @returns {HTMLElement} A formatted group of sentences
  */
-function display_example_sentences (sentences, click_target) {
+function display_example_sentences (sentences, click_target,second_click_target) {
   let img, clickable, parentDiv;
   const outElement = document.createElement('div');
   for (let i = 0; i < sentences.length; i++) {
@@ -821,14 +822,14 @@ function display_example_sentences (sentences, click_target) {
     // Doesn't feel the right way to do it
     clickable.setAttribute(
       'onclick',
-      '{' + click_target + ".value = '" + sentences[i][1].replaceAll("'", "\\'") +
-      "';lwtFormCheck.makeDirty();}"
+      '{' + click_target + ".value = '" + sentences[i]['sentence'][1].replaceAll("'", "\\'") +
+      "';"+second_click_target+".value = '" + sentences[i]['SeID'] +"';"+ "lwtFormCheck.makeDirty();}"
     );
     clickable.appendChild(img);
     // Create parent
     parentDiv = document.createElement('div');
     parentDiv.appendChild(clickable);
-    parentDiv.innerHTML += '&nbsp; ' + sentences[i][0];
+    parentDiv.innerHTML += '&nbsp; ' + sentences[i]['sentence'][0];
     // Add to the output
     outElement.appendChild(parentDiv);
   }
@@ -838,14 +839,15 @@ function display_example_sentences (sentences, click_target) {
 /**
  * Prepare am HTML element that formats the sentences
  *
- * @param {JSON}   sentences    A list of sentences to display.
+ * @param {JSON}   sentences    {{sentences-A list of sentences to display., SeID -sentence ID}}
  * @param {string} click_target The selector for the element that should change value on click
+ * @param {string} second_click_target The second selector for the element that should change value on click
  * @returns {HTMLElement} A formatted group of sentences
  */
-function change_example_sentences_zone (sentences, ctl) {
+function change_example_sentences_zone (sentences, ctl,second_ctl) {
   $('#exsent-waiting').css('display', 'none');
   $('#exsent-sentences').css('display', 'inherit');
-  const new_element = display_example_sentences(sentences, ctl);
+  const new_element = display_example_sentences(sentences, ctl,second_ctl);
   $('#exsent-sentences').append(new_element);
 }
 
@@ -855,10 +857,11 @@ function change_example_sentences_zone (sentences, ctl) {
  * @param {int}    lang Language ID
  * @param {string} word Term text (the looked for term)
  * @param {string} ctl  Selector for the element to edit on click
+ * @param {string} secondCtl  Second selector for the element to edit on click
  * @param {int}    woid Term id (word or multi-word)
  * @returns {undefined}
  */
-function do_ajax_show_sentences (lang, word, ctl, woid) {
+function do_ajax_show_sentences (lang, word, ctl, secondCtl, woid) {
   $('#exsent-interactable').css('display', 'none');
   $('#exsent-waiting').css('display', 'inherit');
 
@@ -869,7 +872,7 @@ function do_ajax_show_sentences (lang, word, ctl, woid) {
         lg_id: lang,
         word_lc: word
       },
-      (data) => change_example_sentences_zone(data, ctl)
+      (data) => change_example_sentences_zone(data, ctl,secondCtl)
     );
   } else {
     const query = {
@@ -882,7 +885,7 @@ function do_ajax_show_sentences (lang, word, ctl, woid) {
     $.getJSON(
       'api.php/v1/sentences-with-term',
       query,
-      (data) => change_example_sentences_zone(data, ctl)
+      (data) => change_example_sentences_zone(data, ctl,secondCtl)
     );
   }
 }

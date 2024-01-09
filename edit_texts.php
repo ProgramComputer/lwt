@@ -271,7 +271,8 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
             );
             $count += (int) runsql(
                 'UPDATE ' . $tbpref . 'words 
-                SET WoSentence = ' . convert_string_to_sqlsyntax(repl_tab_nl($sent[1])) . ' 
+                SET WoSentence = ' . convert_string_to_sqlsyntax(repl_tab_nl($sent[1])) . '
+                , WoSeID = ' . $record['SeID'] . '
                 WHERE WoID = ' . $record['WoID'], 
                 ''
             );
@@ -298,6 +299,7 @@ function edit_texts_mark_action($markaction, $marked, $actiondata): array
             $count += (int) runsql(
                 'update ' . $tbpref . 'words 
                 set WoSentence = ' . convert_string_to_sqlsyntax(repl_tab_nl($sent[1])) . ' 
+                , WoSeID = ' . $record['SeID'] . '
                 where WoID = ' . $record['WoID'], 
                 ''
             );
@@ -543,13 +545,13 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
 
     //currently youtube dailymotion and vimeo but youtube-dl can support more
     $pattern = "/(https?:\/\/).*(youtu|dailymotion|vimeo)/i";
-    $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --no-continue -o ".'media'.'/%(title)r-%(id)s-'.$id.'-.%(ext)s';
+    $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." -f bestaudio --no-cache-dir --no-continue -o ".'media'.'/%(title)r-%(id)s-'.$id.'-.%(ext)s';
     $save_to_disk = getSettingWithDefault('set-tts');
 
    
     if($save_to_disk &&  preg_match($pattern,  trim($_REQUEST["TxAudioURI"])) && ($youtubedl = get_youtubedl_path($youtubedl_args)) != "" )
     {
-        $youtubedl_args = "  ". trim($_REQUEST["TxAudioURI"])." -f mp4 --no-cache-dir --get-filename -o media".'/%(title)r-%(id)s-'.$id.'-.%(ext)s ';
+        $youtubedl_args = "  ". trim($_REQUEST["TxAudioURI"])." -f bestaudio --no-cache-dir --get-filename -o media".'/%(title)r-%(id)s-'.$id.'-.%(ext)s ';
         $titleandid = get_youtubedl_path($youtubedl_args);
 
     $handle = popen($titleandid.' 2>&1; '.$youtubedl.' 2>&1', "r");
