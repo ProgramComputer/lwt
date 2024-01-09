@@ -20,6 +20,7 @@ plugins
 # Backup files (Doxygen)
 *.bak
 vendor/
+!vendor/mantas-done/
 .phpunit.result.cache
 
 composer.phar
