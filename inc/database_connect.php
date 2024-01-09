@@ -16,19 +16,19 @@
 function customAutoloader($className) {
     // Check if the class belongs to your specific package
     if (strpos($className, 'Done\\Subtitles\\') === 0) {
+        $className = preg_replace('/^Done\\\\Subtitles\\\\/', '', $className);
         // Convert namespace separators to directory separators
         $classFile = str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
 
         // Build the full path to the class file
-        $filePath = __DIR__ . '/../vendor/mantas-done/subtitles/src' . $classFile;
-
+        $filePath = __DIR__ . '/../vendor/mantas-done/subtitles/src/' . $classFile;
         // Include the class file if it exists
         if (file_exists($filePath)) {
             require_once $filePath;
         }
     }
+    
 }
-
 // Register your custom autoloader
 spl_autoload_register('customAutoloader');
 require_once __DIR__ . "/kernel_utility.php";
@@ -1616,7 +1616,7 @@ function splitCheckText($text, $lid, $id)
     
     try {
         //TRY and see if file has timed text
-        $subtitles =  Subtitles::loadFromString(get_first_value(
+        $subtitles =  \Done\Subtitles\Subtitles::loadFromString(get_first_value(
             'SELECT TxText AS value FROM ' . $tbpref . 'texts 
             WHERE TxID = ' . $id
         ));
