@@ -4163,9 +4163,9 @@ function makeAudioPlayer($audio, $offset=0)
             media_obj['mp4'] = MEDIA;
         } else if (ext == 'webm') {
             media_obj['webma'] = media_obj['webmv'] = MEDIA;
-        } else {
-            media_obj['mp3'] = MEDIA;
-        }
+        } 
+        media_obj['mp3'] = MEDIA;
+        
         $(this)
         .jPlayer("setMedia", media_obj)
         .jPlayer("pause", MEDIA_OFFSET);
