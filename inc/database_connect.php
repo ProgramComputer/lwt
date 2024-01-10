@@ -1616,10 +1616,18 @@ function splitCheckText($text, $lid, $id)
     
     try {
         //TRY and see if file has timed text
-        $subtitles =  \Done\Subtitles\Subtitles::loadFromString(get_first_value(
+        $text = get_first_value(
             'SELECT TxText AS value FROM ' . $tbpref . 'texts 
             WHERE TxID = ' . $id
-        ));
+        );
+        $subtitles =  \Done\Subtitles\Subtitles::loadFromString($text);
+        $modified_string = \Done\Subtitles\Code\Helpers::convertToUtf8($text);
+        $modified_string = \Done\Subtitles\Code\Helpers::removeUtf8Bom($modified_string);
+        $modified_string = \Done\Subtitles\Code\Helpers::normalizeNewLines($modified_string);
+        $input_converter = \Done\Subtitles\Code\Helpers::getConverterByFileContent($modified_string);
+        if(str_contains(get_class($input_converter),"TxtConverter")){
+            return;
+        }
     
         $internalFormat = $subtitles->getInternalFormat();
         $seids= array();

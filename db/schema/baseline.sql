@@ -6,6 +6,7 @@ CREATE TABLE _migrations (
 	filename VARCHAR(255) NOT NULL,
 	PRIMARY KEY (filename)
 );
+
 INSERT INTO _migrations VALUES('19700101_000001_lwt_original.sql');
 INSERT INTO _migrations VALUES('19700102_000001_lwt_fork.sql');
 INSERT INTO _migrations VALUES('20231224_131202_missing_auto_increment.sql');
