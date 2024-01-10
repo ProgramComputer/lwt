@@ -3915,8 +3915,8 @@ function makeMediaPlayer($path, $offset=0)
     /**
     * File extension (if exists) 
     */
-    $extension = substr($path, -4);
-    if ($extension == '.mp3' || $extension == '.wav' || $extension == '.ogg') {
+    $extension = substr($path, -4);                                                     //extractor could be audio only in container  %(format)                      
+    if ($extension == '.mp3' || $extension == '.wav' || $extension == '.ogg' || str_contains($path, "audio only")) {
         makeAudioPlayer($path, $offset);
     } else {
         makeVideoPlayer($path, $offset);

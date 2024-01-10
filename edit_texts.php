@@ -545,13 +545,13 @@ function edit_texts_do_operation($op, $message1, $no_pagestart): string
 
     //currently youtube dailymotion and vimeo but youtube-dl can support more
     $pattern = "/(https?:\/\/).*(youtu|dailymotion|vimeo)/i";
-    $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." -f bestaudio --no-cache-dir --no-continue -o ".'media'.'/%(title)r-%(id)s-'.$id.'-.%(ext)s';
+    $youtubedl_args = " " .trim($_REQUEST["TxAudioURI"])." —restrict-filenames -f bestaudio --no-cache-dir --no-continue -o ".'media'.'/%(id)s-%(format)s-'.$id.'-.%(ext)s';
     $save_to_disk = getSettingWithDefault('set-tts');
 
    
     if($save_to_disk &&  preg_match($pattern,  trim($_REQUEST["TxAudioURI"])) && ($youtubedl = get_youtubedl_path($youtubedl_args)) != "" )
     {
-        $youtubedl_args = "  ". trim($_REQUEST["TxAudioURI"])." -f bestaudio --no-cache-dir --get-filename -o media".'/%(title)r-%(id)s-'.$id.'-.%(ext)s ';
+        $youtubedl_args = "  ". trim($_REQUEST["TxAudioURI"])." —restrict-filenames -f bestaudio --no-cache-dir --get-filename -o media".'/%(id)s-%(format)s-'.$id.'-.%(ext)s ';
         $titleandid = get_youtubedl_path($youtubedl_args);
 
     $handle = popen($titleandid.' 2>&1; '.$youtubedl.' 2>&1', "r");
